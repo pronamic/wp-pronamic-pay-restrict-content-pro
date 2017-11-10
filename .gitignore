@@ -1,0 +1,17 @@
+# Build
+/build/
+
+# Composer
+/vendor/
+
+# Eclipse
+/.buildpath
+/.project
+/.settings
+
+# Node.js
+/node_modules/
+/npm-debug.log
+
+# WordPress content
+/wp-content/

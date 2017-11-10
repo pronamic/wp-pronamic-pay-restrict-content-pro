@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<ruleset name="WordPress Pay Restrict Content Pro rules">
+	<rule ref="WordPress">
+		<exclude name="Generic.Files.LowercasedFilename.NotFound"></exclude>
+
+		<exclude name="Squiz.Commenting"></exclude>
+
+		<!-- Excluded for wp_json_encode() function which is only available since WordPress 4.1 -->
+		<exclude name="WordPress.PHP.DiscouragedFunctions.DiscouragedWithAlternative"></exclude>
+	</rule>
+</ruleset>

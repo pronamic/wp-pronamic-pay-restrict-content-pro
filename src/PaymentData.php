@@ -161,7 +161,7 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 
 			$user_id = $user->ID;
 		} else {
-			$payments = new RCP_Payments;
+			$payments = new RCP_Payments();
 			$payment  = $payments->get_payment( $this->payment_id );
 
 			if ( $payment ) {

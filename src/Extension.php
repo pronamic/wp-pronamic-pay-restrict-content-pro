@@ -204,26 +204,42 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 		switch( $new_status ) {
 			case 'active' :
 				$status = Pronamic_WP_Pay_Statuses::ACTIVE;
-				$note   = __( 'Subscription activated by Restrict Content Pro', 'pronamic_ideal' );
+
+				$note = sprintf(
+					__( 'Subscription activated by %s', 'pronamic_ideal' ),
+					__( 'Restrict Content Pro', 'pronamic_ideal' )
+				);
 
 				break;
 
 			case 'cancelled' :
 				$status = Pronamic_WP_Pay_Statuses::CANCELLED;
-				$note   = __( 'Subscription cancelled by Restrict Content Pro', 'pronamic_ideal' );
+
+				$note = sprintf(
+					__( 'Subscription canceled by %s', 'pronamic_ideal' ),
+					__( 'Restrict Content Pro', 'pronamic_ideal' )
+				);
 
 				break;
 
 			case 'free' :
 			case 'expired' :
 				$status = Pronamic_WP_Pay_Statuses::COMPLETED;
-				$note   = __( 'Subscription completed by Restrict Content Pro', 'pronamic_ideal' );
 
-				break;
+				$note   = sprintf(
+					__( 'Subscription completed by %s', 'pronamic_ideal' ),
+					__( 'Restrict Content Pro', 'pronamic_ideal' )
+				);
+
+			break;
 
 			case 'pending' :
 				$status = Pronamic_WP_Pay_Statuses::OPEN;
-				$note   = __( 'Subscription pending by Restrict Content Pro', 'pronamic_ideal' );
+
+				$note   = sprintf(
+					__( 'Subscription pending by %s', 'pronamic_ideal' ),
+					__( 'Restrict Content Pro', 'pronamic_ideal' )
+				);
 
 				break;
 		}

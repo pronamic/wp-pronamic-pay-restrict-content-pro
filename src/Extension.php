@@ -174,8 +174,6 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 						$auto_renew = true;
 					}
 
-					error_log( 'RCP user auto renew: ' . (int) $auto_renew . ' (user ID: ' . $data->get_user_id() . ')' );
-
 					$member->renew( $auto_renew, 'active' );
 				}
 

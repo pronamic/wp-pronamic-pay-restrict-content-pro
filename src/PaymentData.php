@@ -64,6 +64,7 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 	//////////////////////////////////////////////////
 
 	public function get_title() {
+		/* translators: %s: order id */
 		return sprintf( __( 'Restrict Content Pro order %s', 'pronamic_ideal' ), $this->get_order_id() );
 	}
 

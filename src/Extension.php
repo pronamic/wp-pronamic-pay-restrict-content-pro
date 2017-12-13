@@ -53,24 +53,24 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 			add_filter( 'rcp_accepted_payment_icons', array( __CLASS__, 'accepted_payment_icons' ) );
 		}
 
-		add_filter( 'pronamic_payment_source_description_restrictcontentpro',   array( __CLASS__, 'source_description' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_url_restrictcontentpro',   array( __CLASS__, 'source_url' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_description_restrictcontentpro', array( __CLASS__, 'source_description' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_url_restrictcontentpro', array( __CLASS__, 'source_url' ), 10, 2 );
 	}
 
 	/**
 	 * Restrict Content Pro payment status 'Cancelled' label.
 	 */
 	public static function rcp_status_label_cancelled( $label, $status ) {
-		switch( $status ) {
-			case 'cancelled' :
+		switch ( $status ) {
+			case 'cancelled':
 				$label = _x( 'Cancelled', 'Payment status', 'pronamic_ideal' );
 
 				break;
-			case 'expired' :
+			case 'expired':
 				$label = _x( 'Expired', 'Payment status', 'pronamic_ideal' );
 
 				break;
-			case 'failed' :
+			case 'failed':
 				$label = _x( 'Failed', 'Payment status', 'pronamic_ideal' );
 
 				break;
@@ -94,23 +94,23 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 		$url = $data->get_normal_return_url();
 
 		switch ( $payment->get_status() ) {
-			case Pronamic_WP_Pay_Statuses::CANCELLED :
+			case Pronamic_WP_Pay_Statuses::CANCELLED:
 				$url = $data->get_cancel_url();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::EXPIRED :
+			case Pronamic_WP_Pay_Statuses::EXPIRED:
 				$url = $data->get_error_url();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::FAILURE :
+			case Pronamic_WP_Pay_Statuses::FAILURE:
 				$url = $data->get_error_url();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::SUCCESS :
+			case Pronamic_WP_Pay_Statuses::SUCCESS:
 				$url = $data->get_success_url();
 
 				break;
-			case Pronamic_WP_Pay_Statuses::OPEN :
+			case Pronamic_WP_Pay_Statuses::OPEN:
 				// Nothing to do?
 
 				break;
@@ -140,7 +140,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 		$member = new RCP_Member( $data->get_user_id() );
 
 		switch ( $payment->get_status() ) {
-			case Pronamic_WP_Pay_Statuses::CANCELLED :
+			case Pronamic_WP_Pay_Statuses::CANCELLED:
 				$payments->update( $source_id, array( 'status' => Pronamic_WP_Pay_Extensions_RCP_RestrictContentPro::PAYMENT_STATUS_CANCELLED ) );
 
 				if ( $member ) {
@@ -148,7 +148,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 				}
 
 				break;
-			case Pronamic_WP_Pay_Statuses::EXPIRED :
+			case Pronamic_WP_Pay_Statuses::EXPIRED:
 				$payments->update( $source_id, array( 'status' => Pronamic_WP_Pay_Extensions_RCP_RestrictContentPro::PAYMENT_STATUS_EXPIRED ) );
 
 				if ( $member ) {
@@ -156,7 +156,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 				}
 
 				break;
-			case Pronamic_WP_Pay_Statuses::FAILURE :
+			case Pronamic_WP_Pay_Statuses::FAILURE:
 				$payments->update( $source_id, array( 'status' => Pronamic_WP_Pay_Extensions_RCP_RestrictContentPro::PAYMENT_STATUS_FAILED ) );
 
 				if ( $member ) {
@@ -164,7 +164,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 				}
 
 				break;
-			case Pronamic_WP_Pay_Statuses::SUCCESS :
+			case Pronamic_WP_Pay_Statuses::SUCCESS:
 				$payments->update( $source_id, array( 'status' => Pronamic_WP_Pay_Extensions_RCP_RestrictContentPro::PAYMENT_STATUS_COMPLETE ) );
 
 				if ( $member ) {
@@ -174,13 +174,11 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 						$auto_renew = true;
 					}
 
-					error_log( 'RCP user auto renew: ' . (int) $auto_renew . ' (user ID: ' . $data->get_user_id() . ')' );
-
 					$member->renew( $auto_renew, 'active' );
 				}
 
 				break;
-			case Pronamic_WP_Pay_Statuses::OPEN :
+			case Pronamic_WP_Pay_Statuses::OPEN:
 				// Nothing to do?
 
 				break;
@@ -203,29 +201,49 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 
 		$note = null;
 
-		switch( $new_status ) {
-			case 'active' :
+		switch ( $new_status ) {
+			case 'active':
 				$status = Pronamic_WP_Pay_Statuses::ACTIVE;
-				$note   = __( 'Subscription activated by Restrict Content Pro', 'pronamic_ideal' );
+
+				$note = sprintf(
+					/* translators: %s: Restrict Content Pro */
+					__( 'Subscription activated by %s', 'pronamic_ideal' ),
+					__( 'Restrict Content Pro', 'pronamic_ideal' )
+				);
 
 				break;
 
-			case 'cancelled' :
+			case 'cancelled':
 				$status = Pronamic_WP_Pay_Statuses::CANCELLED;
-				$note   = __( 'Subscription cancelled by Restrict Content Pro', 'pronamic_ideal' );
+
+				$note = sprintf(
+					/* translators: %s: Restrict Content Pro */
+					__( 'Subscription canceled by %s', 'pronamic_ideal' ),
+					__( 'Restrict Content Pro', 'pronamic_ideal' )
+				);
 
 				break;
 
-			case 'free' :
-			case 'expired' :
+			case 'free':
+			case 'expired':
 				$status = Pronamic_WP_Pay_Statuses::COMPLETED;
-				$note   = __( 'Subscription completed by Restrict Content Pro', 'pronamic_ideal' );
+
+				$note = sprintf(
+					/* translators: %s: Restrict Content Pro */
+					__( 'Subscription completed by %s', 'pronamic_ideal' ),
+					__( 'Restrict Content Pro', 'pronamic_ideal' )
+				);
 
 				break;
 
-			case 'pending' :
+			case 'pending':
 				$status = Pronamic_WP_Pay_Statuses::OPEN;
-				$note   = __( 'Subscription pending by Restrict Content Pro', 'pronamic_ideal' );
+
+				$note = sprintf(
+					/* translators: %s: Restrict Content Pro */
+					__( 'Subscription pending by %s', 'pronamic_ideal' ),
+					__( 'Restrict Content Pro', 'pronamic_ideal' )
+				);
 
 				break;
 		}
@@ -242,7 +260,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 	/**
 	 * Source column
 	 *
-	 * @param string				  $text
+	 * @param string $text
 	 * @param Pronamic_WP_Pay_Payment $payment
 	 *
 	 * @return string $text
@@ -259,6 +277,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 		$text .= sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( $source_url ),
+			/* translators: %s: source id */
 			sprintf( __( 'Payment %s', 'pronamic_ideal' ), $payment->source_id )
 		);
 

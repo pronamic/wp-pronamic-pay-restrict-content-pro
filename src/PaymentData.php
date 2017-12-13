@@ -64,6 +64,7 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 	//////////////////////////////////////////////////
 
 	public function get_title() {
+		/* translators: %s: order id */
 		return sprintf( __( 'Restrict Content Pro order %s', 'pronamic_ideal' ), $this->get_order_id() );
 	}
 
@@ -161,7 +162,7 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 
 			$user_id = $user->ID;
 		} else {
-			$payments = new RCP_Payments;
+			$payments = new RCP_Payments();
 			$payment  = $payments->get_payment( $this->payment_id );
 
 			if ( $payment ) {

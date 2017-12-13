@@ -121,13 +121,24 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 		<table class="form-table">
 			<tr valign="top">
 				<th colspan=2>
-					<h3><?php echo sprintf( __( '%s Settings', 'pronamic_ideal' ), $this->admin_label ); ?></h3>
+					<?php
+
+					printf(
+						'<h3>%s</h3>',
+						sprintf(
+							/* translators: %s: admin label */
+							__( '%s Settings', 'pronamic_ideal' ),
+							$this->admin_label
+						)
+					);
+
+					?>
 				</th>
 			</tr>
 
 			<tr>
 				<th>
-					<label for="rcp_settings[<?php echo esc_attr( $this->id . '_label'); ?>]"><?php _e( 'Checkout label', 'pronamic_ideal' ); ?></label>
+					<label for="rcp_settings[<?php echo esc_attr( $this->id . '_label' ); ?>]"><?php esc_html_e( 'Checkout label', 'pronamic_ideal' ); ?></label>
 				</th>
 				<td>
 					<?php
@@ -142,13 +153,13 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 
 					<input class="regular-text" id="rcp_settings[<?php echo esc_attr( $label_option ); ?>]" style="width: 300px;" name="rcp_settings[<?php echo esc_attr( $label_option ); ?>]" value="<?php echo esc_attr( $label ); ?>" />
 
-					<p class="description"><?php _e( 'Enter a label to display at checkout.', 'pronamic_ideal' ); ?></p>
+					<p class="description"><?php esc_html_e( 'Enter a label to display at checkout.', 'pronamic_ideal' ); ?></p>
 				</td>
 			</tr>
 
 			<tr>
 				<th>
-					<label for="rcp_settings[<?php echo esc_attr( $config_option ); ?>]"><?php _e( 'Gateway Configuration', 'pronamic_ideal' ); ?></label>
+					<label for="rcp_settings[<?php echo esc_attr( $config_option ); ?>]"><?php esc_html_e( 'Gateway Configuration', 'pronamic_ideal' ); ?></label>
 				</th>
 				<td>
 					<?php
@@ -167,7 +178,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 
 					?>
 
-					<p class="description"><?php _e( 'Choose your configuration.', 'pronamic_ideal' ); ?></p>
+					<p class="description"><?php esc_html_e( 'Choose your configuration.', 'pronamic_ideal' ); ?></p>
 				</td>
 			</tr>
 		</table>
@@ -280,6 +291,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 		if ( ! $payment_id ) {
 			do_action( 'rcp_registration_failed', $this );
 
+			/* translators: %s: JSON encoded payment data */
 			wp_die( sprintf( __( 'Payment creation failed before sending buyer to the payment provider. Payment data: %s', 'pronamic_ideal' ), json_encode( $payment_data ) ), __( 'Payment Error', 'pronamic_ideal' ), array( 'response' => '401' ) );
 		} else {
 			$data = new Pronamic_WP_Pay_Extensions_RCP_PaymentData( $payment_id, $payment_data );
@@ -311,6 +323,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 				if ( is_wp_error( $error ) ) {
 					do_action( 'rcp_registration_failed', $this );
 
+					/* translators: %s: JSON encoded payment data */
 					wp_die( sprintf( __( 'Payment creation failed before sending buyer to the payment provider. Payment data: %s', 'pronamic_ideal' ), json_encode( $payment_data ) ), __( 'Payment Error', 'pronamic_ideal' ), array( 'response' => '401' ) );
 				} else {
 					// Transaction ID

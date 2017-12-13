@@ -17,37 +17,32 @@ class Pronamic_WP_Pay_Extensions_RCP_Util {
 	 * @return boolean
 	 */
 	public static function get_subscription_by_user( $user_id = null ) {
-		if ( ! $user_id ) {
+		if ( empty( $user_id ) ) {
 			return;
 		}
 
-		global $wpdb;
+		$query = new WP_Query( array(
+			'fields'         => 'ids',
+			'post_type'      => 'pronamic_pay_subscr',
+			'author'         => $user_id,
+			'meta_query'     => array(
+				array(
+					'key'   => '_pronamic_subscription_source',
+					'value' => 'restrictcontentpro',
+				),
+			),
+			'no_found_rows'  => true,
+			'order'          => 'DESC',
+			'orderby'        => 'ID',
+			'posts_per_page' => 1,
+		) );
 
-		$subscription = null;
+		$post_id = reset( $query->posts );
 
-		$db_query = $wpdb->prepare( "
-		SELECT
-			p.ID
-		FROM
-			wp_posts as `p`
-		LEFT JOIN wp_postmeta as `m` ON p.ID = m.post_id
-		WHERE
-			p.post_type = 'pronamic_pay_subscr'
-				AND
-			p.post_author = '%s'
-				AND
-			m.meta_key = '_pronamic_subscription_source'
-				AND
-			m.meta_value = 'restrictcontentpro'
-		ORDER BY p.ID DESC
-		LIMIT 1;", $user_id );
-
-		$post_id = $wpdb->get_var( $db_query ); // WPCS: unprepared SQL ok.
-
-		if ( $post_id ) {
-			$subscription = new Pronamic_WP_Pay_Subscription( $post_id );
+		if ( false === $post_id ) {
+			return;
 		}
 
-		return $subscription;
+		return new Pronamic_WP_Pay_Subscription( $post_id );
 	}
 }

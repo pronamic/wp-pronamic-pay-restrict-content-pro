@@ -10,9 +10,13 @@
 	<rule ref="PHPCompatibility" />
 
 	<rule ref="WordPress">
+		<exclude name="Squiz.Commenting"></exclude>
+
 		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
 		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"></exclude>
 
-		<exclude name="Squiz.Commenting"></exclude>
+		<exclude name="WordPress.VIP.RestrictedFunctions.user_meta_get_user_meta" />
+
+		<exclude name="WordPress.VIP.SlowDBQuery.slow_db_query_meta_query" />
 	</rule>
 </ruleset>

@@ -24,6 +24,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Util {
 		$query = new WP_Query( array(
 			'fields'         => 'ids',
 			'post_type'      => 'pronamic_pay_subscr',
+			'post_status'    => 'any',
 			'author'         => $user_id,
 			'meta_query'     => array(
 				array(

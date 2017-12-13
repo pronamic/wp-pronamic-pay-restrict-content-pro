@@ -125,11 +125,11 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 
 					printf(
 						'<h3>%s</h3>',
-						sprintf(
+						esc_html( sprintf(
 							/* translators: %s: admin label */
 							__( '%s Settings', 'pronamic_ideal' ),
 							$this->admin_label
-						)
+						) )
 					);
 
 					?>
@@ -195,7 +195,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 	 * @see https://github.com/restrictcontentpro/restrict-content-pro/blob/1.9.4/includes/checkout/template.php#L167
 	 */
 	public function payment_fields() {
-		echo $this->fields();
+		echo $this->fields(); // WPCS: XSS ok.
 	}
 
 	public function fields() {
@@ -212,9 +212,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 
 			if ( $input ) {
 				echo '<fieldset class="rcp_card_fieldset"><p>';
-				// @codingStandardsIgnoreStart
-				echo $input;
-				// @codingStandardsIgnoreEnd
+				echo $input; // WPCS: XSS ok.
 				echo '</p></fieldset>';
 			}
 		}
@@ -291,8 +289,15 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 		if ( ! $payment_id ) {
 			do_action( 'rcp_registration_failed', $this );
 
-			/* translators: %s: JSON encoded payment data */
-			wp_die( sprintf( __( 'Payment creation failed before sending buyer to the payment provider. Payment data: %s', 'pronamic_ideal' ), json_encode( $payment_data ) ), __( 'Payment Error', 'pronamic_ideal' ), array( 'response' => '401' ) );
+			wp_die(
+				esc_html( sprintf(
+					/* translators: %s: JSON encoded payment data */
+					__( 'Payment creation failed before sending buyer to the payment provider. Payment data: %s', 'pronamic_ideal' ),
+					wp_json_encode( $payment_data )
+				) ),
+				esc_html__( 'Payment Error', 'pronamic_ideal' ),
+				array( 'response' => '401' )
+			);
 		} else {
 			$data = new Pronamic_WP_Pay_Extensions_RCP_PaymentData( $payment_id, $payment_data );
 
@@ -323,8 +328,15 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 				if ( is_wp_error( $error ) ) {
 					do_action( 'rcp_registration_failed', $this );
 
-					/* translators: %s: JSON encoded payment data */
-					wp_die( sprintf( __( 'Payment creation failed before sending buyer to the payment provider. Payment data: %s', 'pronamic_ideal' ), json_encode( $payment_data ) ), __( 'Payment Error', 'pronamic_ideal' ), array( 'response' => '401' ) );
+					wp_die(
+						esc_html( sprintf(
+							/* translators: %s: JSON encoded payment data */
+							__( 'Payment creation failed before sending buyer to the payment provider. Payment data: %s', 'pronamic_ideal' ),
+							wp_json_encode( $payment_data )
+						) ),
+						esc_html__( 'Payment Error', 'pronamic_ideal' ),
+						array( 'response' => '401' )
+					);
 				} else {
 					// Transaction ID
 					if ( '' !== $payment->get_transaction_id() ) {
@@ -340,7 +352,11 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 			} else {
 				do_action( 'rcp_registration_failed', $this );
 
-				wp_die( Pronamic_WP_Pay_Plugin::get_default_error_message(), __( 'Payment Error', 'pronamic_ideal' ), array( 'response' => '401' ) );
+				wp_die(
+					esc_html( Pronamic_WP_Pay_Plugin::get_default_error_message() ),
+					esc_html__( 'Payment Error', 'pronamic_ideal' ),
+					array( 'response' => '401' )
+				);
 			}
 		}
 	}

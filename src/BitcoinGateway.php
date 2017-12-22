@@ -12,7 +12,7 @@
  */
 class Pronamic_WP_Pay_Extensions_RCP_BitcoinGateway extends Pronamic_WP_Pay_Extensions_RCP_Gateway {
 	/**
-	 * Construct and initialize Credit Card gateway
+	 * Construct and initialize Bitcoin gateway
 	 */
 	public function init() {
 		$this->id             = 'pronamic_pay_bitcoin';

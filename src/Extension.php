@@ -31,16 +31,17 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 			 * @since 1.1.0
 			 */
 			new Pronamic_WP_Pay_Extensions_RCP_Gateway();
+			new Pronamic_WP_Pay_Extensions_RCP_BancontactGateway();
 			new Pronamic_WP_Pay_Extensions_RCP_BankTransferGateway();
 			new Pronamic_WP_Pay_Extensions_RCP_BitcoinGateway();
 			new Pronamic_WP_Pay_Extensions_RCP_CreditCardGateway();
 			new Pronamic_WP_Pay_Extensions_RCP_DirectDebitGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_IDealGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_BancontactGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_SofortGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_DirectDebitIDealGateway();
 			new Pronamic_WP_Pay_Extensions_RCP_DirectDebitBancontactGateway();
+			new Pronamic_WP_Pay_Extensions_RCP_DirectDebitIDealGateway();
 			new Pronamic_WP_Pay_Extensions_RCP_DirectDebitSofortGateway();
+			new Pronamic_WP_Pay_Extensions_RCP_IDealGateway();
+			new Pronamic_WP_Pay_Extensions_RCP_PayPalGateway();
+			new Pronamic_WP_Pay_Extensions_RCP_SofortGateway();
 
 			add_action( 'pronamic_payment_status_update_restrictcontentpro', array( __CLASS__, 'status_update' ), 10, 1 );
 			add_filter( 'pronamic_payment_redirect_url_restrictcontentpro', array( __CLASS__, 'redirect_url' ), 10, 2 );

@@ -258,10 +258,6 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 			'status'           => 'pending',
 		);
 
-		// Record the pending payment
-		$payments   = new RCP_Payments();
-		$payment_id = $payments->insert( $rcp_payment_data );
-
 		$data = array(
 			'email'             => $subscription_data['user_email'],
 			'user_name'         => $subscription_data['user_name'],
@@ -284,6 +280,17 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 		$member = new RCP_Member( $payment_data['user_id'] );
 
 		$member->set_recurring( $payment_data['auto_renew'] );
+
+		// Record the pending payment
+		$payments = new RCP_Payments();
+
+		if ( ! is_callable( array( $member, 'get_pending_payment_id' ) ) || ! $member->get_pending_payment_id() ) {
+			$payment_id = $payments->insert( $rcp_payment_data );
+		} else {
+			$payment_id = $member->get_pending_payment_id();
+
+			$payments->update( $payment_id, $rcp_payment_data );
+		}
 
 		// Check payment
 		if ( ! $payment_id ) {

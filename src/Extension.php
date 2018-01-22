@@ -169,7 +169,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 			case Pronamic_WP_Pay_Statuses::SUCCESS:
 				$payments->update( $source_id, array( 'status' => Pronamic_WP_Pay_Extensions_RCP_RestrictContentPro::PAYMENT_STATUS_COMPLETE ) );
 
-				if ( $member ) {
+				if ( $member && ! is_callable( array( $member, 'get_pending_payment_id' ) ) ) {
 					$auto_renew = false;
 
 					if ( 'yes' === get_user_meta( $data->get_user_id(), 'rcp_recurring', true ) ) {

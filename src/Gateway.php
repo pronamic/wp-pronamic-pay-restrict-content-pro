@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Plugin;
 
 /**
  * Title: Restrict Content Pro gateway
@@ -203,7 +204,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 
 		ob_start();
 
-		$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $rcp_options[ $this->id . '_config_id' ] );
+		$gateway = Plugin::get_gateway( $rcp_options[ $this->id . '_config_id' ] );
 
 		if ( $gateway ) {
 			$gateway->set_payment_method( $this->payment_method );
@@ -308,7 +309,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 		} else {
 			$data = new Pronamic_WP_Pay_Extensions_RCP_PaymentData( $payment_id, $payment_data );
 
-			$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $config_id );
+			$gateway = Plugin::get_gateway( $config_id );
 
 			if ( $gateway ) {
 				// Maybe update existing subscription
@@ -328,7 +329,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 				}
 
 				// Start
-				$payment = Pronamic_WP_Pay_Plugin::start( $config_id, $gateway, $data, $this->payment_method );
+				$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
 
 				$error = $gateway->get_error();
 
@@ -360,7 +361,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 				do_action( 'rcp_registration_failed', $this );
 
 				wp_die(
-					esc_html( Pronamic_WP_Pay_Plugin::get_default_error_message() ),
+					esc_html( Plugin::get_default_error_message() ),
 					esc_html__( 'Payment Error', 'pronamic_ideal' ),
 					array( 'response' => '401' )
 				);

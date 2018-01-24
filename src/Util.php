@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 
 /**
  * Title: Restrict Content Pro Util
@@ -44,6 +45,6 @@ class Pronamic_WP_Pay_Extensions_RCP_Util {
 			return;
 		}
 
-		return new Pronamic_WP_Pay_Subscription( $post_id );
+		return new Subscription( $post_id );
 	}
 }

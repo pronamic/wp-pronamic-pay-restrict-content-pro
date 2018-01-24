@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Plugin;
 
 /**
  * Title: Restrict Content Pro Credit Card gateway
@@ -26,7 +27,7 @@ class Pronamic_WP_Pay_Extensions_RCP_CreditCardGateway extends Pronamic_WP_Pay_E
 		$config_option = $this->id . '_config_id';
 
 		if ( isset( $rcp_options[ $config_option ] ) ) {
-			$gateway = Pronamic_WP_Pay_Plugin::get_gateway( $rcp_options[ $config_option ] );
+			$gateway = Plugin::get_gateway( $rcp_options[ $config_option ] );
 
 			if ( $gateway && $gateway->supports( 'recurring_credit_card' ) ) {
 				$this->supports = array(

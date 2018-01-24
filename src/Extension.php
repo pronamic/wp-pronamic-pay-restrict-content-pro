@@ -1,4 +1,6 @@
 <?php
+use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Plugin;
 
 /**
  * Title: Restrict Content Pro iDEAL Add-On
@@ -84,8 +86,9 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 	/**
 	 * Payment redirect URL filter.
 	 *
-	 * @param string                  $url
-	 * @param Pronamic_WP_Pay_Payment $payment
+	 * @param string  $url
+	 * @param Payment $payment
+	 *
 	 * @return string
 	 */
 	public static function redirect_url( $url, $payment ) {
@@ -253,7 +256,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 		if ( isset( $status ) ) {
 			$subscription->update_status( $status, $note );
 
-			Pronamic_WP_Pay_Plugin::update_subscription( $subscription, false );
+			Plugin::update_subscription( $subscription, false );
 		}
 	}
 
@@ -263,11 +266,11 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 	 * Source column
 	 *
 	 * @param string $text
-	 * @param Pronamic_WP_Pay_Payment $payment
+	 * @param Payment $payment
 	 *
 	 * @return string $text
 	 */
-	public static function source_text( $text, Pronamic_WP_Pay_Payment $payment ) {
+	public static function source_text( $text, Payment $payment ) {
 		$text = __( 'Restrict Content Pro', 'pronamic_ideal' ) . '<br />';
 
 		$source_url = add_query_arg(
@@ -321,23 +324,19 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 	 */
 	public static function accepted_payment_icons( $icons ) {
 		// iDEAL
-		$key = plugins_url( 'images/ideal/icon-64x48.png', Pronamic_WP_Pay_Plugin::$file );
-
+		$key           = plugins_url( 'images/ideal/icon-64x48.png', Plugin::$file );
 		$icons[ $key ] = __( 'iDEAL', 'pronamic_ideal' );
 
 		// Bancontact/Mister Cash
-		$key = plugins_url( 'images/bancontact/icon-64x48.png', Pronamic_WP_Pay_Plugin::$file );
-
+		$key           = plugins_url( 'images/bancontact/icon-64x48.png', Plugin::$file );
 		$icons[ $key ] = __( 'Bancontact', 'pronamic_ideal' );
 
 		// Bitcoin
-		$key = plugins_url( 'images/bitcoin/icon-64x48.png', Pronamic_WP_Pay_Plugin::$file );
-
+		$key           = plugins_url( 'images/bitcoin/icon-64x48.png', Plugin::$file );
 		$icons[ $key ] = __( 'Bitcoin', 'pronamic_ideal' );
 
 		// Sofort
-		$key = plugins_url( 'images/sofort/icon-64x48.png', Pronamic_WP_Pay_Plugin::$file );
-
+		$key           = plugins_url( 'images/sofort/icon-64x48.png', Plugin::$file );
 		$icons[ $key ] = __( 'SOFORT Überweisung', 'pronamic_ideal' );
 
 		return $icons;

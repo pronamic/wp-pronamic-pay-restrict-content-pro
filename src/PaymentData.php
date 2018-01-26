@@ -1,5 +1,8 @@
 <?php
+use Pronamic\WordPress\Pay\Core\Util;
 use Pronamic\WordPress\Pay\Payments\PaymentData;
+use Pronamic\WordPress\Pay\Payments\Item;
+use Pronamic\WordPress\Pay\Payments\Items;
 
 /**
  * Title: Restrict Content Pro payment data
@@ -91,15 +94,15 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends PaymentData {
 	 * Get items
 	 *
 	 * @see Pronamic_Pay_PaymentDataInterface::get_items()
-	 * @return Pronamic_IDeal_Items
+	 * @return Items
 	 */
 	public function get_items() {
 		// Items
-		$items = new Pronamic_IDeal_Items();
+		$items = new Items();
 
 		// Item
 		// We only add one total item, because iDEAL cant work with negative price items (discount)
-		$item = new Pronamic_IDeal_Item();
+		$item = new Item();
 		$item->setNumber( $this->payment_id );
 		$item->setDescription( $this->get_description() );
 		$item->setPrice( $this->payment_data['amount'] );
@@ -210,7 +213,7 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends PaymentData {
 		$subscription                  = new Pronamic_Pay_Subscription();
 		$subscription->frequency       = '';
 		$subscription->interval        = $subscription_data['length'];
-		$subscription->interval_period = Pronamic_WP_Pay_Util::to_period( $subscription_data['length_unit'] );
+		$subscription->interval_period = Util::to_period( $subscription_data['length_unit'] );
 		$subscription->amount          = $subscription_data['recurring_price'];
 		$subscription->currency        = $this->get_currency();
 		$subscription->description     = $this->get_description();

@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: Restrict Content Pro iDEAL gateway
@@ -18,6 +19,6 @@ class Pronamic_WP_Pay_Extensions_RCP_IDealGateway extends Pronamic_WP_Pay_Extens
 		$this->id             = 'pronamic_pay_ideal';
 		$this->label          = __( 'iDEAL', 'pronamic_ideal' );
 		$this->admin_label    = __( 'iDEAL', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::IDEAL;
+		$this->payment_method = PaymentMethods::IDEAL;
 	}
 }

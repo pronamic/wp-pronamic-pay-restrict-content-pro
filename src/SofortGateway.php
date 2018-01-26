@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: Restrict Content Pro Sofort gateway
@@ -18,6 +19,6 @@ class Pronamic_WP_Pay_Extensions_RCP_SofortGateway extends Pronamic_WP_Pay_Exten
 		$this->id             = 'pronamic_pay_sofort';
 		$this->label          = __( 'SOFORT Banking', 'pronamic_ideal' );
 		$this->admin_label    = __( 'SOFORT Banking', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::SOFORT;
+		$this->payment_method = PaymentMethods::SOFORT;
 	}
 }

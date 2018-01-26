@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: Restrict Content Pro PayPal gateway
@@ -18,6 +19,6 @@ class Pronamic_WP_Pay_Extensions_RCP_PayPalGateway extends Pronamic_WP_Pay_Exten
 		$this->id             = 'pronamic_pay_paypal';
 		$this->label          = __( 'PayPal', 'pronamic_ideal' );
 		$this->admin_label    = __( 'PayPal', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::PAYPAL;
+		$this->payment_method = PaymentMethods::PAYPAL;
 	}
 }

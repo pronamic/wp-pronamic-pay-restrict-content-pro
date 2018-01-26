@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: Restrict Content Pro Bitcoin gateway
@@ -18,6 +19,6 @@ class Pronamic_WP_Pay_Extensions_RCP_BitcoinGateway extends Pronamic_WP_Pay_Exte
 		$this->id             = 'pronamic_pay_bitcoin';
 		$this->label          = __( 'Bitcoin', 'pronamic_ideal' );
 		$this->admin_label    = __( 'Bitcoin', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::BITCOIN;
+		$this->payment_method = PaymentMethods::BITCOIN;
 	}
 }

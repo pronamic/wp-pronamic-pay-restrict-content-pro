@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: Restrict Content Pro Direct Debit (mandate via iDEAL) gateway
@@ -18,7 +19,7 @@ class Pronamic_WP_Pay_Extensions_RCP_DirectDebitIDealGateway extends Pronamic_WP
 		$this->id             = 'pronamic_pay_direct_debit_ideal';
 		$this->label          = __( 'Direct Debit (mandate via iDEAL)', 'pronamic_ideal' );
 		$this->admin_label    = __( 'Direct Debit (mandate via iDEAL)', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT_IDEAL;
+		$this->payment_method = PaymentMethods::DIRECT_DEBIT_IDEAL;
 		$this->supports       = array(
 			'recurring',
 		);

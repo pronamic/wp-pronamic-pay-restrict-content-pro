@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: Restrict Content Pro Bank Transfer gateway
@@ -18,6 +19,6 @@ class Pronamic_WP_Pay_Extensions_RCP_BankTransferGateway extends Pronamic_WP_Pay
 		$this->id             = 'pronamic_pay_bank_transfer';
 		$this->label          = __( 'Bank Transfer', 'pronamic_ideal' );
 		$this->admin_label    = __( 'Bank Transfer', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::BANK_TRANSFER;
+		$this->payment_method = PaymentMethods::BANK_TRANSFER;
 	}
 }

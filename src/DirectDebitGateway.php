@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
  * Title: Restrict Content Pro Credit Card gateway
@@ -18,6 +19,6 @@ class Pronamic_WP_Pay_Extensions_RCP_DirectDebitGateway extends Pronamic_WP_Pay_
 		$this->id             = 'pronamic_pay_direct_debit';
 		$this->label          = __( 'Direct Debit', 'pronamic_ideal' );
 		$this->admin_label    = __( 'Direct Debit', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::DIRECT_DEBIT;
+		$this->payment_method = PaymentMethods::DIRECT_DEBIT;
 	}
 }

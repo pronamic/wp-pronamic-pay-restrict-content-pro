@@ -1,4 +1,5 @@
 <?php
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
@@ -21,7 +22,7 @@ class Pronamic_WP_Pay_Extensions_RCP_CreditCardGateway extends Pronamic_WP_Pay_E
 		$this->id             = 'pronamic_pay_credit_card';
 		$this->label          = __( 'Credit Card', 'pronamic_ideal' );
 		$this->admin_label    = __( 'Credit Card', 'pronamic_ideal' );
-		$this->payment_method = Pronamic_WP_Pay_PaymentMethods::CREDIT_CARD;
+		$this->payment_method = PaymentMethods::CREDIT_CARD;
 
 		// Recurring subscription payments
 		$config_option = $this->id . '_config_id';

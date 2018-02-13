@@ -53,9 +53,6 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 			add_filter( 'rcp_payment_status_label', array( __CLASS__, 'rcp_status_label_cancelled' ), 10, 2 );
 
 			add_action( 'rcp_set_status', array( __CLASS__, 'rcp_set_status' ), 10, 3 );
-
-			// Icons
-			add_filter( 'rcp_accepted_payment_icons', array( __CLASS__, 'accepted_payment_icons' ) );
 		}
 
 		add_filter( 'pronamic_payment_source_description_restrictcontentpro', array( __CLASS__, 'source_description' ), 10, 2 );
@@ -310,36 +307,5 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 		);
 
 		return $url;
-	}
-
-	//////////////////////////////////////////////////
-
-	/**
-	 * Accepted payment icons
-	 *
-	 * @see https://github.com/restrictcontentpro/restrict-content-pro/blob/2.1.3/includes/admin/settings/register-settings.php#L261-L268
-	 * @see https://github.com/restrictcontentpro/restrict-content-pro/blob/2.1.3/includes/checkout/template.php#L573-L609
-	 *
-	 * @param array $icons
-	 * @return array
-	 */
-	public static function accepted_payment_icons( $icons ) {
-		// iDEAL
-		$key           = plugins_url( 'images/ideal/icon-64x48.png', Plugin::$file );
-		$icons[ $key ] = __( 'iDEAL', 'pronamic_ideal' );
-
-		// Bancontact/Mister Cash
-		$key           = plugins_url( 'images/bancontact/icon-64x48.png', Plugin::$file );
-		$icons[ $key ] = __( 'Bancontact', 'pronamic_ideal' );
-
-		// Bitcoin
-		$key           = plugins_url( 'images/bitcoin/icon-64x48.png', Plugin::$file );
-		$icons[ $key ] = __( 'Bitcoin', 'pronamic_ideal' );
-
-		// Sofort
-		$key           = plugins_url( 'images/sofort/icon-64x48.png', Plugin::$file );
-		$icons[ $key ] = __( 'SOFORT Überweisung', 'pronamic_ideal' );
-
-		return $icons;
 	}
 }

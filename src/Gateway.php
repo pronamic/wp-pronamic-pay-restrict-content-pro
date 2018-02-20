@@ -1,5 +1,13 @@
 <?php
+
+namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
+
+use Pronamic\WordPress\Pay\Admin\AdminModule;
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
+use RCP_Member;
+use RCP_Payment_Gateway;
+use RCP_Payments;
 
 /**
  * Title: Restrict Content Pro gateway
@@ -7,17 +15,24 @@ use Pronamic\WordPress\Pay\Plugin;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
+ * @author  Reüel van der Steege
  * @version unreleased
- * @since 1.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
+class Gateway extends RCP_Payment_Gateway {
 	/**
 	 * ID
 	 *
 	 * @var string
 	 */
-	protected $id;
+	protected $id = 'pronamic_pay';
+
+	/**
+	 * Payment method
+	 *
+	 * @var string
+	 */
+	protected $payment_method;
 
 	/**
 	 * Admin label
@@ -32,13 +47,6 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 	 * @var string
 	 */
 	protected $label;
-
-	/**
-	 * Payment method
-	 *
-	 * @var string
-	 */
-	protected $payment_method;
 
 	//////////////////////////////////////////////////
 
@@ -78,9 +86,14 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 	 * Init
 	 */
 	public function init() {
-		$this->id          = 'pronamic_pay';
-		$this->label       = __( 'Pronamic', 'pronamic_ideal' );
-		$this->admin_label = __( 'Pronamic', 'pronamic_ideal' );
+		$this->label       = PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
+		$this->admin_label = PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
+
+		if ( PaymentMethods::is_direct_debit_method( $this->payment_method ) ) {
+			$this->supports = array(
+				'recurring',
+			);
+		}
 	}
 
 	//////////////////////////////////////////////////
@@ -110,8 +123,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 	 *
 	 * @see https://github.com/restrictcontentpro/restrict-content-pro/blob/2.2.8/includes/admin/settings/register-settings.php#L126
 	 *
-	 * @param mixed $settings_gateways
-	 * @return mixed $settings_gateways
+	 * @param $rcp_options
 	 */
 	public function payments_settings( $rcp_options ) {
 		$config_option = $this->id . '_config_id';
@@ -152,7 +164,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 
 					?>
 
-					<input class="regular-text" id="rcp_settings[<?php echo esc_attr( $label_option ); ?>]" style="width: 300px;" name="rcp_settings[<?php echo esc_attr( $label_option ); ?>]" value="<?php echo esc_attr( $label ); ?>" />
+					<input class="regular-text" id="rcp_settings[<?php echo esc_attr( $label_option ); ?>]" style="width: 300px;" name="rcp_settings[<?php echo esc_attr( $label_option ); ?>]" value="<?php echo esc_attr( $label ); ?>"/>
 
 					<p class="description"><?php esc_html_e( 'Enter a label to display at checkout.', 'pronamic_ideal' ); ?></p>
 				</td>
@@ -171,7 +183,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 						$config_id = $rcp_options[ $config_option ];
 					}
 
-					Pronamic_WP_Pay_Admin::dropdown_configs( array(
+					AdminModule::dropdown_configs( array(
 						'name'           => 'rcp_settings[' . esc_attr( $config_option ) . ']',
 						'selected'       => $config_id,
 						'payment_method' => $this->payment_method,
@@ -193,7 +205,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 	 * Payment fields for this gateway
 	 *
 	 * @version 1.0.0
-	 * @see https://github.com/restrictcontentpro/restrict-content-pro/blob/1.9.4/includes/checkout/template.php#L167
+	 * @see     https://github.com/restrictcontentpro/restrict-content-pro/blob/1.9.4/includes/checkout/template.php#L167
 	 */
 	public function payment_fields() {
 		echo $this->fields(); // WPCS: XSS ok.
@@ -239,8 +251,10 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 	 *   'user_info'    => array of user's information and used discount code
 	 *   'cart_details' => array of cart details,
 	 * );
+	 *
+	 * @param array $purchase_data
 	 */
-	public function process_purchase( $subscription_data ) {
+	public function process_purchase( $purchase_data ) {
 		global $rcp_options;
 
 		$config_id = $rcp_options[ $this->id . '_config_id' ];
@@ -249,30 +263,30 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 
 		// Collect payment data
 		$rcp_payment_data = array(
-			'subscription'     => $subscription_data['subscription_name'],
+			'subscription'     => $purchase_data['subscription_name'],
 			'date'             => date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ),
-			'amount'           => $subscription_data['price'] + $subscription_data['fee'],
-			'user_id'          => $subscription_data['user_id'],
+			'amount'           => $purchase_data['price'] + $purchase_data['fee'],
+			'user_id'          => $purchase_data['user_id'],
 			'payment_type'     => $this->admin_label,
-			'subscription_key' => $subscription_data['key'],
+			'subscription_key' => $purchase_data['key'],
 			'transaction_id'   => $rcp_transaction_id,
 			'status'           => 'pending',
 		);
 
 		$data = array(
-			'email'             => $subscription_data['user_email'],
-			'user_name'         => $subscription_data['user_name'],
-			'currency'          => $subscription_data['currency'],
-			'discount'          => $subscription_data['discount'],
-			'discount_code'     => $subscription_data['discount_code'],
-			'length'            => $subscription_data['length'],
-			'length_unit'       => $subscription_data['length_unit'],
-			'signup_fee'        => $this->supports( 'fees' ) ? $subscription_data['fee'] : 0,
-			'subscription_id'   => $subscription_data['subscription_id'],
-			'subscription_name' => $subscription_data['subscription_name'],
-			'auto_renew'        => $this->supports( 'recurring' ) ? $subscription_data['auto_renew'] : false,
-			'return_url'        => $subscription_data['return_url'],
-			'subscription_data' => $subscription_data,
+			'email'             => $purchase_data['user_email'],
+			'user_name'         => $purchase_data['user_name'],
+			'currency'          => $purchase_data['currency'],
+			'discount'          => $purchase_data['discount'],
+			'discount_code'     => $purchase_data['discount_code'],
+			'length'            => $purchase_data['length'],
+			'length_unit'       => $purchase_data['length_unit'],
+			'signup_fee'        => $this->supports( 'fees' ) ? $purchase_data['fee'] : 0,
+			'subscription_id'   => $purchase_data['subscription_id'],
+			'subscription_name' => $purchase_data['subscription_name'],
+			'auto_renew'        => $this->supports( 'recurring' ) ? $purchase_data['auto_renew'] : false,
+			'return_url'        => $purchase_data['return_url'],
+			'subscription_data' => $purchase_data,
 		);
 
 		$payment_data = array_merge( $rcp_payment_data, $data );
@@ -307,7 +321,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Gateway extends RCP_Payment_Gateway {
 				array( 'response' => '401' )
 			);
 		} else {
-			$data = new Pronamic_WP_Pay_Extensions_RCP_PaymentData( $payment_id, $payment_data );
+			$data = new PaymentData( $payment_id, $payment_data );
 
 			$gateway = Plugin::get_gateway( $config_id );
 

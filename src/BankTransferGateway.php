@@ -1,4 +1,7 @@
 <?php
+
+namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
+
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
@@ -7,18 +10,20 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
+ * @author  Reüel van der Steege
  * @version 1.0.0
- * @since 1.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_RCP_BankTransferGateway extends Pronamic_WP_Pay_Extensions_RCP_Gateway {
+class BankTransferGateway extends Gateway {
 	/**
-	 * Initialize Credit Card gateway
+	 * Gateway id.
 	 */
-	public function init() {
-		$this->id             = 'pronamic_pay_bank_transfer';
-		$this->label          = __( 'Bank Transfer', 'pronamic_ideal' );
-		$this->admin_label    = __( 'Bank Transfer', 'pronamic_ideal' );
-		$this->payment_method = PaymentMethods::BANK_TRANSFER;
-	}
+	protected $id = 'pronamic_pay_bank_transfer';
+
+	/**
+	 * Payment method.
+	 *
+	 * @var string $payment_method
+	 */
+	protected $payment_method = PaymentMethods::BANK_TRANSFER;
 }

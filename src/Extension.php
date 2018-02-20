@@ -1,7 +1,12 @@
 <?php
+
+namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
+
 use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Plugin;
+use RCP_Member;
+use RCP_Payments;
 
 /**
  * Title: Restrict Content Pro iDEAL Add-On
@@ -9,11 +14,11 @@ use Pronamic\WordPress\Pay\Plugin;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
+ * @author  Reüel van der Steege
  * @version 1.0.0
- * @since 1.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_RCP_Extension {
+class Extension {
 	/**
 	 * Bootstrap
 	 */
@@ -28,39 +33,46 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 	 * Test to see if the Restrict Content Pro plugin is active, then add all actions.
 	 */
 	public static function plugins_loaded() {
-		if ( Pronamic_WP_Pay_Extensions_RCP_RestrictContentPro::is_active() ) {
-			/*
-			 * Gateways
-			 * @since 1.1.0
-			 */
-			new Pronamic_WP_Pay_Extensions_RCP_Gateway();
-			new Pronamic_WP_Pay_Extensions_RCP_BancontactGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_BankTransferGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_BitcoinGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_CreditCardGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_DirectDebitGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_DirectDebitBancontactGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_DirectDebitIDealGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_DirectDebitSofortGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_IDealGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_PayPalGateway();
-			new Pronamic_WP_Pay_Extensions_RCP_SofortGateway();
-
-			add_action( 'pronamic_payment_status_update_restrictcontentpro', array( __CLASS__, 'status_update' ), 10, 1 );
-			add_filter( 'pronamic_payment_redirect_url_restrictcontentpro', array( __CLASS__, 'redirect_url' ), 10, 2 );
-			add_filter( 'pronamic_payment_source_text_restrictcontentpro', array( __CLASS__, 'source_text' ), 10, 2 );
-
-			add_filter( 'rcp_payment_status_label', array( __CLASS__, 'rcp_status_label_cancelled' ), 10, 2 );
-
-			add_action( 'rcp_set_status', array( __CLASS__, 'rcp_set_status' ), 10, 3 );
-		}
-
 		add_filter( 'pronamic_payment_source_description_restrictcontentpro', array( __CLASS__, 'source_description' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_url_restrictcontentpro', array( __CLASS__, 'source_url' ), 10, 2 );
+
+		if ( ! RestrictContentPro::is_active() ) {
+			return;
+		}
+
+		/*
+		 * Gateways
+		 * @since 1.1.0
+		 */
+		new Gateway();
+		new BancontactGateway();
+		new BankTransferGateway();
+		new BitcoinGateway();
+		new CreditCardGateway();
+		new DirectDebitGateway();
+		new DirectDebitBancontactGateway();
+		new DirectDebitIDealGateway();
+		new DirectDebitSofortGateway();
+		new IDealGateway();
+		new PayPalGateway();
+		new SofortGateway();
+
+		add_action( 'pronamic_payment_status_update_restrictcontentpro', array( __CLASS__, 'status_update' ), 10, 1 );
+		add_filter( 'pronamic_payment_redirect_url_restrictcontentpro', array( __CLASS__, 'redirect_url' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_text_restrictcontentpro', array( __CLASS__, 'source_text' ), 10, 2 );
+
+		add_filter( 'rcp_payment_status_label', array( __CLASS__, 'rcp_status_label_cancelled' ), 10, 2 );
+
+		add_action( 'rcp_set_status', array( __CLASS__, 'rcp_set_status' ), 10, 3 );
 	}
 
 	/**
 	 * Restrict Content Pro payment status 'Cancelled' label.
+	 *
+	 * @param $label
+	 * @param $status
+	 *
+	 * @return string
 	 */
 	public static function rcp_status_label_cancelled( $label, $status ) {
 		switch ( $status ) {
@@ -92,7 +104,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 	public static function redirect_url( $url, $payment ) {
 		$source_id = $payment->get_source_id();
 
-		$data = new Pronamic_WP_Pay_Extensions_RCP_PaymentData( $source_id, array() );
+		$data = new PaymentData( $source_id, array() );
 
 		$url = $data->get_normal_return_url();
 
@@ -125,26 +137,26 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 	/**
 	 * Update the status of the specified payment
 	 *
-	 * @param Pronamic_Pay_Payment $payment
+	 * @param Payment $payment
 	 */
-	public static function status_update( Pronamic_Pay_Payment $payment ) {
+	public static function status_update( Payment $payment ) {
 		$source_id = $payment->get_source_id();
 
 		$payments    = new RCP_Payments();
 		$rcp_payment = $payments->get_payment( $source_id );
 
 		// Only update if order is not completed
-		if ( ! $payment->get_subscription() && Pronamic_WP_Pay_Extensions_RCP_RestrictContentPro::PAYMENT_STATUS_COMPLETE === $rcp_payment->status ) {
+		if ( ! $payment->get_subscription() && RestrictContentPro::PAYMENT_STATUS_COMPLETE === $rcp_payment->status ) {
 			return;
 		}
 
-		$data = new Pronamic_WP_Pay_Extensions_RCP_PaymentData( $source_id, array() );
+		$data = new PaymentData( $source_id, array() );
 
 		$member = new RCP_Member( $data->get_user_id() );
 
 		switch ( $payment->get_status() ) {
 			case Statuses::CANCELLED:
-				$payments->update( $source_id, array( 'status' => Pronamic_WP_Pay_Extensions_RCP_RestrictContentPro::PAYMENT_STATUS_CANCELLED ) );
+				$payments->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_CANCELLED ) );
 
 				if ( $member ) {
 					$member->cancel();
@@ -152,7 +164,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 
 				break;
 			case Statuses::EXPIRED:
-				$payments->update( $source_id, array( 'status' => Pronamic_WP_Pay_Extensions_RCP_RestrictContentPro::PAYMENT_STATUS_EXPIRED ) );
+				$payments->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_EXPIRED ) );
 
 				if ( $member ) {
 					$member->cancel();
@@ -160,7 +172,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 
 				break;
 			case Statuses::FAILURE:
-				$payments->update( $source_id, array( 'status' => Pronamic_WP_Pay_Extensions_RCP_RestrictContentPro::PAYMENT_STATUS_FAILED ) );
+				$payments->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_FAILED ) );
 
 				if ( $member ) {
 					$member->cancel();
@@ -168,7 +180,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 
 				break;
 			case Statuses::SUCCESS:
-				$payments->update( $source_id, array( 'status' => Pronamic_WP_Pay_Extensions_RCP_RestrictContentPro::PAYMENT_STATUS_COMPLETE ) );
+				$payments->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_COMPLETE ) );
 
 				if ( $member && ! is_callable( array( $member, 'get_pending_payment_id' ) ) ) {
 					$auto_renew = false;
@@ -190,9 +202,13 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 
 	/**
 	 * Restrict Content Pro user subscription status updated.
+	 *
+	 * @param $new_status
+	 * @param $user_id
+	 * @param $old_status
 	 */
 	public static function rcp_set_status( $new_status, $user_id, $old_status ) {
-		$subscription = Pronamic_WP_Pay_Extensions_RCP_Util::get_subscription_by_user( $user_id );
+		$subscription = Util::get_subscription_by_user( $user_id );
 
 		if ( ! $subscription ) {
 			return;
@@ -263,7 +279,7 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 	/**
 	 * Source column
 	 *
-	 * @param string $text
+	 * @param string  $text
 	 * @param Payment $payment
 	 *
 	 * @return string $text
@@ -289,17 +305,25 @@ class Pronamic_WP_Pay_Extensions_RCP_Extension {
 
 	/**
 	 * Source description.
+	 *
+	 * @param string  $description
+	 * @param Payment $payment
+	 *
+	 * @return string
 	 */
-	public static function source_description( $description, Pronamic_Pay_Payment $payment ) {
-		$description = __( 'Restrict Content Pro Order', 'pronamic_ideal' );
-
-		return $description;
+	public static function source_description( $description, Payment $payment ) {
+		return __( 'Restrict Content Pro Order', 'pronamic_ideal' );
 	}
 
 	/**
 	 * Source URL.
+	 *
+	 * @param string  $url
+	 * @param Payment $payment
+	 *
+	 * @return string
 	 */
-	public static function source_url( $url, Pronamic_Pay_Payment $payment ) {
+	public static function source_url( $url, Payment $payment ) {
 		$url = add_query_arg(
 			'user_id',
 			$payment->post->post_author,

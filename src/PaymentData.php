@@ -1,8 +1,13 @@
 <?php
-use Pronamic\WordPress\Pay\Core\Util;
-use Pronamic\WordPress\Pay\Payments\PaymentData;
+
+namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
+
+use Pronamic\WordPress\Pay\Core\Util as Core_Util;
+use Pronamic\WordPress\Pay\Payments\PaymentData as Pay_PaymentData;
 use Pronamic\WordPress\Pay\Payments\Item;
 use Pronamic\WordPress\Pay\Payments\Items;
+use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use RCP_Payments;
 
 /**
  * Title: Restrict Content Pro payment data
@@ -10,11 +15,11 @@ use Pronamic\WordPress\Pay\Payments\Items;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
+ * @author  Reüel van der Steege
  * @version 1.0.0
- * @since 1.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends PaymentData {
+class PaymentData extends Pay_PaymentData {
 	/**
 	 * Payment ID
 	 *
@@ -210,10 +215,10 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends PaymentData {
 
 		$subscription_data = $this->payment_data['subscription_data'];
 
-		$subscription                  = new Pronamic_Pay_Subscription();
+		$subscription                  = new Subscription();
 		$subscription->frequency       = '';
 		$subscription->interval        = $subscription_data['length'];
-		$subscription->interval_period = Util::to_period( $subscription_data['length_unit'] );
+		$subscription->interval_period = Core_Util::to_period( $subscription_data['length_unit'] );
 		$subscription->amount          = $subscription_data['recurring_price'];
 		$subscription->currency        = $this->get_currency();
 		$subscription->description     = $this->get_description();
@@ -234,7 +239,7 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends PaymentData {
 			return false;
 		}
 
-		$user_subscription = Pronamic_WP_Pay_Extensions_RCP_Util::get_subscription_by_user( $this->get_user_id() );
+		$user_subscription = Util::get_subscription_by_user( $this->get_user_id() );
 
 		if ( $user_subscription ) {
 			return $user_subscription->get_source_id();
@@ -254,7 +259,7 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends PaymentData {
 			return;
 		}
 
-		$user_subscription = Pronamic_WP_Pay_Extensions_RCP_Util::get_subscription_by_user( $this->get_user_id() );
+		$user_subscription = Util::get_subscription_by_user( $this->get_user_id() );
 
 		if ( ! $user_subscription ) {
 			return;

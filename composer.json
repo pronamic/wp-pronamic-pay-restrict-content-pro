@@ -24,7 +24,9 @@
 		"source": "https://github.com/wp-pay-extensions/restrict-content-pro"
 	},
 	"autoload": {
-		"classmap": ["src/"]
+		"psr-4": {
+			"Pronamic\\WordPress\\Pay\\Extensions\\RestrictContentPro\\": "src/"
+		}
 	},
 	"config": {
 		"platform": {

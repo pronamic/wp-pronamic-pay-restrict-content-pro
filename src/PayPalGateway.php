@@ -1,4 +1,7 @@
 <?php
+
+namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
+
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
@@ -7,18 +10,20 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
+ * @author  Reüel van der Steege
  * @version 1.0.1
- * @since 1.0.1
+ * @since   1.0.1
  */
-class Pronamic_WP_Pay_Extensions_RCP_PayPalGateway extends Pronamic_WP_Pay_Extensions_RCP_Gateway {
+class PayPalGateway extends Gateway {
 	/**
-	 * Construct and initialize PayPal gateway
+	 * Gateway id.
 	 */
-	public function init() {
-		$this->id             = 'pronamic_pay_paypal';
-		$this->label          = __( 'PayPal', 'pronamic_ideal' );
-		$this->admin_label    = __( 'PayPal', 'pronamic_ideal' );
-		$this->payment_method = PaymentMethods::PAYPAL;
-	}
+	protected $id = 'pronamic_pay_paypal';
+
+	/**
+	 * Payment method.
+	 *
+	 * @var string $payment_method
+	 */
+	protected $payment_method = PaymentMethods::PAYPAL;
 }

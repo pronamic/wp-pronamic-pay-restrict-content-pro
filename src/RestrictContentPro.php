@@ -55,8 +55,6 @@ class RestrictContentPro {
 	 */
 	const PAYMENT_STATUS_REFUNDED = 'refunded';
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Check if Restrict Content Pro is active
 	 *

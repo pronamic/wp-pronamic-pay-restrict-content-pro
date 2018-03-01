@@ -34,8 +34,6 @@ class PaymentData extends Pay_PaymentData {
 	 */
 	private $payment_data;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initializes an Restrict Content Pro iDEAL data proxy
 	 *
@@ -48,8 +46,6 @@ class PaymentData extends Pay_PaymentData {
 		$this->payment_id   = $payment_id;
 		$this->payment_data = $payment_data;
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Get source ID
@@ -69,8 +65,6 @@ class PaymentData extends Pay_PaymentData {
 	public function get_source() {
 		return 'restrictcontentpro';
 	}
-
-	//////////////////////////////////////////////////
 
 	public function get_title() {
 		/* translators: %s: order id */
@@ -118,8 +112,6 @@ class PaymentData extends Pay_PaymentData {
 		return $items;
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Get currency
 	 *
@@ -128,8 +120,6 @@ class PaymentData extends Pay_PaymentData {
 	public function get_currency_alphabetic_code() {
 		return rcp_get_currency();
 	}
-
-	//////////////////////////////////////////////////
 
 	public function get_email() {
 		return $this->payment_data['email'];
@@ -182,8 +172,6 @@ class PaymentData extends Pay_PaymentData {
 		return $user_id;
 	}
 
-	//////////////////////////////////////////////////
-
 	public function get_normal_return_url() {
 		return home_url();
 	}
@@ -199,10 +187,6 @@ class PaymentData extends Pay_PaymentData {
 
 		return null;
 	}
-
-	//////////////////////////////////////////////////
-	// Subscription
-	//////////////////////////////////////////////////
 
 	public function get_subscription() {
 		if ( ! $this->payment_data['auto_renew'] ) {

@@ -27,8 +27,6 @@ class Extension {
 		add_action( 'plugins_loaded', array( __CLASS__, 'plugins_loaded' ) );
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Test to see if the Restrict Content Pro plugin is active, then add all actions.
 	 */
@@ -273,8 +271,6 @@ class Extension {
 			Plugin::update_subscription( $subscription, false );
 		}
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Source column

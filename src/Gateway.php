@@ -48,8 +48,6 @@ class Gateway extends RCP_Payment_Gateway {
 	 */
 	protected $label;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Bootstrap
 	 *
@@ -80,8 +78,6 @@ class Gateway extends RCP_Payment_Gateway {
 		add_filter( 'rcp_get_payment_transaction_id-' . $this->id, array( $this, 'get_payment_transaction_id' ) );
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Init
 	 */
@@ -95,8 +91,6 @@ class Gateway extends RCP_Payment_Gateway {
 			);
 		}
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Add the gateway to Restrict Content Pro
@@ -115,8 +109,6 @@ class Gateway extends RCP_Payment_Gateway {
 
 		return $gateways;
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Add the iDEAL configuration settings to the Restrict Content Pro payment gateways settings page.
@@ -199,8 +191,6 @@ class Gateway extends RCP_Payment_Gateway {
 		<?php
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Payment fields for this gateway
 	 *
@@ -232,8 +222,6 @@ class Gateway extends RCP_Payment_Gateway {
 
 		return ob_get_clean();
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * The $purchase_data array consists of the following data:

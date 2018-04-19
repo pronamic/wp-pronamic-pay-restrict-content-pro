@@ -319,7 +319,7 @@ class Gateway extends RCP_Payment_Gateway {
 					$new_subscription = $data->get_subscription();
 
 					$update_meta = array(
-						'amount'          => $new_subscription->get_amount(),
+						'amount'          => $new_subscription->get_amount()->get_amount(),
 						'frequency'       => $new_subscription->get_frequency(),
 						'interval'        => $new_subscription->get_interval(),
 						'interval_period' => $new_subscription->get_interval_period(),

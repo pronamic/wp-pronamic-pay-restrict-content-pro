@@ -2,6 +2,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
+use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\PaymentData as Pay_PaymentData;
 use Pronamic\WordPress\Pay\Payments\Item;
@@ -203,9 +204,12 @@ class PaymentData extends Pay_PaymentData {
 		$subscription->frequency       = '';
 		$subscription->interval        = $subscription_data['length'];
 		$subscription->interval_period = Core_Util::to_period( $subscription_data['length_unit'] );
-		$subscription->amount          = $subscription_data['recurring_price'];
-		$subscription->currency        = $this->get_currency();
 		$subscription->description     = $this->get_description();
+
+		$subscription->set_amount( new Money(
+			$subscription_data['recurring_price'],
+			$this->get_currency_alphabetic_code()
+		) );
 
 		return $subscription;
 	}

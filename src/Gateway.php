@@ -314,7 +314,7 @@ class Gateway extends RCP_Payment_Gateway {
 			$gateway = Plugin::get_gateway( $config_id );
 
 			if ( $gateway ) {
-				// Maybe update existing subscription
+				// Maybe update existing subscription.
 				if ( $data->get_subscription_id() ) {
 					$new_subscription = $data->get_subscription();
 
@@ -328,10 +328,13 @@ class Gateway extends RCP_Payment_Gateway {
 					$subscription = get_pronamic_subscription( $data->get_subscription_id() );
 
 					$subscription->update_meta( $update_meta );
-				}
 
-				// Start
-				$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
+					// Start recurring.
+					$payment = pronamic_pay_plugin()->subscriptions_module->start_recurring( $subscription, $gateway );
+				} else {
+					// Start.
+					$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
+				}
 
 				$error = $gateway->get_error();
 

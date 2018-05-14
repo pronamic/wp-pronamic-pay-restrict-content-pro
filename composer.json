@@ -3,7 +3,7 @@
 	"description": "Restrict Content Pro driver for the WordPress payment processing library.",
 	"keywords": ["wordpress", "wp", "pay", "restrict", "content", "pro", "extension", "pronamic"],
 	"homepage": "http://www.wp-pay.org/extensions/restrict-content-pro/",
-	"license": "GPL-3.0+",
+	"license": "GPL-3.0-or-later",
 	"authors": [
 		{
 			"name": "Pronamic",
@@ -24,7 +24,9 @@
 		"source": "https://github.com/wp-pay-extensions/restrict-content-pro"
 	},
 	"autoload": {
-		"classmap": ["src/"]
+		"psr-4": {
+			"Pronamic\\WordPress\\Pay\\Extensions\\RestrictContentPro\\": "src/"
+		}
 	},
 	"config": {
 		"platform": {
@@ -33,7 +35,7 @@
 	},
 	"require": {
 		"php": "^5.3",
-		"wp-pay/core": "^1.3"
+		"wp-pay/core": "^2.0"
 	},
 	"require-dev": {
 		"php-coveralls/php-coveralls": "^1.0",

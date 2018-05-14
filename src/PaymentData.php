@@ -1,16 +1,26 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
+
+use Pronamic\WordPress\Money\Money;
+use Pronamic\WordPress\Pay\Core\Util as Core_Util;
+use Pronamic\WordPress\Pay\Payments\PaymentData as Pay_PaymentData;
+use Pronamic\WordPress\Pay\Payments\Item;
+use Pronamic\WordPress\Pay\Payments\Items;
+use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use RCP_Payments;
+
 /**
  * Title: Restrict Content Pro payment data
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
- * @version 1.0.0
- * @since 1.0.0
+ * @author  Reüel van der Steege
+ * @version 2.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_PaymentData {
+class PaymentData extends Pay_PaymentData {
 	/**
 	 * Payment ID
 	 *
@@ -25,8 +35,6 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 	 */
 	private $payment_data;
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Constructs and initializes an Restrict Content Pro iDEAL data proxy
 	 *
@@ -39,8 +47,6 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 		$this->payment_id   = $payment_id;
 		$this->payment_data = $payment_data;
 	}
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Get source ID
@@ -60,8 +66,6 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 	public function get_source() {
 		return 'restrictcontentpro';
 	}
-
-	//////////////////////////////////////////////////
 
 	public function get_title() {
 		/* translators: %s: order id */
@@ -90,15 +94,15 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 	 * Get items
 	 *
 	 * @see Pronamic_Pay_PaymentDataInterface::get_items()
-	 * @return Pronamic_IDeal_Items
+	 * @return Items
 	 */
 	public function get_items() {
 		// Items
-		$items = new Pronamic_IDeal_Items();
+		$items = new Items();
 
 		// Item
 		// We only add one total item, because iDEAL cant work with negative price items (discount)
-		$item = new Pronamic_IDeal_Item();
+		$item = new Item();
 		$item->setNumber( $this->payment_id );
 		$item->setDescription( $this->get_description() );
 		$item->setPrice( $this->payment_data['amount'] );
@@ -109,8 +113,6 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 		return $items;
 	}
 
-	//////////////////////////////////////////////////
-
 	/**
 	 * Get currency
 	 *
@@ -119,8 +121,6 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 	public function get_currency_alphabetic_code() {
 		return rcp_get_currency();
 	}
-
-	//////////////////////////////////////////////////
 
 	public function get_email() {
 		return $this->payment_data['email'];
@@ -173,8 +173,6 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 		return $user_id;
 	}
 
-	//////////////////////////////////////////////////
-
 	public function get_normal_return_url() {
 		return home_url();
 	}
@@ -191,10 +189,6 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 		return null;
 	}
 
-	//////////////////////////////////////////////////
-	// Subscription
-	//////////////////////////////////////////////////
-
 	public function get_subscription() {
 		if ( ! $this->payment_data['auto_renew'] ) {
 			return false;
@@ -206,13 +200,16 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 
 		$subscription_data = $this->payment_data['subscription_data'];
 
-		$subscription                  = new Pronamic_Pay_Subscription();
+		$subscription                  = new Subscription();
 		$subscription->frequency       = '';
 		$subscription->interval        = $subscription_data['length'];
-		$subscription->interval_period = Pronamic_WP_Pay_Util::to_period( $subscription_data['length_unit'] );
-		$subscription->amount          = $subscription_data['recurring_price'];
-		$subscription->currency        = $this->get_currency();
+		$subscription->interval_period = Core_Util::to_period( $subscription_data['length_unit'] );
 		$subscription->description     = $this->get_description();
+
+		$subscription->set_amount( new Money(
+			$subscription_data['recurring_price'],
+			$this->get_currency_alphabetic_code()
+		) );
 
 		return $subscription;
 	}
@@ -230,7 +227,7 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 			return false;
 		}
 
-		$user_subscription = Pronamic_WP_Pay_Extensions_RCP_Util::get_subscription_by_user( $this->get_user_id() );
+		$user_subscription = Util::get_subscription_by_user( $this->get_user_id() );
 
 		if ( $user_subscription ) {
 			return $user_subscription->get_source_id();
@@ -250,7 +247,7 @@ class Pronamic_WP_Pay_Extensions_RCP_PaymentData extends Pronamic_WP_Pay_Payment
 			return;
 		}
 
-		$user_subscription = Pronamic_WP_Pay_Extensions_RCP_Util::get_subscription_by_user( $this->get_user_id() );
+		$user_subscription = Util::get_subscription_by_user( $this->get_user_id() );
 
 		if ( ! $user_subscription ) {
 			return;

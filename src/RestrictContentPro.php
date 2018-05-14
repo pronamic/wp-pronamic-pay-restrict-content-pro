@@ -1,16 +1,18 @@
 <?php
 
+namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
+
 /**
  * Title: Restrict Content Pro
  * Description:
- * Copyright: Copyright (c) 2005 - 2017
+ * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
- * @author Reüel van der Steege
- * @version 1.0.0
- * @since 1.0.0
+ * @author  Reüel van der Steege
+ * @version 2.0.0
+ * @since   1.0.0
  */
-class Pronamic_WP_Pay_Extensions_RCP_RestrictContentPro {
+class RestrictContentPro {
 	/**
 	 * Payment status cancelled
 	 *
@@ -52,8 +54,6 @@ class Pronamic_WP_Pay_Extensions_RCP_RestrictContentPro {
 	 * @var string
 	 */
 	const PAYMENT_STATUS_REFUNDED = 'refunded';
-
-	//////////////////////////////////////////////////
 
 	/**
 	 * Check if Restrict Content Pro is active

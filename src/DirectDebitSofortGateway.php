@@ -5,25 +5,25 @@ namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 
 /**
- * Title: Restrict Content Pro Credit Card gateway
+ * Title: Restrict Content Pro Direct Debit (mandate via Sofort) gateway
  * Description:
  * Copyright: Copyright (c) 2005 - 2018
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
  * @version 2.0.0
- * @since   1.0.0
+ * @since   1.0.1
  */
-class DirectDebitGateway extends Gateway {
+class DirectDebitSofortGateway extends Gateway {
 	/**
 	 * Gateway id.
 	 */
-	protected $id = 'pronamic_pay_direct_debit';
+	protected $id = 'pronamic_pay_direct_debit_sofort';
 
 	/**
 	 * Payment method.
 	 *
 	 * @var string $payment_method
 	 */
-	protected $payment_method = PaymentMethods::DIRECT_DEBIT;
+	protected $payment_method = PaymentMethods::DIRECT_DEBIT_SOFORT;
 }

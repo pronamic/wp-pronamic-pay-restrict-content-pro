@@ -16,7 +16,7 @@ use RCP_Payments;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version unreleased
+ * @version 2.0.0
  * @since   1.0.0
  */
 class Gateway extends RCP_Payment_Gateway {

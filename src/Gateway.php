@@ -16,7 +16,7 @@ use RCP_Payments;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.0
+ * @version 2.0.1
  * @since   1.0.0
  */
 class Gateway extends RCP_Payment_Gateway {
@@ -287,7 +287,13 @@ class Gateway extends RCP_Payment_Gateway {
 		// Record the pending payment
 		$payments = new RCP_Payments();
 
-		if ( ! is_callable( array( $member, 'get_pending_payment_id' ) ) || ! $member->get_pending_payment_id() ) {
+		$pending_payment_id = null;
+
+		if ( is_callable( array( $member, 'get_pending_payment_id' ) ) ) {
+			$pending_payment_id = $member->get_pending_payment_id();
+		}
+
+		if ( empty( $pending_payment_id ) ) {
 			$payment_id = $payments->insert( $rcp_payment_data );
 		} else {
 			$payment_id = $member->get_pending_payment_id();
@@ -330,7 +336,7 @@ class Gateway extends RCP_Payment_Gateway {
 					$subscription->update_meta( $update_meta );
 
 					// Start recurring.
-					$payment = Plugin::start_recurring( $subscription, $gateway );
+					$payment = Plugin::start_recurring( $subscription, $gateway, $data );
 				} else {
 					// Start.
 					$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );

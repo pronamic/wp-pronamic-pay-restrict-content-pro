@@ -2,9 +2,9 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
+use Pronamic\WordPress\Pay\Core\Recurring;
 use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Payments\Payment;
-use Pronamic\WordPress\Pay\Plugin;
 use RCP_Member;
 use RCP_Payments;
 
@@ -15,7 +15,7 @@ use RCP_Payments;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.0
+ * @version 2.0.1
  * @since   1.0.0
  */
 class Extension {
@@ -180,7 +180,7 @@ class Extension {
 			case Statuses::SUCCESS:
 				$payments->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_COMPLETE ) );
 
-				if ( $member && ! is_callable( array( $member, 'get_pending_payment_id' ) ) ) {
+				if ( $member && ( ! is_callable( array( $member, 'get_pending_payment_id' ) ) || Recurring::RECURRING === $payment->recurring_type ) ) {
 					$auto_renew = false;
 
 					if ( 'yes' === get_user_meta( $data->get_user_id(), 'rcp_recurring', true ) ) {
@@ -266,9 +266,11 @@ class Extension {
 		}
 
 		if ( isset( $status ) ) {
-			$subscription->update_status( $status, $note );
+			$subscription->set_status( $status );
 
-			Plugin::update_subscription( $subscription, false );
+			$subscription->add_note( $note );
+
+			$subscription->save();
 		}
 	}
 

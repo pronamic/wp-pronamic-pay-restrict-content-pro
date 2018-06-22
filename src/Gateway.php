@@ -335,6 +335,17 @@ class Gateway extends RCP_Payment_Gateway {
 
 					$subscription->update_meta( $update_meta );
 
+					// Set updated meta in subscription.
+					$subscription->set_amount( $new_subscription->get_amount() );
+
+					$subscription->frequency       = $update_meta['frequency'];
+					$subscription->interval        = $update_meta['interval'];
+					$subscription->interval_period = $update_meta['interval_period'];
+
+					if ( ! doing_action( 'pronamic_pay_update_subscription_payments' ) ) {
+						$data->set_recurring( false );
+					}
+
 					// Start recurring.
 					$payment = Plugin::start_recurring( $subscription, $gateway, $data );
 				} else {

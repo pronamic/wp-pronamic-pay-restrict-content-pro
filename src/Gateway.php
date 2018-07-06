@@ -16,7 +16,7 @@ use RCP_Payments;
  * Company: Pronamic
  *
  * @author  Reüel van der Steege
- * @version 2.0.1
+ * @version 2.0.2
  * @since   1.0.0
  */
 class Gateway extends RCP_Payment_Gateway {
@@ -334,6 +334,17 @@ class Gateway extends RCP_Payment_Gateway {
 					$subscription = get_pronamic_subscription( $data->get_subscription_id() );
 
 					$subscription->update_meta( $update_meta );
+
+					// Set updated meta in subscription.
+					$subscription->set_amount( $new_subscription->get_amount() );
+
+					$subscription->frequency       = $update_meta['frequency'];
+					$subscription->interval        = $update_meta['interval'];
+					$subscription->interval_period = $update_meta['interval_period'];
+
+					if ( ! doing_action( 'pronamic_pay_update_subscription_payments' ) ) {
+						$data->set_recurring( false );
+					}
 
 					// Start recurring.
 					$payment = Plugin::start_recurring( $subscription, $gateway, $data );

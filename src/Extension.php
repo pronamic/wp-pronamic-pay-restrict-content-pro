@@ -164,35 +164,7 @@ class Extension {
 	 * @return string
 	 */
 	public function redirect_url( $url, $payment ) {
-		$source_id = $payment->get_source_id();
-
-		$data = new PaymentData( $source_id, array() );
-
-		$url = $data->get_normal_return_url();
-
-		switch ( $payment->get_status() ) {
-			case Statuses::CANCELLED:
-				$url = $data->get_cancel_url();
-
-				break;
-			case Statuses::EXPIRED:
-				$url = $data->get_error_url();
-
-				break;
-			case Statuses::FAILURE:
-				$url = $data->get_error_url();
-
-				break;
-			case Statuses::SUCCESS:
-				$url = $data->get_success_url();
-
-				break;
-			case Statuses::OPEN:
-				// Nothing to do?
-				break;
-		}
-
-		return $url;
+		return rcp_get_return_url( $payment->user_id );
 	}
 
 	/**
@@ -201,23 +173,25 @@ class Extension {
 	 * @param Payment $payment Payment.
 	 */
 	public function status_update( Payment $payment ) {
+		/**
+		 * @var RCP_Payments $rcp_payments_db
+		 */
+		global $rcp_payments_db;
+
 		$source_id = $payment->get_source_id();
 
-		$payments    = new RCP_Payments();
-		$rcp_payment = $payments->get_payment( $source_id );
+		$rcp_payment = $rcp_payments_db->get_payment( $source_id );
 
 		// Only update if order is not completed.
 		if ( ! $payment->get_subscription() && RestrictContentPro::PAYMENT_STATUS_COMPLETE === $rcp_payment->status ) {
 			return;
 		}
 
-		$data = new PaymentData( $source_id, array() );
-
-		$member = new RCP_Member( $data->get_user_id() );
+		$member = new RCP_Member( $payment->user_id );
 
 		switch ( $payment->get_status() ) {
 			case Statuses::CANCELLED:
-				$payments->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_CANCELLED ) );
+				$rcp_payments_db->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_CANCELLED ) );
 
 				if ( $member ) {
 					$member->cancel();
@@ -225,7 +199,7 @@ class Extension {
 
 				break;
 			case Statuses::EXPIRED:
-				$payments->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_EXPIRED ) );
+				$rcp_payments_db->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_EXPIRED ) );
 
 				if ( $member ) {
 					$member->cancel();
@@ -233,7 +207,7 @@ class Extension {
 
 				break;
 			case Statuses::FAILURE:
-				$payments->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_FAILED ) );
+				$rcp_payments_db->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_FAILED ) );
 
 				if ( $member ) {
 					$member->cancel();
@@ -241,7 +215,7 @@ class Extension {
 
 				break;
 			case Statuses::SUCCESS:
-				$payments->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_COMPLETE ) );
+				$rcp_payments_db->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_COMPLETE ) );
 
 				if ( $member && ( ! is_callable( array( $member, 'get_pending_payment_id' ) ) || Recurring::RECURRING === $payment->recurring_type ) ) {
 					$auto_renew = false;

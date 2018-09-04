@@ -189,7 +189,15 @@ class Gateway extends RCP_Payment_Gateway {
 	 * Process signup.
 	 */
 	public function process_signup() {
+		/**
+		 * @var array
+		 */
 		global $rcp_options;
+
+		/**
+		 * @var RCP_Payments $rcp_payments_db
+		 */
+		global $rcp_payments_db;
 
 		$config_id = $rcp_options[ $this->id . '_config_id' ];
 
@@ -207,34 +215,7 @@ class Gateway extends RCP_Payment_Gateway {
 
 		$data = new PaymentData( $this );
 
-		// Start payment.
-		if ( $data->get_subscription_id() ) {
-			$new_subscription = $data->get_subscription();
-
-			$update_meta = array(
-				'amount'          => $new_subscription->get_amount()->get_amount(),
-				'frequency'       => $new_subscription->get_frequency(),
-				'interval'        => $new_subscription->get_interval(),
-				'interval_period' => $new_subscription->get_interval_period(),
-			);
-
-			$subscription = get_pronamic_subscription( $data->get_subscription_id() );
-
-			$subscription->update_meta( $update_meta );
-
-			// Set updated meta in subscription.
-			$subscription->set_amount( $new_subscription->get_amount() );
-
-			$subscription->frequency       = $update_meta['frequency'];
-			$subscription->interval        = $update_meta['interval'];
-			$subscription->interval_period = $update_meta['interval_period'];
-
-			// Start recurring.
-			$payment = Plugin::start_recurring( $subscription, $gateway, $data );
-		} else {
-			// Start.
-			$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
-		}
+		$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
 
 		$error = $gateway->get_error();
 
@@ -244,8 +225,8 @@ class Gateway extends RCP_Payment_Gateway {
 			wp_die(
 				esc_html( sprintf(
 					/* translators: %s: JSON encoded payment data */
-					__( 'Payment creation failed before sending buyer to the payment provider. Payment data: %s', 'pronamic_ideal' ),
-					wp_json_encode( $payment_data )
+					__( 'Payment creation failed before sending buyer to the payment provider. Error: %s', 'pronamic_ideal' ),
+					$error->get_error_message()
 				) ),
 				esc_html__( 'Payment Error', 'pronamic_ideal' ),
 				array( 'response' => '401' )
@@ -254,9 +235,9 @@ class Gateway extends RCP_Payment_Gateway {
 
 		// Transaction ID.
 		if ( '' !== $payment->get_transaction_id() ) {
-			$rcp_payment_data['transaction_id'] = $payment->get_transaction_id();
-
-			$payments->update( $payment_id, $rcp_payment_data );
+			$rcp_payments_db->update( $this->payment->id, array(
+				'transaction_id' => $payment->get_transaction_id(),
+			) );
 		}
 
 		$gateway->redirect( $payment );

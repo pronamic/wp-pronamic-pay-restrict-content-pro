@@ -34,13 +34,6 @@ class PaymentData extends Pay_PaymentData {
 	private $gateway;
 
 	/**
-	 * Payment data
-	 *
-	 * @var mixed
-	 */
-	private $payment_data;
-
-	/**
 	 * Constructs and initializes an Restrict Content Pro iDEAL data proxy
 	 *
 	 * @param RCP_Payment_Gateway $gateway Gateway.
@@ -52,12 +45,21 @@ class PaymentData extends Pay_PaymentData {
 	}
 
 	/**
+	 * Get payment ID.
+	 *
+	 * @return string
+	 */
+	private function get_payment_id() {
+		return $this->gateway->payment->id;
+	}
+
+	/**
 	 * Get source ID
 	 *
 	 * @return int $source_id
 	 */
 	public function get_source_id() {
-		return $this->payment_id;
+		return $this->get_payment_id();
 	}
 
 	/**
@@ -86,7 +88,7 @@ class PaymentData extends Pay_PaymentData {
 	 * @return string
 	 */
 	public function get_description() {
-		return $this->payment_data['subscription_name'];
+		return $this->gateway->subscription_name;
 	}
 
 	/**
@@ -95,7 +97,7 @@ class PaymentData extends Pay_PaymentData {
 	 * @return string
 	 */
 	public function get_order_id() {
-		return $this->payment_id;
+		return $this->get_payment_id();
 	}
 
 	/**
@@ -111,9 +113,9 @@ class PaymentData extends Pay_PaymentData {
 		// Item.
 		// We only add one total item, because iDEAL cant work with negative price items (discount).
 		$item = new Item();
-		$item->set_number( $this->payment_id );
+		$item->set_number( $this->get_payment_id() );
 		$item->set_description( $this->get_description() );
-		$item->set_price( $this->payment_data['amount'] );
+		$item->set_price( $this->gateway->amount );
 		$item->set_quantity( 1 );
 
 		$items->addItem( $item );
@@ -136,7 +138,7 @@ class PaymentData extends Pay_PaymentData {
 	 * @return string
 	 */
 	public function get_email() {
-		return $this->payment_data['email'];
+		return $this->gateway->email;
 	}
 
 	/**
@@ -147,12 +149,10 @@ class PaymentData extends Pay_PaymentData {
 	public function get_customer_name() {
 		$name = '';
 
-		if ( isset( $this->payment_data['user_name'] ) ) {
-			$user = get_user_by( 'login', $this->payment_data['user_name'] );
+		$user = get_user_by( 'login', $this->gateway->user_name );
 
-			if ( $user ) {
-				$name = trim( $user->first_name . ' ' . $user->last_name );
-			}
+		if ( $user ) {
+			$name = trim( $user->first_name . ' ' . $user->last_name );
 		}
 
 		return $name;
@@ -191,24 +191,7 @@ class PaymentData extends Pay_PaymentData {
 	 * @return int|string
 	 */
 	public function get_user_id() {
-		$user_id = 0;
-
-		if ( isset( $this->payment_data['subscription_data']['user_id'] ) ) {
-			$user_id = $this->payment_data['subscription_data']['user_id'];
-		} elseif ( isset( $this->payment_data['user_name'] ) ) {
-			$user = get_user_by( 'login', $this->payment_data['user_name'] );
-
-			$user_id = $user->ID;
-		} else {
-			$payments = new RCP_Payments();
-			$payment  = $payments->get_payment( $this->payment_id );
-
-			if ( $payment ) {
-				$user_id = $payment->user_id;
-			}
-		}
-
-		return $user_id;
+		return $this->gateway->user_id;
 	}
 
 	/**
@@ -217,7 +200,7 @@ class PaymentData extends Pay_PaymentData {
 	 * @return string
 	 */
 	public function get_normal_return_url() {
-		return home_url();
+		return rcp_get_return_url( $this->get_user_id() );
 	}
 
 	/**
@@ -226,15 +209,7 @@ class PaymentData extends Pay_PaymentData {
 	 * @return string
 	 */
 	public function get_success_url() {
-		global $rcp_options;
-
-		$page_id = $rcp_options['redirect'];
-
-		if ( is_numeric( $page_id ) ) {
-			return get_permalink( $page_id );
-		}
-
-		return null;
+		return rcp_get_return_url( $this->get_user_id() );
 	}
 
 	/**
@@ -243,24 +218,22 @@ class PaymentData extends Pay_PaymentData {
 	 * @return Subscription|false
 	 */
 	public function get_subscription() {
-		if ( ! $this->payment_data['auto_renew'] ) {
+		if ( ! $this->gateway->auto_renew ) {
 			return false;
 		}
 
-		if ( ! isset( $this->payment_data['subscription_data'] ) ) {
+		if ( ! isset( $this->gateway->subscription_data ) ) {
 			return false;
 		}
-
-		$subscription_data = $this->payment_data['subscription_data'];
 
 		$subscription                  = new Subscription();
 		$subscription->frequency       = '';
-		$subscription->interval        = $subscription_data['length'];
-		$subscription->interval_period = Core_Util::to_period( $subscription_data['length_unit'] );
+		$subscription->interval        = $this->gateway->subscription_data['length'];
+		$subscription->interval_period = Core_Util::to_period( $this->gateway->subscription_data['length_unit'] );
 		$subscription->description     = $this->get_description();
 
 		$subscription->set_amount( new Money(
-			$subscription_data['recurring_price'],
+			$this->gateway->subscription_data['recurring_price'],
 			$this->get_currency_alphabetic_code()
 		) );
 

@@ -1022,7 +1022,7 @@
             "dist": {
                 "type": "zip",
                 "url": "https://github.com/restrictcontentpro/restrict-content/archive/2.2.3.zip",
-                "reference": null,
+                "reference": "tags/2.2.3",
                 "shasum": null
             },
             "type": "library",

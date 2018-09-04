@@ -54,36 +54,6 @@ class Gateway extends RCP_Payment_Gateway {
 	protected $label;
 
 	/**
-	 * Construct gateway.
-	 *
-	 * @param array $subscription_data Subscription data.
-	 */
-	public function __construct( $subscription_data = array() ) {
-		global $rcp_options;
-
-		parent::__construct( $subscription_data );
-
-		// Settings.
-		if ( isset( $rcp_options[ $this->id . '_label' ] ) && ! empty( $rcp_options[ $this->id . '_label' ] ) ) {
-			$this->label = $rcp_options[ $this->id . '_label' ];
-		}
-
-		// Actions.
-		add_action( 'rcp_gateway_' . $this->id, array( $this, 'process_purchase' ) );
-
-		// Filters.
-		add_filter( 'rcp_payments_settings', array( $this, 'payments_settings' ) );
-
-		$config_option = $this->id . '_config_id';
-
-		if ( is_admin() || ( isset( $rcp_options[ $config_option ] ) && '0' !== $rcp_options[ $config_option ] ) ) {
-			add_filter( 'rcp_payment_gateways', array( $this, 'payment_gateways' ) );
-		}
-
-		add_filter( 'rcp_get_payment_transaction_id-' . $this->id, array( $this, 'get_payment_transaction_id' ) );
-	}
-
-	/**
 	 * Initialize.
 	 */
 	public function init() {
@@ -95,23 +65,6 @@ class Gateway extends RCP_Payment_Gateway {
 				'recurring',
 			);
 		}
-	}
-
-	/**
-	 * Add the gateway to Restrict Content Pro
-	 *
-	 * @param array $gateways Gateways.
-	 * @return array
-	 */
-	public function payment_gateways( $gateways ) {
-		$gateways[ $this->id ] = array(
-			'label'       => $this->label,
-			'admin_label' => $this->admin_label,
-			'supports'    => $this->supports,
-			'class'       => get_class( $this ),
-		);
-
-		return $gateways;
 	}
 
 	/**
@@ -233,85 +186,59 @@ class Gateway extends RCP_Payment_Gateway {
 	}
 
 	/**
-	 * The $purchase_data array consists of the following data:
-	 *
-	 * $purchase_data = array(
-	 *   'downloads'    => array of download IDs,
-	 *   'tax'          => taxed amount on shopping cart
-	 *   'subtotal'     => total price before tax
-	 *   'price'        => total price of cart contents after taxes,
-	 *   'purchase_key' => Random key
-	 *   'user_email'   => $user_email,
-	 *   'date'         => date( 'Y-m-d H:i:s' ),
-	 *   'user_id'      => $user_id,
-	 *   'post_data'    => $_POST,
-	 *   'user_info'    => array of user's information and used discount code
-	 *   'cart_details' => array of cart details,
-	 * );
-	 *
-	 * @param array $purchase_data Restrict Content Pro purchase data.
+	 * Process signup.
 	 */
-	public function process_purchase( $purchase_data ) {
+	public function process_signup() {
 		global $rcp_options;
 
 		$config_id = $rcp_options[ $this->id . '_config_id' ];
 
-		$rcp_transaction_id = $this->generate_transaction_id();
+		$gateway = Plugin::get_gateway( $config_id );
 
-		// Collect payment data.
-		$rcp_payment_data = array(
-			'subscription'     => $purchase_data['subscription_name'],
-			'date'             => date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ),
-			'amount'           => $purchase_data['price'] + $purchase_data['fee'],
-			'user_id'          => $purchase_data['user_id'],
-			'payment_type'     => $this->admin_label,
-			'subscription_key' => $purchase_data['key'],
-			'transaction_id'   => $rcp_transaction_id,
-			'status'           => 'pending',
-		);
+		if ( empty( $gateway ) ) {
+			do_action( 'rcp_registration_failed', $this );
 
-		$data = array(
-			'email'             => $purchase_data['user_email'],
-			'user_name'         => $purchase_data['user_name'],
-			'currency'          => $purchase_data['currency'],
-			'discount'          => $purchase_data['discount'],
-			'discount_code'     => $purchase_data['discount_code'],
-			'length'            => $purchase_data['length'],
-			'length_unit'       => $purchase_data['length_unit'],
-			'signup_fee'        => $this->supports( 'fees' ) ? $purchase_data['fee'] : 0,
-			'subscription_id'   => $purchase_data['subscription_id'],
-			'subscription_name' => $purchase_data['subscription_name'],
-			'auto_renew'        => $this->supports( 'recurring' ) ? $purchase_data['auto_renew'] : false,
-			'return_url'        => $purchase_data['return_url'],
-			'subscription_data' => $purchase_data,
-		);
-
-		$payment_data = array_merge( $rcp_payment_data, $data );
-
-		// Set user recurring option.
-		$member = new RCP_Member( $payment_data['user_id'] );
-
-		$member->set_recurring( $payment_data['auto_renew'] );
-
-		// Record the pending payment.
-		$payments = new RCP_Payments();
-
-		$pending_payment_id = null;
-
-		if ( is_callable( array( $member, 'get_pending_payment_id' ) ) ) {
-			$pending_payment_id = $member->get_pending_payment_id();
+			wp_die(
+				esc_html( Plugin::get_default_error_message() ),
+				esc_html__( 'Payment Error', 'pronamic_ideal' ),
+				array( 'response' => '401' )
+			);
 		}
 
-		if ( empty( $pending_payment_id ) ) {
-			$payment_id = $payments->insert( $rcp_payment_data );
+		$data = new PaymentData( $this );
+
+		// Start payment.
+		if ( $data->get_subscription_id() ) {
+			$new_subscription = $data->get_subscription();
+
+			$update_meta = array(
+				'amount'          => $new_subscription->get_amount()->get_amount(),
+				'frequency'       => $new_subscription->get_frequency(),
+				'interval'        => $new_subscription->get_interval(),
+				'interval_period' => $new_subscription->get_interval_period(),
+			);
+
+			$subscription = get_pronamic_subscription( $data->get_subscription_id() );
+
+			$subscription->update_meta( $update_meta );
+
+			// Set updated meta in subscription.
+			$subscription->set_amount( $new_subscription->get_amount() );
+
+			$subscription->frequency       = $update_meta['frequency'];
+			$subscription->interval        = $update_meta['interval'];
+			$subscription->interval_period = $update_meta['interval_period'];
+
+			// Start recurring.
+			$payment = Plugin::start_recurring( $subscription, $gateway, $data );
 		} else {
-			$payment_id = $member->get_pending_payment_id();
-
-			$payments->update( $payment_id, $rcp_payment_data );
+			// Start.
+			$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
 		}
 
-		// Check payment.
-		if ( ! $payment_id ) {
+		$error = $gateway->get_error();
+
+		if ( is_wp_error( $error ) ) {
 			do_action( 'rcp_registration_failed', $this );
 
 			wp_die(
@@ -323,80 +250,17 @@ class Gateway extends RCP_Payment_Gateway {
 				esc_html__( 'Payment Error', 'pronamic_ideal' ),
 				array( 'response' => '401' )
 			);
-		} else {
-			$data = new PaymentData( $payment_id, $payment_data );
-
-			$gateway = Plugin::get_gateway( $config_id );
-
-			if ( $gateway ) {
-				// Start payment.
-				if ( $data->get_subscription_id() ) {
-					$new_subscription = $data->get_subscription();
-
-					$update_meta = array(
-						'amount'          => $new_subscription->get_amount()->get_amount(),
-						'frequency'       => $new_subscription->get_frequency(),
-						'interval'        => $new_subscription->get_interval(),
-						'interval_period' => $new_subscription->get_interval_period(),
-					);
-
-					$subscription = get_pronamic_subscription( $data->get_subscription_id() );
-
-					$subscription->update_meta( $update_meta );
-
-					// Set updated meta in subscription.
-					$subscription->set_amount( $new_subscription->get_amount() );
-
-					$subscription->frequency       = $update_meta['frequency'];
-					$subscription->interval        = $update_meta['interval'];
-					$subscription->interval_period = $update_meta['interval_period'];
-
-					if ( ! doing_action( 'pronamic_pay_update_subscription_payments' ) ) {
-						$data->set_recurring( false );
-					}
-
-					// Start recurring.
-					$payment = Plugin::start_recurring( $subscription, $gateway, $data );
-				} else {
-					// Start.
-					$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
-				}
-
-				$error = $gateway->get_error();
-
-				if ( is_wp_error( $error ) ) {
-					do_action( 'rcp_registration_failed', $this );
-
-					wp_die(
-						esc_html( sprintf(
-							/* translators: %s: JSON encoded payment data */
-							__( 'Payment creation failed before sending buyer to the payment provider. Payment data: %s', 'pronamic_ideal' ),
-							wp_json_encode( $payment_data )
-						) ),
-						esc_html__( 'Payment Error', 'pronamic_ideal' ),
-						array( 'response' => '401' )
-					);
-				} else {
-					// Transaction ID.
-					if ( '' !== $payment->get_transaction_id() ) {
-						$rcp_payment_data['transaction_id'] = $payment->get_transaction_id();
-
-						$payments->update( $payment_id, $rcp_payment_data );
-					}
-
-					$gateway->redirect( $payment );
-
-					exit;
-				}
-			} else {
-				do_action( 'rcp_registration_failed', $this );
-
-				wp_die(
-					esc_html( Plugin::get_default_error_message() ),
-					esc_html__( 'Payment Error', 'pronamic_ideal' ),
-					array( 'response' => '401' )
-				);
-			}
 		}
+
+		// Transaction ID.
+		if ( '' !== $payment->get_transaction_id() ) {
+			$rcp_payment_data['transaction_id'] = $payment->get_transaction_id();
+
+			$payments->update( $payment_id, $rcp_payment_data );
+		}
+
+		$gateway->redirect( $payment );
+
+		exit;
 	}
 }

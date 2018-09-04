@@ -28,45 +28,104 @@ class Extension {
 	 * Bootstrap.
 	 */
 	public static function bootstrap() {
-		// The "plugins_loaded" is one of the earliest hooks after EDD is set up.
-		add_action( 'plugins_loaded', array( __CLASS__, 'plugins_loaded' ) );
+		$extension = new self();
+		$extension->setup();
 	}
 
 	/**
-	 * Test to see if the Restrict Content Pro plugin is active, then add all actions.
+	 * Setup.
 	 */
-	public static function plugins_loaded() {
-		add_filter( 'pronamic_payment_source_description_restrictcontentpro', array( __CLASS__, 'source_description' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_url_restrictcontentpro', array( __CLASS__, 'source_url' ), 10, 2 );
+	public function setup() {
+		// The "plugins_loaded" is one of the earliest hooks after EDD is set up.
+		add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ) );
+	}
 
+	/**
+	 * Plugins loaded.
+	 */
+	public function plugins_loaded() {
+		add_filter( 'pronamic_payment_source_description_restrictcontentpro', array( $this, 'source_description' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_url_restrictcontentpro', array( $this, 'source_url' ), 10, 2 );
+
+		// Test to see if the Restrict Content Pro plugin is active, then add all actions.
 		if ( ! RestrictContentPro::is_active() ) {
 			return;
 		}
 
-		/*
-		 * Gateways.
-		 * @since 1.1.0
-		 */
-		new Gateway();
-		new BancontactGateway();
-		new BankTransferGateway();
-		new BitcoinGateway();
-		new CreditCardGateway();
-		new DirectDebitGateway();
-		new DirectDebitBancontactGateway();
-		new DirectDebitIDealGateway();
-		new DirectDebitSofortGateway();
-		new IDealGateway();
-		new PayPalGateway();
-		new SofortGateway();
+		add_filter( 'rcp_payment_gateways', array( $this, 'register_pronamic_gateways' ) );
+		add_action( 'rcp_payments_settings', array( $this, 'payments_settings' ) );
 
-		add_action( 'pronamic_payment_status_update_restrictcontentpro', array( __CLASS__, 'status_update' ), 10, 1 );
-		add_filter( 'pronamic_payment_redirect_url_restrictcontentpro', array( __CLASS__, 'redirect_url' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_text_restrictcontentpro', array( __CLASS__, 'source_text' ), 10, 2 );
+		add_action( 'pronamic_payment_status_update_restrictcontentpro', array( $this, 'status_update' ), 10, 1 );
+		add_filter( 'pronamic_payment_redirect_url_restrictcontentpro', array( $this, 'redirect_url' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_text_restrictcontentpro', array( $this, 'source_text' ), 10, 2 );
 
-		add_filter( 'rcp_payment_status_label', array( __CLASS__, 'rcp_status_label_cancelled' ), 10, 2 );
+		add_filter( 'rcp_payment_status_label', array( $this, 'rcp_status_label_cancelled' ), 10, 2 );
 
-		add_action( 'rcp_set_status', array( __CLASS__, 'rcp_set_status' ), 10, 3 );
+		add_action( 'rcp_set_status', array( $this, 'rcp_set_status' ), 10, 3 );
+	}
+
+	/**
+	 * Register Pronamic gateways.
+	 *
+	 * @param array $gateways Gateways.
+	 * @return array
+	 */
+	public function register_pronamic_gateways( $gateways ) {
+		return array_merge( $gateways, $this->get_gateways() );
+	}
+
+	/**
+	 * Get gateway data.
+	 *
+	 * @param string $label Label.
+	 * @param string $class Class.
+	 * @return array
+	 */
+	private function get_gateway_data( $label, $class ) {
+		return array(
+			'label'       => $label,
+			'admin_label' => sprintf(
+				'%s - %s',
+				__( 'Pronamic', 'pronamic_ideal' ),
+				$label
+			),
+			'class'       => __NAMESPACE__ . '\\' . $class,
+		);
+	}
+
+	/**
+	 * Get Pronamic gateways.
+	 *
+	 * @return array
+	 */
+	public function get_gateways() {
+		return array(
+			'pronamic_pay'                         => $this->get_gateway_data( __( 'Pay', 'pronamic_ideal' ), 'Gateway' ),
+			'pronamic_pay_bancontact'              => $this->get_gateway_data( __( 'Bancontact', 'pronamic_ideal' ), 'BancontactGateway' ),
+			'pronamic_pay_banktransfer'            => $this->get_gateway_data( __( 'Bank Transfer', 'pronamic_ideal' ), 'BankTransferGateway' ),
+			'pronamic_pay_bitcoin'                 => $this->get_gateway_data( __( 'Bitcoin', 'pronamic_ideal' ), 'BitcoinGateway' ),
+			'pronamic_pay_credit_card'             => $this->get_gateway_data( __( 'Credit Card', 'pronamic_ideal' ), 'CreditCardGateway' ),
+			'pronamic_pay_direct_debit'            => $this->get_gateway_data( __( 'Direct Debit', 'pronamic_ideal' ), 'DirectDebitGateway' ),
+			'pronamic_pay_direct_debit_bancontact' => $this->get_gateway_data( __( 'Direct Debit mandate via Bancontact', 'pronamic_ideal' ), 'DirectDebitBancontactGateway' ),
+			'pronamic_pay_direct_debit_ideal'      => $this->get_gateway_data( __( 'Direct Debit mandate via iDEAL', 'pronamic_ideal' ), 'DirectDebitIDealGateway' ),
+			'pronamic_pay_direct_debit_sofort'     => $this->get_gateway_data( __( 'Direct Debit mandate via SOFORT', 'pronamic_ideal' ), 'DirectDebitSofortGateway' ),
+			'pronamic_pay_ideal'                   => $this->get_gateway_data( __( 'iDEAL', 'pronamic_ideal' ), 'IDealGateway' ),
+			'pronamic_pay_paypal'                  => $this->get_gateway_data( __( 'PayPal', 'pronamic_ideal' ), 'PayPalGateway' ),
+			'pronamic_pay_sofort'                  => $this->get_gateway_data( __( 'SOFORT', 'pronamic_ideal' ), 'SofortGateway' ),
+		);
+	}
+
+	/**
+	 * Payment settings.
+	 *
+	 * @param array $rcp_options Restrict Content Pro options.
+	 */
+	public function payments_settings( $rcp_options ) {
+		foreach ( $this->get_gateways() as $data ) {
+			$gateway = new $data['class']();
+
+			$gateway->payments_settings( $rcp_options );
+		}
 	}
 
 	/**
@@ -77,7 +136,7 @@ class Extension {
 	 *
 	 * @return string
 	 */
-	public static function rcp_status_label_cancelled( $label, $status ) {
+	public function rcp_status_label_cancelled( $label, $status ) {
 		switch ( $status ) {
 			case 'cancelled':
 				$label = _x( 'Cancelled', 'Payment status', 'pronamic_ideal' );
@@ -104,7 +163,7 @@ class Extension {
 	 *
 	 * @return string
 	 */
-	public static function redirect_url( $url, $payment ) {
+	public function redirect_url( $url, $payment ) {
 		$source_id = $payment->get_source_id();
 
 		$data = new PaymentData( $source_id, array() );
@@ -141,7 +200,7 @@ class Extension {
 	 *
 	 * @param Payment $payment Payment.
 	 */
-	public static function status_update( Payment $payment ) {
+	public function status_update( Payment $payment ) {
 		$source_id = $payment->get_source_id();
 
 		$payments    = new RCP_Payments();
@@ -208,7 +267,7 @@ class Extension {
 	 * @param string|int $user_id    User ID.
 	 * @param string     $old_status Old status.
 	 */
-	public static function rcp_set_status( $new_status, $user_id, $old_status ) {
+	public function rcp_set_status( $new_status, $user_id, $old_status ) {
 		$subscription = Util::get_subscription_by_user( $user_id );
 
 		if ( ! $subscription ) {
@@ -285,7 +344,7 @@ class Extension {
 	 *
 	 * @return string $text
 	 */
-	public static function source_text( $text, Payment $payment ) {
+	public function source_text( $text, Payment $payment ) {
 		$text = __( 'Restrict Content Pro', 'pronamic_ideal' ) . '<br />';
 
 		$source_url = add_query_arg(
@@ -312,7 +371,7 @@ class Extension {
 	 *
 	 * @return string
 	 */
-	public static function source_description( $description, Payment $payment ) {
+	public function source_description( $description, Payment $payment ) {
 		return __( 'Restrict Content Pro Order', 'pronamic_ideal' );
 	}
 
@@ -324,7 +383,7 @@ class Extension {
 	 *
 	 * @return string
 	 */
-	public static function source_url( $url, Payment $payment ) {
+	public function source_url( $url, Payment $payment ) {
 		$url = add_query_arg(
 			'user_id',
 			$payment->post->post_author,

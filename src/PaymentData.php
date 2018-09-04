@@ -16,7 +16,7 @@ use Pronamic\WordPress\Pay\Payments\PaymentData as Pay_PaymentData;
 use Pronamic\WordPress\Pay\Payments\Item;
 use Pronamic\WordPress\Pay\Payments\Items;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
-use RCP_Payments;
+use RCP_Payment_Gateway;
 
 /**
  * Payment data
@@ -27,11 +27,11 @@ use RCP_Payments;
  */
 class PaymentData extends Pay_PaymentData {
 	/**
-	 * Payment ID
+	 * Gateway
 	 *
-	 * @var int
+	 * @var RCP_Payment_Gateway
 	 */
-	private $payment_id;
+	private $gateway;
 
 	/**
 	 * Payment data
@@ -43,14 +43,12 @@ class PaymentData extends Pay_PaymentData {
 	/**
 	 * Constructs and initializes an Restrict Content Pro iDEAL data proxy
 	 *
-	 * @param int   $payment_id   Restrict Content Pro payment ID.
-	 * @param array $payment_data Restrict Content Pro payment data.
+	 * @param RCP_Payment_Gateway $gateway Gateway.
 	 */
-	public function __construct( $payment_id, $payment_data ) {
+	public function __construct( RCP_Payment_Gateway $gateway ) {
 		parent::__construct();
 
-		$this->payment_id   = $payment_id;
-		$this->payment_data = $payment_data;
+		$this->gateway = $gateway;
 	}
 
 	/**

@@ -33,6 +33,29 @@
 			"php": "5.3.3"
 		}
 	},
+	"repositories": [
+		{
+			"type": "package",
+			"package": {
+				"name": "restrictcontentpro/restrict-content",
+				"version": "2.2.3",
+				"dist": {
+					"url": "https://github.com/restrictcontentpro/restrict-content/archive/2.2.3.zip",
+					"type": "zip"
+				},
+				"source": {
+					"url": "https://github.com/restrictcontentpro/restrict-content",
+					"type": "github",
+					"reference": "tags/2.2.3"
+				},
+				"autoload": {
+					"classmap": [
+						"."
+					]
+				}
+			}
+		}
+	],
 	"require": {
 		"php": "^5.3",
 		"wp-pay/core": "^2.0"
@@ -41,8 +64,9 @@
 		"php-coveralls/php-coveralls": "^1.0",
 		"phpmd/phpmd": "^2.2.3",
 		"phpunit/phpunit": "^4.5",
+		"restrictcontentpro/restrict-content": "2.2.3",
 		"squizlabs/php_codesniffer": "^2.7",
-		"wp-coding-standards/wpcs": "^0.14.0",
+		"wp-coding-standards/wpcs": "^1.0",
 		"wimg/php-compatibility": "^8.0"
 	}
 }

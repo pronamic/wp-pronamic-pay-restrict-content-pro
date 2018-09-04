@@ -1,4 +1,12 @@
 <?php
+/**
+ * Extension
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2018 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
@@ -9,10 +17,7 @@ use RCP_Member;
 use RCP_Payments;
 
 /**
- * Title: Restrict Content Pro iDEAL Add-On
- * Description:
- * Copyright: Copyright (c) 2005 - 2018
- * Company: Pronamic
+ * Extension
  *
  * @author  Reüel van der Steege
  * @version 2.0.1
@@ -20,10 +25,10 @@ use RCP_Payments;
  */
 class Extension {
 	/**
-	 * Bootstrap
+	 * Bootstrap.
 	 */
 	public static function bootstrap() {
-		// The "plugins_loaded" is one of the earliest hooks after EDD is set up
+		// The "plugins_loaded" is one of the earliest hooks after EDD is set up.
 		add_action( 'plugins_loaded', array( __CLASS__, 'plugins_loaded' ) );
 	}
 
@@ -39,7 +44,7 @@ class Extension {
 		}
 
 		/*
-		 * Gateways
+		 * Gateways.
 		 * @since 1.1.0
 		 */
 		new Gateway();
@@ -67,8 +72,8 @@ class Extension {
 	/**
 	 * Restrict Content Pro payment status 'Cancelled' label.
 	 *
-	 * @param $label
-	 * @param $status
+	 * @param string $label  Label.
+	 * @param string $status Status.
 	 *
 	 * @return string
 	 */
@@ -94,8 +99,8 @@ class Extension {
 	/**
 	 * Payment redirect URL filter.
 	 *
-	 * @param string  $url
-	 * @param Payment $payment
+	 * @param string  $url     URL.
+	 * @param Payment $payment Payment.
 	 *
 	 * @return string
 	 */
@@ -125,7 +130,6 @@ class Extension {
 				break;
 			case Statuses::OPEN:
 				// Nothing to do?
-
 				break;
 		}
 
@@ -133,9 +137,9 @@ class Extension {
 	}
 
 	/**
-	 * Update the status of the specified payment
+	 * Update the status of the specified payment.
 	 *
-	 * @param Payment $payment
+	 * @param Payment $payment Payment.
 	 */
 	public static function status_update( Payment $payment ) {
 		$source_id = $payment->get_source_id();
@@ -143,7 +147,7 @@ class Extension {
 		$payments    = new RCP_Payments();
 		$rcp_payment = $payments->get_payment( $source_id );
 
-		// Only update if order is not completed
+		// Only update if order is not completed.
 		if ( ! $payment->get_subscription() && RestrictContentPro::PAYMENT_STATUS_COMPLETE === $rcp_payment->status ) {
 			return;
 		}
@@ -193,7 +197,6 @@ class Extension {
 				break;
 			case Statuses::OPEN:
 				// Nothing to do?
-
 				break;
 		}
 	}
@@ -201,9 +204,9 @@ class Extension {
 	/**
 	 * Restrict Content Pro user subscription status updated.
 	 *
-	 * @param $new_status
-	 * @param $user_id
-	 * @param $old_status
+	 * @param string     $new_status New status.
+	 * @param string|int $user_id    User ID.
+	 * @param string     $old_status Old status.
 	 */
 	public static function rcp_set_status( $new_status, $user_id, $old_status ) {
 		$subscription = Util::get_subscription_by_user( $user_id );
@@ -277,8 +280,8 @@ class Extension {
 	/**
 	 * Source column
 	 *
-	 * @param string  $text
-	 * @param Payment $payment
+	 * @param string  $text    Text.
+	 * @param Payment $payment Payment.
 	 *
 	 * @return string $text
 	 */
@@ -304,8 +307,8 @@ class Extension {
 	/**
 	 * Source description.
 	 *
-	 * @param string  $description
-	 * @param Payment $payment
+	 * @param string  $description Description.
+	 * @param Payment $payment     Payment.
 	 *
 	 * @return string
 	 */
@@ -316,8 +319,8 @@ class Extension {
 	/**
 	 * Source URL.
 	 *
-	 * @param string  $url
-	 * @param Payment $payment
+	 * @param string  $url     URL.
+	 * @param Payment $payment Payment.
 	 *
 	 * @return string
 	 */

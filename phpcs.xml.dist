@@ -16,8 +16,6 @@
 	<rule ref="PHPCompatibility" />
 
 	<rule ref="WordPress">
-		<exclude name="Squiz.Commenting"></exclude>
-
 		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
 		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"></exclude>
 

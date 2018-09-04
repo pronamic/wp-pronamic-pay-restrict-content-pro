@@ -1,4 +1,12 @@
 <?php
+/**
+ * Payment data
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2018 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
@@ -11,10 +19,7 @@ use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use RCP_Payments;
 
 /**
- * Title: Restrict Content Pro payment data
- * Description:
- * Copyright: Copyright (c) 2005 - 2018
- * Company: Pronamic
+ * Payment data
  *
  * @author  Reüel van der Steege
  * @version 2.0.2
@@ -38,8 +43,8 @@ class PaymentData extends Pay_PaymentData {
 	/**
 	 * Constructs and initializes an Restrict Content Pro iDEAL data proxy
 	 *
-	 * @param int   $payment_id
-	 * @param mixed $payment_data
+	 * @param int   $payment_id   Restrict Content Pro payment ID.
+	 * @param array $payment_data Restrict Content Pro payment data.
 	 */
 	public function __construct( $payment_id, $payment_data ) {
 		parent::__construct();
@@ -67,6 +72,11 @@ class PaymentData extends Pay_PaymentData {
 		return 'restrictcontentpro';
 	}
 
+	/**
+	 * Get title.
+	 *
+	 * @return string
+	 */
 	public function get_title() {
 		/* translators: %s: order id */
 		return sprintf( __( 'Restrict Content Pro order %s', 'pronamic_ideal' ), $this->get_order_id() );
@@ -97,11 +107,11 @@ class PaymentData extends Pay_PaymentData {
 	 * @return Items
 	 */
 	public function get_items() {
-		// Items
+		// Items.
 		$items = new Items();
 
-		// Item
-		// We only add one total item, because iDEAL cant work with negative price items (discount)
+		// Item.
+		// We only add one total item, because iDEAL cant work with negative price items (discount).
 		$item = new Item();
 		$item->set_number( $this->payment_id );
 		$item->set_description( $this->get_description() );
@@ -114,7 +124,7 @@ class PaymentData extends Pay_PaymentData {
 	}
 
 	/**
-	 * Get currency
+	 * Get currency.
 	 *
 	 * @return string
 	 */
@@ -122,10 +132,20 @@ class PaymentData extends Pay_PaymentData {
 		return rcp_get_currency();
 	}
 
+	/**
+	 * Get email.
+	 *
+	 * @return string
+	 */
 	public function get_email() {
 		return $this->payment_data['email'];
 	}
 
+	/**
+	 * Get customer name.
+	 *
+	 * @return string
+	 */
 	public function get_customer_name() {
 		$name = '';
 
@@ -140,18 +160,38 @@ class PaymentData extends Pay_PaymentData {
 		return $name;
 	}
 
+	/**
+	 * Get address.
+	 *
+	 * @return string
+	 */
 	public function get_address() {
 		return '';
 	}
 
+	/**
+	 * Get city.
+	 *
+	 * @return string
+	 */
 	public function get_city() {
 		return '';
 	}
 
+	/**
+	 * Get ZIP.
+	 *
+	 * @return string
+	 */
 	public function get_zip() {
 		return '';
 	}
 
+	/**
+	 * Get user ID.
+	 *
+	 * @return int|string
+	 */
 	public function get_user_id() {
 		$user_id = 0;
 
@@ -173,10 +213,20 @@ class PaymentData extends Pay_PaymentData {
 		return $user_id;
 	}
 
+	/**
+	 * Get normal return URL.
+	 *
+	 * @return string
+	 */
 	public function get_normal_return_url() {
 		return home_url();
 	}
 
+	/**
+	 * Get success URL.
+	 *
+	 * @return string
+	 */
 	public function get_success_url() {
 		global $rcp_options;
 
@@ -189,6 +239,11 @@ class PaymentData extends Pay_PaymentData {
 		return null;
 	}
 
+	/**
+	 * Get subscription.
+	 *
+	 * @return Subscription|false
+	 */
 	public function get_subscription() {
 		if ( ! $this->payment_data['auto_renew'] ) {
 			return false;

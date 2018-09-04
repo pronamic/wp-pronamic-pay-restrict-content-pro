@@ -1,4 +1,12 @@
 <?php
+/**
+ * Gateway
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2018 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
@@ -10,10 +18,7 @@ use RCP_Payment_Gateway;
 use RCP_Payments;
 
 /**
- * Title: Restrict Content Pro gateway
- * Description:
- * Copyright: Copyright (c) 2005 - 2018
- * Company: Pronamic
+ * Gateway
  *
  * @author  Reüel van der Steege
  * @version 2.0.2
@@ -49,24 +54,24 @@ class Gateway extends RCP_Payment_Gateway {
 	protected $label;
 
 	/**
-	 * Bootstrap
+	 * Construct gateway.
 	 *
-	 * @param array $subscription_data
+	 * @param array $subscription_data Subscription data.
 	 */
 	public function __construct( $subscription_data = array() ) {
 		global $rcp_options;
 
 		parent::__construct( $subscription_data );
 
-		// Settings
+		// Settings.
 		if ( isset( $rcp_options[ $this->id . '_label' ] ) && ! empty( $rcp_options[ $this->id . '_label' ] ) ) {
 			$this->label = $rcp_options[ $this->id . '_label' ];
 		}
 
-		// Actions
+		// Actions.
 		add_action( 'rcp_gateway_' . $this->id, array( $this, 'process_purchase' ) );
 
-		// Filters
+		// Filters.
 		add_filter( 'rcp_payments_settings', array( $this, 'payments_settings' ) );
 
 		$config_option = $this->id . '_config_id';
@@ -79,7 +84,7 @@ class Gateway extends RCP_Payment_Gateway {
 	}
 
 	/**
-	 * Init
+	 * Initialize.
 	 */
 	public function init() {
 		$this->label       = PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
@@ -95,9 +100,8 @@ class Gateway extends RCP_Payment_Gateway {
 	/**
 	 * Add the gateway to Restrict Content Pro
 	 *
-	 * @param mixed $gateways
-	 *
-	 * @return mixed $gateways
+	 * @param array $gateways Gateways.
+	 * @return array
 	 */
 	public function payment_gateways( $gateways ) {
 		$gateways[ $this->id ] = array(
@@ -115,7 +119,7 @@ class Gateway extends RCP_Payment_Gateway {
 	 *
 	 * @see https://github.com/restrictcontentpro/restrict-content-pro/blob/2.2.8/includes/admin/settings/register-settings.php#L126
 	 *
-	 * @param $rcp_options
+	 * @param array $rcp_options Restrict Content Pro options.
 	 */
 	public function payments_settings( $rcp_options ) {
 		$config_option = $this->id . '_config_id';
@@ -201,6 +205,11 @@ class Gateway extends RCP_Payment_Gateway {
 		echo $this->fields(); // WPCS: XSS ok.
 	}
 
+	/**
+	 * Fields.
+	 *
+	 * @return string
+	 */
 	public function fields() {
 		global $rcp_options;
 
@@ -240,7 +249,7 @@ class Gateway extends RCP_Payment_Gateway {
 	 *   'cart_details' => array of cart details,
 	 * );
 	 *
-	 * @param array $purchase_data
+	 * @param array $purchase_data Restrict Content Pro purchase data.
 	 */
 	public function process_purchase( $purchase_data ) {
 		global $rcp_options;
@@ -249,7 +258,7 @@ class Gateway extends RCP_Payment_Gateway {
 
 		$rcp_transaction_id = $this->generate_transaction_id();
 
-		// Collect payment data
+		// Collect payment data.
 		$rcp_payment_data = array(
 			'subscription'     => $purchase_data['subscription_name'],
 			'date'             => date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ),
@@ -284,7 +293,7 @@ class Gateway extends RCP_Payment_Gateway {
 
 		$member->set_recurring( $payment_data['auto_renew'] );
 
-		// Record the pending payment
+		// Record the pending payment.
 		$payments = new RCP_Payments();
 
 		$pending_payment_id = null;
@@ -301,7 +310,7 @@ class Gateway extends RCP_Payment_Gateway {
 			$payments->update( $payment_id, $rcp_payment_data );
 		}
 
-		// Check payment
+		// Check payment.
 		if ( ! $payment_id ) {
 			do_action( 'rcp_registration_failed', $this );
 
@@ -368,7 +377,7 @@ class Gateway extends RCP_Payment_Gateway {
 						array( 'response' => '401' )
 					);
 				} else {
-					// Transaction ID
+					// Transaction ID.
 					if ( '' !== $payment->get_transaction_id() ) {
 						$rcp_payment_data['transaction_id'] = $payment->get_transaction_id();
 

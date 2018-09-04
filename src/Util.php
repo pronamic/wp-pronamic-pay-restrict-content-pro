@@ -1,4 +1,12 @@
 <?php
+/**
+ * Util
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2018 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
@@ -6,10 +14,7 @@ use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use WP_Query;
 
 /**
- * Title: Restrict Content Pro Util
- * Description:
- * Copyright: Copyright (c) 2005 - 2018
- * Company: Pronamic
+ * Util
  *
  * @author  Reüel van der Steege
  * @version 2.0.0
@@ -19,9 +24,9 @@ class Util {
 	/**
 	 * Get Pronamic RCP subscription for user.
 	 *
-	 * @param $user_id
+	 * @param int|string $user_id WordPress user ID.
 	 *
-	 * @return Subscription
+	 * @return Subscription|null
 	 */
 	public static function get_subscription_by_user( $user_id = null ) {
 		if ( empty( $user_id ) ) {

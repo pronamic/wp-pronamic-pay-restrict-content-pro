@@ -261,6 +261,7 @@ class Extension {
 				if ( $subscription ) {
 					// @todo Add note to subscription with info why subscription is cancelled?
 					$subscription->set_status( Statuses::CANCELLED );
+
 					$subscription->save();
 				}
 			}

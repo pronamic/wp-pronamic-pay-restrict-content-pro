@@ -207,7 +207,9 @@ class Gateway extends RCP_Payment_Gateway {
 	public function process_signup() {
 		global $rcp_payments_db;
 
-		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
+		$config_id = $this->get_pronamic_config_id();
+
+		$gateway = Plugin::get_gateway( $config_id );
 
 		if ( empty( $gateway ) ) {
 			do_action( 'rcp_registration_failed', $this );

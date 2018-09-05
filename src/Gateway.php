@@ -68,6 +68,28 @@ class Gateway extends RCP_Payment_Gateway {
 	}
 
 	/**
+	 * Get the Pronamic configuration ID for this gateway.
+	 *
+	 * @global array $rcp_options Restrict Content Pro options.
+	 * @return string
+	 */
+	private function get_pronamic_config_id() {
+		global $rcp_options;
+
+		$key = $this->id . '_config_id';
+
+		if ( array_key_exists( $key, $rcp_options ) ) {
+			$config_id = $rcp_options[ $key ];
+		}
+
+		if ( empty( $config_id ) ) {
+			$config_id = get_option( 'pronamic_pay_config_id' );
+		}
+
+		return $config_id;
+	}
+
+	/**
 	 * Add the iDEAL configuration settings to the Restrict Content Pro payment gateways settings page.
 	 *
 	 * @see https://github.com/restrictcontentpro/restrict-content-pro/blob/2.2.8/includes/admin/settings/register-settings.php#L126
@@ -126,15 +148,9 @@ class Gateway extends RCP_Payment_Gateway {
 				<td>
 					<?php
 
-					$config_id = get_option( 'pronamic_pay_config_id' );
-
-					if ( isset( $rcp_options[ $config_option ] ) ) {
-						$config_id = $rcp_options[ $config_option ];
-					}
-
 					AdminModule::dropdown_configs( array(
 						'name'           => 'rcp_settings[' . esc_attr( $config_option ) . ']',
-						'selected'       => $config_id,
+						'selected'       => $this->get_pronamic_config_id(),
 						'payment_method' => $this->payment_method,
 					) );
 
@@ -164,11 +180,9 @@ class Gateway extends RCP_Payment_Gateway {
 	 * @return string
 	 */
 	public function fields() {
-		global $rcp_options;
-
 		ob_start();
 
-		$gateway = Plugin::get_gateway( $rcp_options[ $this->id . '_config_id' ] );
+		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
 
 		if ( $gateway ) {
 			$gateway->set_payment_method( $this->payment_method );
@@ -187,21 +201,13 @@ class Gateway extends RCP_Payment_Gateway {
 
 	/**
 	 * Process signup.
+	 *
+	 * @global RCP_Payments $rcp_payments_db Restrict Content Pro payments object.
 	 */
 	public function process_signup() {
-		/**
-		 * @var array
-		 */
-		global $rcp_options;
-
-		/**
-		 * @var RCP_Payments $rcp_payments_db
-		 */
 		global $rcp_payments_db;
 
-		$config_id = $rcp_options[ $this->id . '_config_id' ];
-
-		$gateway = Plugin::get_gateway( $config_id );
+		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
 
 		if ( empty( $gateway ) ) {
 			do_action( 'rcp_registration_failed', $this );

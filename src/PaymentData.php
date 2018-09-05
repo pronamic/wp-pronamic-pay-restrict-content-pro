@@ -17,6 +17,7 @@ use Pronamic\WordPress\Pay\Payments\Item;
 use Pronamic\WordPress\Pay\Payments\Items;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use RCP_Payment_Gateway;
+use RCP_Member;
 
 /**
  * Payment data
@@ -247,19 +248,7 @@ class PaymentData extends Pay_PaymentData {
 	 * @return string
 	 */
 	public function get_subscription_source_id() {
-		$subscription = $this->get_subscription();
-
-		if ( ! $subscription ) {
-			return false;
-		}
-
-		$user_subscription = Util::get_subscription_by_user( $this->get_user_id() );
-
-		if ( $user_subscription ) {
-			return $user_subscription->get_source_id();
-		}
-
-		return $this->get_source_id();
+		return $this->gateway->user_id;
 	}
 
 	/**
@@ -269,16 +258,18 @@ class PaymentData extends Pay_PaymentData {
 	 * @return string
 	 */
 	public function get_subscription_id() {
-		if ( ! $this->get_subscription() ) {
+		$member = new RCP_Member( $this->gateway->user_id );
+
+		if ( $member->get_subscription_id() !== $this->gateway->subscription_id ) {
 			return;
 		}
 
-		$user_subscription = Util::get_subscription_by_user( $this->get_user_id() );
+		$subscription = Util::get_subscription_by_user( $this->gateway->user_id );
 
-		if ( ! $user_subscription ) {
+		if ( empty( $subscription ) ) {
 			return;
 		}
 
-		return $user_subscription->get_id();
+		return $subscription->get_id();
 	}
 }

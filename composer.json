@@ -67,6 +67,8 @@
 		"restrictcontentpro/restrict-content": "2.2.3",
 		"squizlabs/php_codesniffer": "^2.7",
 		"wp-coding-standards/wpcs": "^1.0",
-		"wimg/php-compatibility": "^8.0"
+		"wimg/php-compatibility": "^8.0",
+		"wp-phpunit/wp-phpunit": "^4.9",
+		"johnpbloch/wordpress": "^4.9"
 	}
 }

@@ -112,7 +112,7 @@ class Gateway extends RCP_Payment_Gateway {
 						esc_html(
 							sprintf(
 								/* translators: %s: admin label */
-								 __( '%s Settings', 'pronamic_ideal' ),
+								__( '%s Settings', 'pronamic_ideal' ),
 								$this->admin_label
 							)
 						)
@@ -238,7 +238,7 @@ class Gateway extends RCP_Payment_Gateway {
 				esc_html(
 					sprintf(
 						/* translators: %s: JSON encoded payment data */
-						 __( 'Payment creation failed before sending buyer to the payment provider. Error: %s', 'pronamic_ideal' ),
+						__( 'Payment creation failed before sending buyer to the payment provider. Error: %s', 'pronamic_ideal' ),
 						$error->get_error_message()
 					)
 				),

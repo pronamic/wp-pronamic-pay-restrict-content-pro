@@ -21,7 +21,7 @@ use RCP_Payments;
  * Gateway
  *
  * @author  Reüel van der Steege
- * @version 2.0.2
+ * @version 2.1.0
  * @since   1.0.0
  */
 class Gateway extends RCP_Payment_Gateway {
@@ -109,11 +109,13 @@ class Gateway extends RCP_Payment_Gateway {
 
 					printf(
 						'<h3>%s</h3>',
-						esc_html( sprintf(
-							/* translators: %s: admin label */
-							__( '%s Settings', 'pronamic_ideal' ),
-							$this->admin_label
-						) )
+						esc_html(
+							sprintf(
+								/* translators: %s: admin label */
+								 __( '%s Settings', 'pronamic_ideal' ),
+								$this->admin_label
+							)
+						)
 					);
 
 					?>
@@ -148,11 +150,13 @@ class Gateway extends RCP_Payment_Gateway {
 				<td>
 					<?php
 
-					AdminModule::dropdown_configs( array(
-						'name'           => 'rcp_settings[' . esc_attr( $config_option ) . ']',
-						'selected'       => $this->get_pronamic_config_id(),
-						'payment_method' => $this->payment_method,
-					) );
+					AdminModule::dropdown_configs(
+						array(
+							'name'           => 'rcp_settings[' . esc_attr( $config_option ) . ']',
+							'selected'       => $this->get_pronamic_config_id(),
+							'payment_method' => $this->payment_method,
+						)
+					);
 
 					?>
 
@@ -231,11 +235,13 @@ class Gateway extends RCP_Payment_Gateway {
 			do_action( 'rcp_registration_failed', $this );
 
 			wp_die(
-				esc_html( sprintf(
-					/* translators: %s: JSON encoded payment data */
-					__( 'Payment creation failed before sending buyer to the payment provider. Error: %s', 'pronamic_ideal' ),
-					$error->get_error_message()
-				) ),
+				esc_html(
+					sprintf(
+						/* translators: %s: JSON encoded payment data */
+						 __( 'Payment creation failed before sending buyer to the payment provider. Error: %s', 'pronamic_ideal' ),
+						$error->get_error_message()
+					)
+				),
 				esc_html__( 'Payment Error', 'pronamic_ideal' ),
 				array( 'response' => '401' )
 			);
@@ -243,9 +249,12 @@ class Gateway extends RCP_Payment_Gateway {
 
 		// Transaction ID.
 		if ( '' !== $payment->get_transaction_id() ) {
-			$rcp_payments_db->update( $this->payment->id, array(
-				'transaction_id' => $payment->get_transaction_id(),
-			) );
+			$rcp_payments_db->update(
+				$this->payment->id,
+				array(
+					'transaction_id' => $payment->get_transaction_id(),
+				)
+			);
 		}
 
 		$gateway->redirect( $payment );

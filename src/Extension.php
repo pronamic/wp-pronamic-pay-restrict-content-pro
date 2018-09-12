@@ -21,7 +21,7 @@ use WP_Query;
  * Extension
  *
  * @author  Reüel van der Steege
- * @version 2.0.1
+ * @version 2.1.0
  * @since   1.0.0
  */
 class Extension {

@@ -23,7 +23,7 @@ use RCP_Member;
  * Payment data
  *
  * @author  Reüel van der Steege
- * @version 2.0.2
+ * @version 2.1.0
  * @since   1.0.0
  */
 class PaymentData extends Pay_PaymentData {
@@ -233,10 +233,12 @@ class PaymentData extends Pay_PaymentData {
 		$subscription->interval_period = Core_Util::to_period( $this->gateway->subscription_data['length_unit'] );
 		$subscription->description     = $this->get_description();
 
-		$subscription->set_amount( new Money(
-			$this->gateway->subscription_data['recurring_price'],
-			$this->get_currency_alphabetic_code()
-		) );
+		$subscription->set_amount(
+			new Money(
+				$this->gateway->subscription_data['recurring_price'],
+				$this->get_currency_alphabetic_code()
+			)
+		);
 
 		return $subscription;
 	}

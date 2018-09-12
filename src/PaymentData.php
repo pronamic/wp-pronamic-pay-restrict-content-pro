@@ -1,4 +1,12 @@
 <?php
+/**
+ * Payment data
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2018 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
@@ -8,44 +16,42 @@ use Pronamic\WordPress\Pay\Payments\PaymentData as Pay_PaymentData;
 use Pronamic\WordPress\Pay\Payments\Item;
 use Pronamic\WordPress\Pay\Payments\Items;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
-use RCP_Payments;
+use RCP_Payment_Gateway;
+use RCP_Member;
 
 /**
- * Title: Restrict Content Pro payment data
- * Description:
- * Copyright: Copyright (c) 2005 - 2018
- * Company: Pronamic
+ * Payment data
  *
  * @author  Reüel van der Steege
- * @version 2.0.2
+ * @version 2.1.0
  * @since   1.0.0
  */
 class PaymentData extends Pay_PaymentData {
 	/**
-	 * Payment ID
+	 * Gateway
 	 *
-	 * @var int
+	 * @var RCP_Payment_Gateway
 	 */
-	private $payment_id;
-
-	/**
-	 * Payment data
-	 *
-	 * @var mixed
-	 */
-	private $payment_data;
+	private $gateway;
 
 	/**
 	 * Constructs and initializes an Restrict Content Pro iDEAL data proxy
 	 *
-	 * @param int   $payment_id
-	 * @param mixed $payment_data
+	 * @param RCP_Payment_Gateway $gateway Gateway.
 	 */
-	public function __construct( $payment_id, $payment_data ) {
+	public function __construct( RCP_Payment_Gateway $gateway ) {
 		parent::__construct();
 
-		$this->payment_id   = $payment_id;
-		$this->payment_data = $payment_data;
+		$this->gateway = $gateway;
+	}
+
+	/**
+	 * Get payment ID.
+	 *
+	 * @return string
+	 */
+	private function get_payment_id() {
+		return $this->gateway->payment->id;
 	}
 
 	/**
@@ -54,7 +60,7 @@ class PaymentData extends Pay_PaymentData {
 	 * @return int $source_id
 	 */
 	public function get_source_id() {
-		return $this->payment_id;
+		return $this->get_payment_id();
 	}
 
 	/**
@@ -67,6 +73,11 @@ class PaymentData extends Pay_PaymentData {
 		return 'restrictcontentpro';
 	}
 
+	/**
+	 * Get title.
+	 *
+	 * @return string
+	 */
 	public function get_title() {
 		/* translators: %s: order id */
 		return sprintf( __( 'Restrict Content Pro order %s', 'pronamic_ideal' ), $this->get_order_id() );
@@ -78,7 +89,7 @@ class PaymentData extends Pay_PaymentData {
 	 * @return string
 	 */
 	public function get_description() {
-		return $this->payment_data['subscription_name'];
+		return $this->gateway->subscription_name;
 	}
 
 	/**
@@ -87,7 +98,7 @@ class PaymentData extends Pay_PaymentData {
 	 * @return string
 	 */
 	public function get_order_id() {
-		return $this->payment_id;
+		return $this->get_payment_id();
 	}
 
 	/**
@@ -97,15 +108,15 @@ class PaymentData extends Pay_PaymentData {
 	 * @return Items
 	 */
 	public function get_items() {
-		// Items
+		// Items.
 		$items = new Items();
 
-		// Item
-		// We only add one total item, because iDEAL cant work with negative price items (discount)
+		// Item.
+		// We only add one total item, because iDEAL cant work with negative price items (discount).
 		$item = new Item();
-		$item->set_number( $this->payment_id );
+		$item->set_number( $this->get_payment_id() );
 		$item->set_description( $this->get_description() );
-		$item->set_price( $this->payment_data['amount'] );
+		$item->set_price( $this->gateway->amount );
 		$item->set_quantity( 1 );
 
 		$items->addItem( $item );
@@ -114,7 +125,7 @@ class PaymentData extends Pay_PaymentData {
 	}
 
 	/**
-	 * Get currency
+	 * Get currency.
 	 *
 	 * @return string
 	 */
@@ -122,94 +133,112 @@ class PaymentData extends Pay_PaymentData {
 		return rcp_get_currency();
 	}
 
+	/**
+	 * Get email.
+	 *
+	 * @return string
+	 */
 	public function get_email() {
-		return $this->payment_data['email'];
+		return $this->gateway->email;
 	}
 
+	/**
+	 * Get customer name.
+	 *
+	 * @return string
+	 */
 	public function get_customer_name() {
 		$name = '';
 
-		if ( isset( $this->payment_data['user_name'] ) ) {
-			$user = get_user_by( 'login', $this->payment_data['user_name'] );
+		$user = get_user_by( 'login', $this->gateway->user_name );
 
-			if ( $user ) {
-				$name = trim( $user->first_name . ' ' . $user->last_name );
-			}
+		if ( $user ) {
+			$name = trim( $user->first_name . ' ' . $user->last_name );
 		}
 
 		return $name;
 	}
 
+	/**
+	 * Get address.
+	 *
+	 * @return string
+	 */
 	public function get_address() {
 		return '';
 	}
 
+	/**
+	 * Get city.
+	 *
+	 * @return string
+	 */
 	public function get_city() {
 		return '';
 	}
 
+	/**
+	 * Get ZIP.
+	 *
+	 * @return string
+	 */
 	public function get_zip() {
 		return '';
 	}
 
+	/**
+	 * Get user ID.
+	 *
+	 * @return int|string
+	 */
 	public function get_user_id() {
-		$user_id = 0;
-
-		if ( isset( $this->payment_data['subscription_data']['user_id'] ) ) {
-			$user_id = $this->payment_data['subscription_data']['user_id'];
-		} elseif ( isset( $this->payment_data['user_name'] ) ) {
-			$user = get_user_by( 'login', $this->payment_data['user_name'] );
-
-			$user_id = $user->ID;
-		} else {
-			$payments = new RCP_Payments();
-			$payment  = $payments->get_payment( $this->payment_id );
-
-			if ( $payment ) {
-				$user_id = $payment->user_id;
-			}
-		}
-
-		return $user_id;
+		return $this->gateway->user_id;
 	}
 
+	/**
+	 * Get normal return URL.
+	 *
+	 * @return string
+	 */
 	public function get_normal_return_url() {
-		return home_url();
+		return rcp_get_return_url( $this->get_user_id() );
 	}
 
+	/**
+	 * Get success URL.
+	 *
+	 * @return string
+	 */
 	public function get_success_url() {
-		global $rcp_options;
-
-		$page_id = $rcp_options['redirect'];
-
-		if ( is_numeric( $page_id ) ) {
-			return get_permalink( $page_id );
-		}
-
-		return null;
+		return rcp_get_return_url( $this->get_user_id() );
 	}
 
+	/**
+	 * Get subscription.
+	 *
+	 * @return Subscription|false
+	 */
 	public function get_subscription() {
-		if ( ! $this->payment_data['auto_renew'] ) {
+		if ( ! $this->gateway->auto_renew ) {
 			return false;
 		}
 
-		if ( ! isset( $this->payment_data['subscription_data'] ) ) {
+		if ( ! isset( $this->gateway->subscription_data ) ) {
 			return false;
 		}
-
-		$subscription_data = $this->payment_data['subscription_data'];
 
 		$subscription                  = new Subscription();
 		$subscription->frequency       = '';
-		$subscription->interval        = $subscription_data['length'];
-		$subscription->interval_period = Core_Util::to_period( $subscription_data['length_unit'] );
+		$subscription->interval        = $this->gateway->subscription_data['length'];
+		$subscription->interval_period = Core_Util::to_period( $this->gateway->subscription_data['length_unit'] );
 		$subscription->description     = $this->get_description();
 
-		$subscription->set_amount( new Money(
-			$subscription_data['recurring_price'],
-			$this->get_currency_alphabetic_code()
-		) );
+		$subscription->set_amount(
+			new Money(
+				$this->gateway->subscription_data['recurring_price'],
+				$this->get_currency_alphabetic_code()
+			)
+		);
 
 		return $subscription;
 	}
@@ -221,19 +250,7 @@ class PaymentData extends Pay_PaymentData {
 	 * @return string
 	 */
 	public function get_subscription_source_id() {
-		$subscription = $this->get_subscription();
-
-		if ( ! $subscription ) {
-			return false;
-		}
-
-		$user_subscription = Util::get_subscription_by_user( $this->get_user_id() );
-
-		if ( $user_subscription ) {
-			return $user_subscription->get_source_id();
-		}
-
-		return $this->get_source_id();
+		return $this->gateway->user_id;
 	}
 
 	/**
@@ -243,16 +260,18 @@ class PaymentData extends Pay_PaymentData {
 	 * @return string
 	 */
 	public function get_subscription_id() {
-		if ( ! $this->get_subscription() ) {
+		$member = new RCP_Member( $this->gateway->user_id );
+
+		if ( $member->get_subscription_id() !== $this->gateway->subscription_id ) {
 			return;
 		}
 
-		$user_subscription = Util::get_subscription_by_user( $this->get_user_id() );
+		$subscription = Util::get_subscription_by_user( $this->gateway->user_id );
 
-		if ( ! $user_subscription ) {
+		if ( empty( $subscription ) ) {
 			return;
 		}
 
-		return $user_subscription->get_id();
+		return $subscription->get_id();
 	}
 }

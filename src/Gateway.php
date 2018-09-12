@@ -1,4 +1,12 @@
 <?php
+/**
+ * Gateway
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2018 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
@@ -10,13 +18,10 @@ use RCP_Payment_Gateway;
 use RCP_Payments;
 
 /**
- * Title: Restrict Content Pro gateway
- * Description:
- * Copyright: Copyright (c) 2005 - 2018
- * Company: Pronamic
+ * Gateway
  *
  * @author  Reüel van der Steege
- * @version 2.0.2
+ * @version 2.1.0
  * @since   1.0.0
  */
 class Gateway extends RCP_Payment_Gateway {
@@ -49,37 +54,7 @@ class Gateway extends RCP_Payment_Gateway {
 	protected $label;
 
 	/**
-	 * Bootstrap
-	 *
-	 * @param array $subscription_data
-	 */
-	public function __construct( $subscription_data = array() ) {
-		global $rcp_options;
-
-		parent::__construct( $subscription_data );
-
-		// Settings
-		if ( isset( $rcp_options[ $this->id . '_label' ] ) && ! empty( $rcp_options[ $this->id . '_label' ] ) ) {
-			$this->label = $rcp_options[ $this->id . '_label' ];
-		}
-
-		// Actions
-		add_action( 'rcp_gateway_' . $this->id, array( $this, 'process_purchase' ) );
-
-		// Filters
-		add_filter( 'rcp_payments_settings', array( $this, 'payments_settings' ) );
-
-		$config_option = $this->id . '_config_id';
-
-		if ( is_admin() || ( isset( $rcp_options[ $config_option ] ) && '0' !== $rcp_options[ $config_option ] ) ) {
-			add_filter( 'rcp_payment_gateways', array( $this, 'payment_gateways' ) );
-		}
-
-		add_filter( 'rcp_get_payment_transaction_id-' . $this->id, array( $this, 'get_payment_transaction_id' ) );
-	}
-
-	/**
-	 * Init
+	 * Initialize.
 	 */
 	public function init() {
 		$this->label       = PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
@@ -93,21 +68,25 @@ class Gateway extends RCP_Payment_Gateway {
 	}
 
 	/**
-	 * Add the gateway to Restrict Content Pro
+	 * Get the Pronamic configuration ID for this gateway.
 	 *
-	 * @param mixed $gateways
-	 *
-	 * @return mixed $gateways
+	 * @global array $rcp_options Restrict Content Pro options.
+	 * @return string
 	 */
-	public function payment_gateways( $gateways ) {
-		$gateways[ $this->id ] = array(
-			'label'       => $this->label,
-			'admin_label' => $this->admin_label,
-			'supports'    => $this->supports,
-			'class'       => get_class( $this ),
-		);
+	private function get_pronamic_config_id() {
+		global $rcp_options;
 
-		return $gateways;
+		$key = $this->id . '_config_id';
+
+		if ( array_key_exists( $key, $rcp_options ) ) {
+			$config_id = $rcp_options[ $key ];
+		}
+
+		if ( empty( $config_id ) ) {
+			$config_id = get_option( 'pronamic_pay_config_id' );
+		}
+
+		return $config_id;
 	}
 
 	/**
@@ -115,7 +94,7 @@ class Gateway extends RCP_Payment_Gateway {
 	 *
 	 * @see https://github.com/restrictcontentpro/restrict-content-pro/blob/2.2.8/includes/admin/settings/register-settings.php#L126
 	 *
-	 * @param $rcp_options
+	 * @param array $rcp_options Restrict Content Pro options.
 	 */
 	public function payments_settings( $rcp_options ) {
 		$config_option = $this->id . '_config_id';
@@ -130,11 +109,13 @@ class Gateway extends RCP_Payment_Gateway {
 
 					printf(
 						'<h3>%s</h3>',
-						esc_html( sprintf(
-							/* translators: %s: admin label */
-							__( '%s Settings', 'pronamic_ideal' ),
-							$this->admin_label
-						) )
+						esc_html(
+							sprintf(
+								/* translators: %s: admin label */
+								__( '%s Settings', 'pronamic_ideal' ),
+								$this->admin_label
+							)
+						)
 					);
 
 					?>
@@ -169,17 +150,13 @@ class Gateway extends RCP_Payment_Gateway {
 				<td>
 					<?php
 
-					$config_id = get_option( 'pronamic_pay_config_id' );
-
-					if ( isset( $rcp_options[ $config_option ] ) ) {
-						$config_id = $rcp_options[ $config_option ];
-					}
-
-					AdminModule::dropdown_configs( array(
-						'name'           => 'rcp_settings[' . esc_attr( $config_option ) . ']',
-						'selected'       => $config_id,
-						'payment_method' => $this->payment_method,
-					) );
+					AdminModule::dropdown_configs(
+						array(
+							'name'           => 'rcp_settings[' . esc_attr( $config_option ) . ']',
+							'selected'       => $this->get_pronamic_config_id(),
+							'payment_method' => $this->payment_method,
+						)
+					);
 
 					?>
 
@@ -201,12 +178,15 @@ class Gateway extends RCP_Payment_Gateway {
 		echo $this->fields(); // WPCS: XSS ok.
 	}
 
+	/**
+	 * Fields.
+	 *
+	 * @return string
+	 */
 	public function fields() {
-		global $rcp_options;
-
 		ob_start();
 
-		$gateway = Plugin::get_gateway( $rcp_options[ $this->id . '_config_id' ] );
+		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
 
 		if ( $gateway ) {
 			$gateway->set_payment_method( $this->payment_method );
@@ -224,170 +204,61 @@ class Gateway extends RCP_Payment_Gateway {
 	}
 
 	/**
-	 * The $purchase_data array consists of the following data:
+	 * Process signup.
 	 *
-	 * $purchase_data = array(
-	 *   'downloads'    => array of download IDs,
-	 *   'tax'          => taxed amount on shopping cart
-	 *   'subtotal'     => total price before tax
-	 *   'price'        => total price of cart contents after taxes,
-	 *   'purchase_key' => Random key
-	 *   'user_email'   => $user_email,
-	 *   'date'         => date( 'Y-m-d H:i:s' ),
-	 *   'user_id'      => $user_id,
-	 *   'post_data'    => $_POST,
-	 *   'user_info'    => array of user's information and used discount code
-	 *   'cart_details' => array of cart details,
-	 * );
-	 *
-	 * @param array $purchase_data
+	 * @global RCP_Payments $rcp_payments_db Restrict Content Pro payments object.
 	 */
-	public function process_purchase( $purchase_data ) {
-		global $rcp_options;
+	public function process_signup() {
+		global $rcp_payments_db;
 
-		$config_id = $rcp_options[ $this->id . '_config_id' ];
+		$config_id = $this->get_pronamic_config_id();
 
-		$rcp_transaction_id = $this->generate_transaction_id();
+		$gateway = Plugin::get_gateway( $config_id );
 
-		// Collect payment data
-		$rcp_payment_data = array(
-			'subscription'     => $purchase_data['subscription_name'],
-			'date'             => date( 'Y-m-d H:i:s', current_time( 'timestamp' ) ),
-			'amount'           => $purchase_data['price'] + $purchase_data['fee'],
-			'user_id'          => $purchase_data['user_id'],
-			'payment_type'     => $this->admin_label,
-			'subscription_key' => $purchase_data['key'],
-			'transaction_id'   => $rcp_transaction_id,
-			'status'           => 'pending',
-		);
-
-		$data = array(
-			'email'             => $purchase_data['user_email'],
-			'user_name'         => $purchase_data['user_name'],
-			'currency'          => $purchase_data['currency'],
-			'discount'          => $purchase_data['discount'],
-			'discount_code'     => $purchase_data['discount_code'],
-			'length'            => $purchase_data['length'],
-			'length_unit'       => $purchase_data['length_unit'],
-			'signup_fee'        => $this->supports( 'fees' ) ? $purchase_data['fee'] : 0,
-			'subscription_id'   => $purchase_data['subscription_id'],
-			'subscription_name' => $purchase_data['subscription_name'],
-			'auto_renew'        => $this->supports( 'recurring' ) ? $purchase_data['auto_renew'] : false,
-			'return_url'        => $purchase_data['return_url'],
-			'subscription_data' => $purchase_data,
-		);
-
-		$payment_data = array_merge( $rcp_payment_data, $data );
-
-		// Set user recurring option.
-		$member = new RCP_Member( $payment_data['user_id'] );
-
-		$member->set_recurring( $payment_data['auto_renew'] );
-
-		// Record the pending payment
-		$payments = new RCP_Payments();
-
-		$pending_payment_id = null;
-
-		if ( is_callable( array( $member, 'get_pending_payment_id' ) ) ) {
-			$pending_payment_id = $member->get_pending_payment_id();
-		}
-
-		if ( empty( $pending_payment_id ) ) {
-			$payment_id = $payments->insert( $rcp_payment_data );
-		} else {
-			$payment_id = $member->get_pending_payment_id();
-
-			$payments->update( $payment_id, $rcp_payment_data );
-		}
-
-		// Check payment
-		if ( ! $payment_id ) {
+		if ( empty( $gateway ) ) {
 			do_action( 'rcp_registration_failed', $this );
 
 			wp_die(
-				esc_html( sprintf(
-					/* translators: %s: JSON encoded payment data */
-					__( 'Payment creation failed before sending buyer to the payment provider. Payment data: %s', 'pronamic_ideal' ),
-					wp_json_encode( $payment_data )
-				) ),
+				esc_html( Plugin::get_default_error_message() ),
 				esc_html__( 'Payment Error', 'pronamic_ideal' ),
 				array( 'response' => '401' )
 			);
-		} else {
-			$data = new PaymentData( $payment_id, $payment_data );
-
-			$gateway = Plugin::get_gateway( $config_id );
-
-			if ( $gateway ) {
-				// Start payment.
-				if ( $data->get_subscription_id() ) {
-					$new_subscription = $data->get_subscription();
-
-					$update_meta = array(
-						'amount'          => $new_subscription->get_amount()->get_amount(),
-						'frequency'       => $new_subscription->get_frequency(),
-						'interval'        => $new_subscription->get_interval(),
-						'interval_period' => $new_subscription->get_interval_period(),
-					);
-
-					$subscription = get_pronamic_subscription( $data->get_subscription_id() );
-
-					$subscription->update_meta( $update_meta );
-
-					// Set updated meta in subscription.
-					$subscription->set_amount( $new_subscription->get_amount() );
-
-					$subscription->frequency       = $update_meta['frequency'];
-					$subscription->interval        = $update_meta['interval'];
-					$subscription->interval_period = $update_meta['interval_period'];
-
-					if ( ! doing_action( 'pronamic_pay_update_subscription_payments' ) ) {
-						$data->set_recurring( false );
-					}
-
-					// Start recurring.
-					$payment = Plugin::start_recurring( $subscription, $gateway, $data );
-				} else {
-					// Start.
-					$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
-				}
-
-				$error = $gateway->get_error();
-
-				if ( is_wp_error( $error ) ) {
-					do_action( 'rcp_registration_failed', $this );
-
-					wp_die(
-						esc_html( sprintf(
-							/* translators: %s: JSON encoded payment data */
-							__( 'Payment creation failed before sending buyer to the payment provider. Payment data: %s', 'pronamic_ideal' ),
-							wp_json_encode( $payment_data )
-						) ),
-						esc_html__( 'Payment Error', 'pronamic_ideal' ),
-						array( 'response' => '401' )
-					);
-				} else {
-					// Transaction ID
-					if ( '' !== $payment->get_transaction_id() ) {
-						$rcp_payment_data['transaction_id'] = $payment->get_transaction_id();
-
-						$payments->update( $payment_id, $rcp_payment_data );
-					}
-
-					$gateway->redirect( $payment );
-
-					exit;
-				}
-			} else {
-				do_action( 'rcp_registration_failed', $this );
-
-				wp_die(
-					esc_html( Plugin::get_default_error_message() ),
-					esc_html__( 'Payment Error', 'pronamic_ideal' ),
-					array( 'response' => '401' )
-				);
-			}
 		}
+
+		$data = new PaymentData( $this );
+
+		$payment = Plugin::start( $config_id, $gateway, $data, $this->payment_method );
+
+		$error = $gateway->get_error();
+
+		if ( is_wp_error( $error ) ) {
+			do_action( 'rcp_registration_failed', $this );
+
+			wp_die(
+				esc_html(
+					sprintf(
+						/* translators: %s: JSON encoded payment data */
+						__( 'Payment creation failed before sending buyer to the payment provider. Error: %s', 'pronamic_ideal' ),
+						$error->get_error_message()
+					)
+				),
+				esc_html__( 'Payment Error', 'pronamic_ideal' ),
+				array( 'response' => '401' )
+			);
+		}
+
+		// Transaction ID.
+		if ( '' !== $payment->get_transaction_id() ) {
+			$rcp_payments_db->update(
+				$this->payment->id,
+				array(
+					'transaction_id' => $payment->get_transaction_id(),
+				)
+			);
+		}
+
+		$gateway->redirect( $payment );
+
+		exit;
 	}
 }

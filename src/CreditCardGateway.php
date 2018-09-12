@@ -1,4 +1,12 @@
 <?php
+/**
+ * Credit Card gateway
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2018 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
+ */
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
@@ -6,10 +14,7 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
- * Title: Restrict Content Pro Credit Card gateway
- * Description:
- * Copyright: Copyright (c) 2005 - 2018
- * Company: Pronamic
+ * Credit Card gateway
  *
  * @author  Reüel van der Steege
  * @version 2.0.0
@@ -18,25 +23,27 @@ use Pronamic\WordPress\Pay\Plugin;
 class CreditCardGateway extends Gateway {
 	/**
 	 * Gateway id.
+	 *
+	 * @var string
 	 */
 	protected $id = 'pronamic_pay_credit_card';
 
 	/**
 	 * Payment method.
 	 *
-	 * @var string $payment_method
+	 * @var string
 	 */
 	protected $payment_method = PaymentMethods::CREDIT_CARD;
 
 	/**
-	 * Construct and initialize Credit Card gateway
+	 * Construct and initialize Credit Card gateway.
 	 */
 	public function init() {
 		global $rcp_options;
 
 		parent::init();
 
-		// Recurring subscription payments
+		// Recurring subscription payments.
 		$config_option = $this->id . '_config_id';
 
 		if ( ! isset( $rcp_options[ $config_option ] ) ) {

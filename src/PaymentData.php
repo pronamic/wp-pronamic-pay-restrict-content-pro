@@ -256,7 +256,7 @@ class PaymentData extends Pay_PaymentData {
 	/**
 	 * Get subscription ID.
 	 *
-	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
+	 * @link https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
 	 * @return string
 	 */
 	public function get_subscription_id() {

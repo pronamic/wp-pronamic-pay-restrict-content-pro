@@ -116,7 +116,7 @@ class PaymentData extends Pay_PaymentData {
 		$item = new Item();
 		$item->set_number( $this->get_payment_id() );
 		$item->set_description( $this->get_description() );
-		$item->set_price( $this->gateway->amount );
+		$item->set_price( $this->gateway->initial_amount );
 		$item->set_quantity( 1 );
 
 		$items->addItem( $item );

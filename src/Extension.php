@@ -204,11 +204,13 @@ class Extension {
 			case Statuses::SUCCESS:
 				$rcp_payments_db->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_COMPLETE ) );
 
-				$subscription = $payment->get_subscription();
+				if ( ! is_callable( array( $member, 'get_pending_payment_id' ) ) || Recurring::RECURRING === $payment->recurring_type ) {
+					$subscription = $payment->get_subscription();
 
-				$recurring = empty( $subscription ) ? false : true;
+					$recurring = empty( $subscription ) ? false : true;
 
-				$member->renew( $recurring, 'active' );
+					$member->renew( $recurring, 'active' );
+				}
 
 				$this->cancel_other_subscriptions( $payment );
 

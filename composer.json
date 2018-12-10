@@ -69,6 +69,6 @@
 		"wp-coding-standards/wpcs": "^1.1",
 		"wimg/php-compatibility": "^8.0",
 		"wp-phpunit/wp-phpunit": "^4.9",
-		"johnpbloch/wordpress": "^4.9"
+		"johnpbloch/wordpress": "^5.0"
 	}
 }

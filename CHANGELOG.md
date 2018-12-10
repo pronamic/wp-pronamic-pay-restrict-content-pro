@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
+## [2.1.1] - 2018-12-10
+- Use correct initial amount.
+- Fix duplicate renewal.
+
 ## [2.1.0] - 2018-09-12
 - Complete rewrite of library.
 
@@ -19,7 +23,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2017-12-13
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.1.0...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.1.1...HEAD
+[2.1.1]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.0.1...2.1.0
 [2.0.2]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.0.1...2.0.2
 [2.0.1]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.0.0...2.0.1

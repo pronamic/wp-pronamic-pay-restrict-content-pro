@@ -23,7 +23,7 @@ use RCP_Member;
  * Payment data
  *
  * @author  Reüel van der Steege
- * @version 2.1.0
+ * @version 2.1.1
  * @since   1.0.0
  */
 class PaymentData extends Pay_PaymentData {
@@ -116,7 +116,7 @@ class PaymentData extends Pay_PaymentData {
 		$item = new Item();
 		$item->set_number( $this->get_payment_id() );
 		$item->set_description( $this->get_description() );
-		$item->set_price( $this->gateway->amount );
+		$item->set_price( $this->gateway->initial_amount );
 		$item->set_quantity( 1 );
 
 		$items->addItem( $item );
@@ -256,7 +256,7 @@ class PaymentData extends Pay_PaymentData {
 	/**
 	 * Get subscription ID.
 	 *
-	 * @see https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
+	 * @link https://github.com/woothemes/woocommerce/blob/v2.1.3/includes/abstracts/abstract-wc-payment-gateway.php#L52
 	 * @return string
 	 */
 	public function get_subscription_id() {

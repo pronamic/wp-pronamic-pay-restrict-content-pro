@@ -21,7 +21,7 @@ use RCP_Payments;
  * Gateway
  *
  * @author  Reüel van der Steege
- * @version 2.1.0
+ * @version 2.1.1
  * @since   1.0.0
  */
 class Gateway extends RCP_Payment_Gateway {
@@ -92,7 +92,7 @@ class Gateway extends RCP_Payment_Gateway {
 	/**
 	 * Add the iDEAL configuration settings to the Restrict Content Pro payment gateways settings page.
 	 *
-	 * @see https://github.com/restrictcontentpro/restrict-content-pro/blob/2.2.8/includes/admin/settings/register-settings.php#L126
+	 * @link https://github.com/restrictcontentpro/restrict-content-pro/blob/2.2.8/includes/admin/settings/register-settings.php#L126
 	 *
 	 * @param array $rcp_options Restrict Content Pro options.
 	 */

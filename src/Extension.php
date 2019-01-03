@@ -180,6 +180,11 @@ class Extension {
 	 * @return string
 	 */
 	public function redirect_url( $url, $payment ) {
+		if ( Statuses::SUCCESS !== $payment->get_status() ) {
+			return $url;
+		}
+
+		// Return success page URL.
 		return rcp_get_return_url( $payment->user_id );
 	}
 

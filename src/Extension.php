@@ -185,7 +185,7 @@ class Extension {
 		}
 
 		// Return success page URL.
-		return rcp_get_return_url( $payment->user_id );
+		return rcp_get_return_url( $payment->get_customer()->get_user_id() );
 	}
 
 	/**
@@ -206,7 +206,7 @@ class Extension {
 			return;
 		}
 
-		$member = new RCP_Member( $payment->user_id );
+		$member = new RCP_Member( $payment->get_customer()->get_user_id() );
 
 		switch ( $payment->get_status() ) {
 			case Statuses::CANCELLED:
@@ -250,7 +250,7 @@ class Extension {
 		$args = array(
 			'post_type'     => 'pronamic_pay_subscr',
 			'post_status'   => 'any',
-			'author'        => $payment->user_id,
+			'author'        => $payment->get_customer()->get_user_id(),
 			'meta_query'    => array(
 				array(
 					'key'   => '_pronamic_subscription_source',

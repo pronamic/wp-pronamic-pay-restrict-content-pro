@@ -233,7 +233,7 @@ class PaymentData extends Pay_PaymentData {
 		$subscription->interval_period = Core_Util::to_period( $this->gateway->subscription_data['length_unit'] );
 		$subscription->description     = $this->get_description();
 
-		$subscription->set_amount(
+		$subscription->set_total_amount(
 			new Money(
 				$this->gateway->subscription_data['recurring_price'],
 				$this->get_currency_alphabetic_code()

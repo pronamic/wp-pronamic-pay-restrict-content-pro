@@ -3,7 +3,7 @@
  * Payment data
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2018 Pronamic
+ * @copyright 2005-2019 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
  */
@@ -233,7 +233,7 @@ class PaymentData extends Pay_PaymentData {
 		$subscription->interval_period = Core_Util::to_period( $this->gateway->subscription_data['length_unit'] );
 		$subscription->description     = $this->get_description();
 
-		$subscription->set_amount(
+		$subscription->set_total_amount(
 			new Money(
 				$this->gateway->subscription_data['recurring_price'],
 				$this->get_currency_alphabetic_code()

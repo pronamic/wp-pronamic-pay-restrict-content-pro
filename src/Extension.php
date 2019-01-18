@@ -3,7 +3,7 @@
  * Extension
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2018 Pronamic
+ * @copyright 2005-2019 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
  */
@@ -56,6 +56,10 @@ class Extension {
 		add_filter( 'rcp_payment_gateways', array( $this, 'register_pronamic_gateways' ) );
 		add_action( 'rcp_payments_settings', array( $this, 'payments_settings' ) );
 
+		// Member subscription cancellation.
+		add_filter( 'rcp_member_can_cancel', array( $this, 'member_can_cancel' ), 10, 2 );
+		add_action( 'template_redirect', array( $this, 'process_member_cancellation' ), 5 );
+
 		add_action( 'pronamic_payment_status_update_restrictcontentpro', array( $this, 'status_update' ), 10, 1 );
 		add_filter( 'pronamic_payment_redirect_url_restrictcontentpro', array( $this, 'redirect_url' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_text_restrictcontentpro', array( $this, 'source_text' ), 10, 2 );
@@ -100,20 +104,35 @@ class Extension {
 	 * @return array
 	 */
 	public function get_gateways() {
-		return array(
-			'pronamic_pay'                         => $this->get_gateway_data( __( 'Pay', 'pronamic_ideal' ), 'Gateway' ),
-			'pronamic_pay_bancontact'              => $this->get_gateway_data( __( 'Bancontact', 'pronamic_ideal' ), 'BancontactGateway' ),
-			'pronamic_pay_banktransfer'            => $this->get_gateway_data( __( 'Bank Transfer', 'pronamic_ideal' ), 'BankTransferGateway' ),
-			'pronamic_pay_bitcoin'                 => $this->get_gateway_data( __( 'Bitcoin', 'pronamic_ideal' ), 'BitcoinGateway' ),
-			'pronamic_pay_credit_card'             => $this->get_gateway_data( __( 'Credit Card', 'pronamic_ideal' ), 'CreditCardGateway' ),
-			'pronamic_pay_direct_debit'            => $this->get_gateway_data( __( 'Direct Debit', 'pronamic_ideal' ), 'DirectDebitGateway' ),
-			'pronamic_pay_direct_debit_bancontact' => $this->get_gateway_data( __( 'Direct Debit mandate via Bancontact', 'pronamic_ideal' ), 'DirectDebitBancontactGateway' ),
-			'pronamic_pay_direct_debit_ideal'      => $this->get_gateway_data( __( 'Direct Debit mandate via iDEAL', 'pronamic_ideal' ), 'DirectDebitIDealGateway' ),
-			'pronamic_pay_direct_debit_sofort'     => $this->get_gateway_data( __( 'Direct Debit mandate via SOFORT', 'pronamic_ideal' ), 'DirectDebitSofortGateway' ),
-			'pronamic_pay_ideal'                   => $this->get_gateway_data( __( 'iDEAL', 'pronamic_ideal' ), 'IDealGateway' ),
-			'pronamic_pay_paypal'                  => $this->get_gateway_data( __( 'PayPal', 'pronamic_ideal' ), 'PayPalGateway' ),
-			'pronamic_pay_sofort'                  => $this->get_gateway_data( __( 'SOFORT', 'pronamic_ideal' ), 'SofortGateway' ),
+		$gateways = array(
+			'pronamic_pay'              => $this->get_gateway_data( __( 'Pay', 'pronamic_ideal' ), 'Gateway' ),
+			'pronamic_pay_bancontact'   => $this->get_gateway_data( __( 'Bancontact', 'pronamic_ideal' ), 'BancontactGateway' ),
+			'pronamic_pay_banktransfer' => $this->get_gateway_data( __( 'Bank Transfer', 'pronamic_ideal' ), 'BankTransferGateway' ),
+			'pronamic_pay_bitcoin'      => $this->get_gateway_data( __( 'Bitcoin', 'pronamic_ideal' ), 'BitcoinGateway' ),
+			'pronamic_pay_credit_card'  => $this->get_gateway_data( __( 'Credit Card', 'pronamic_ideal' ), 'CreditCardGateway' ),
+			'pronamic_pay_direct_debit' => $this->get_gateway_data( __( 'Direct Debit', 'pronamic_ideal' ), 'DirectDebitGateway' ),
+			'pronamic_pay_ideal'        => $this->get_gateway_data( __( 'iDEAL', 'pronamic_ideal' ), 'IDealGateway' ),
+			'pronamic_pay_paypal'       => $this->get_gateway_data( __( 'PayPal', 'pronamic_ideal' ), 'PayPalGateway' ),
+			'pronamic_pay_sofort'       => $this->get_gateway_data( __( 'SOFORT', 'pronamic_ideal' ), 'SofortGateway' ),
 		);
+
+		// Add direct debit recurring gateways only if no level set or level duration is not forever.
+		global $rcp_level;
+
+		$level = rcp_get_subscription_details( $rcp_level );
+
+		if ( empty( $rcp_level ) || ! ( is_object( $level ) && isset( $level->duration ) && '0' === $level->duration ) ) {
+			$gateways = array_merge(
+				$gateways,
+				array(
+					'pronamic_pay_direct_debit_bancontact' => $this->get_gateway_data( __( 'Direct Debit mandate via Bancontact', 'pronamic_ideal' ), 'DirectDebitBancontactGateway' ),
+					'pronamic_pay_direct_debit_ideal'      => $this->get_gateway_data( __( 'Direct Debit mandate via iDEAL', 'pronamic_ideal' ), 'DirectDebitIDealGateway' ),
+					'pronamic_pay_direct_debit_sofort'     => $this->get_gateway_data( __( 'Direct Debit mandate via SOFORT', 'pronamic_ideal' ), 'DirectDebitSofortGateway' ),
+				)
+			);
+		}
+
+		return $gateways;
 	}
 
 	/**
@@ -127,6 +146,77 @@ class Extension {
 
 			$gateway->payments_settings( $rcp_options );
 		}
+	}
+
+	/**
+	 * Member can cancel?
+	 *
+	 * @param bool $can_cancel Whether or not member can cancel.
+	 * @param int  $user_id    WordPress user ID.
+	 */
+	public function member_can_cancel( $can_cancel, $user_id ) {
+		$subscription = Util::get_subscription_by_user( $user_id );
+
+		if ( empty( $subscription ) ) {
+			return $can_cancel;
+		}
+
+		$member = new RCP_Member( $user_id );
+
+		if ( $member->is_recurring() && $member->is_active() && 'cancelled' !== $member->get_status() ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Process a member cancellation request.
+	 *
+	 * @return  void
+	 */
+	public function process_member_cancellation() {
+		if ( 'cancel' !== filter_input( INPUT_GET, 'rcp-action', FILTER_SANITIZE_STRING ) ) {
+			return;
+		}
+
+		if ( ! is_user_logged_in() ) {
+			return;
+		}
+
+		if ( ! wp_verify_nonce( filter_input( INPUT_GET, '_wpnonce', FILTER_SANITIZE_STRING ), 'rcp-cancel-nonce' ) ) {
+			return;
+		}
+
+		global $rcp_options;
+
+		// Default redirect URL.
+		$redirect = remove_query_arg( array( 'rcp-action', '_wpnonce', 'member-id' ), rcp_get_current_url() );
+
+		// Check for user subscription.
+		$member = new RCP_Member( get_current_user_id() );
+
+		$subscription = Util::get_subscription_by_user( $member->ID );
+
+		if ( ! $subscription ) {
+			return;
+		}
+
+		// Cancel member subscription.
+		$member->cancel();
+
+		do_action( 'rcp_process_member_cancellation', get_current_user_id() );
+
+		$subscription->set_status( Statuses::CANCELLED );
+
+		$subscription->save();
+
+		// Redirect to profile.
+		$redirect = add_query_arg( 'profile', 'cancelled', $redirect );
+
+		wp_safe_redirect( $redirect );
+
+		exit;
 	}
 
 	/**
@@ -165,7 +255,12 @@ class Extension {
 	 * @return string
 	 */
 	public function redirect_url( $url, $payment ) {
-		return rcp_get_return_url( $payment->user_id );
+		if ( Statuses::SUCCESS !== $payment->get_status() ) {
+			return $url;
+		}
+
+		// Return success page URL.
+		return rcp_get_return_url( $payment->get_customer()->get_user_id() );
 	}
 
 	/**
@@ -186,7 +281,7 @@ class Extension {
 			return;
 		}
 
-		$member = new RCP_Member( $payment->user_id );
+		$member = new RCP_Member( $payment->get_customer()->get_user_id() );
 
 		switch ( $payment->get_status() ) {
 			case Statuses::CANCELLED:
@@ -204,12 +299,14 @@ class Extension {
 			case Statuses::SUCCESS:
 				$rcp_payments_db->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_COMPLETE ) );
 
+				$subscription = $payment->get_subscription();
+
+				$recurring = empty( $subscription ) ? false : true;
+
 				if ( ! is_callable( array( $member, 'get_pending_payment_id' ) ) || Recurring::RECURRING === $payment->recurring_type ) {
-					$subscription = $payment->get_subscription();
-
-					$recurring = empty( $subscription ) ? false : true;
-
 					$member->renew( $recurring, 'active' );
+				} else {
+					$member->set_recurring( $recurring );
 				}
 
 				$this->cancel_other_subscriptions( $payment );
@@ -230,7 +327,7 @@ class Extension {
 		$args = array(
 			'post_type'     => 'pronamic_pay_subscr',
 			'post_status'   => 'any',
-			'author'        => $payment->user_id,
+			'author'        => $payment->get_customer()->get_user_id(),
 			'meta_query'    => array(
 				array(
 					'key'   => '_pronamic_subscription_source',

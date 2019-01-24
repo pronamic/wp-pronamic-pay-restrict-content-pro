@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\Money\Money;
+use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Payments\PaymentData as Pay_PaymentData;
 use Pronamic\WordPress\Pay\Payments\Item;
@@ -234,7 +235,7 @@ class PaymentData extends Pay_PaymentData {
 		$subscription->description     = $this->get_description();
 
 		$subscription->set_total_amount(
-			new Money(
+			new TaxedMoney(
 				$this->gateway->subscription_data['recurring_price'],
 				$this->get_currency_alphabetic_code()
 			)

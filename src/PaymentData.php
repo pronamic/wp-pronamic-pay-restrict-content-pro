@@ -229,7 +229,7 @@ class PaymentData extends Pay_PaymentData {
 		}
 
 		$subscription                  = new Subscription();
-		$subscription->frequency       = '';
+		$subscription->frequency       = null;
 		$subscription->interval        = $this->gateway->subscription_data['length'];
 		$subscription->interval_period = Core_Util::to_period( $this->gateway->subscription_data['length_unit'] );
 		$subscription->description     = $this->get_description();

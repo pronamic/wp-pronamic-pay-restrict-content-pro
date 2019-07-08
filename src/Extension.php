@@ -58,7 +58,8 @@ class Extension {
 
 		// Member subscription cancellation.
 		add_filter( 'rcp_member_can_cancel', array( $this, 'member_can_cancel' ), 10, 2 );
-		add_action( 'template_redirect', array( $this, 'process_member_cancellation' ), 5 );
+
+		add_action( 'rcp_process_member_cancellation', array( $this, 'rcp_process_member_cancellation' ) );
 
 		add_action( 'pronamic_payment_status_update_restrictcontentpro', array( $this, 'status_update' ), 10, 1 );
 		add_filter( 'pronamic_payment_redirect_url_restrictcontentpro', array( $this, 'redirect_url' ), 10, 2 );
@@ -169,52 +170,20 @@ class Extension {
 	}
 
 	/**
-	 * Process a member cancellation request.
+	 * Restrict Content Pro process member cancellation.
 	 *
-	 * @return  void
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/membership-actions.php#L68
+	 * @link https://developer.wordpress.org/reference/functions/get_current_user_id/
+	 *
+	 * @param int $user_id User ID.
+	 * @return void
 	 */
-	public function process_member_cancellation() {
-		if ( 'cancel' !== filter_input( INPUT_GET, 'rcp-action', FILTER_SANITIZE_STRING ) ) {
-			return;
-		}
-
-		if ( ! is_user_logged_in() ) {
-			return;
-		}
-
-		if ( ! wp_verify_nonce( filter_input( INPUT_GET, '_wpnonce', FILTER_SANITIZE_STRING ), 'rcp-cancel-nonce' ) ) {
-			return;
-		}
-
-		global $rcp_options;
-
-		// Default redirect URL.
-		$redirect = remove_query_arg( array( 'rcp-action', '_wpnonce', 'member-id' ), rcp_get_current_url() );
-
-		// Check for user subscription.
-		$member = new RCP_Member( get_current_user_id() );
-
-		$subscription = Util::get_subscription_by_user( $member->ID );
-
-		if ( ! $subscription ) {
-			return;
-		}
-
-		// Cancel member subscription.
-		$member->cancel();
-
-		do_action( 'rcp_process_member_cancellation', get_current_user_id() );
+	public function rcp_process_member_cancellation( $user_id ) {
+		$subscription = Util::get_subscription_by_user( $user_id );
 
 		$subscription->set_status( Statuses::CANCELLED );
 
 		$subscription->save();
-
-		// Redirect to profile.
-		$redirect = add_query_arg( 'profile', 'cancelled', $redirect );
-
-		wp_safe_redirect( $redirect );
-
-		exit;
 	}
 
 	/**

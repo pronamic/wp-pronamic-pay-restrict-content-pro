@@ -209,63 +209,10 @@ class Extension {
 					$member->set_recurring( $recurring );
 				}
 
-				$this->cancel_other_subscriptions( $payment );
-
 				break;
 			case Statuses::OPEN:
 				// Nothing to do?
 				break;
-		}
-	}
-
-	/**
-	 * Cancel other Restrict Content Pro subscription.
-	 *
-	 * @param Payment $payment Payment.
-	 */
-	public function cancel_other_subscriptions( $payment ) {
-		$args = array(
-			'post_type'     => 'pronamic_pay_subscr',
-			'post_status'   => 'any',
-			'author'        => $payment->get_customer()->get_user_id(),
-			'meta_query'    => array(
-				array(
-					'key'   => '_pronamic_subscription_source',
-					'value' => 'restrictcontentpro',
-				),
-			),
-			'no_found_rows' => true,
-			'order'         => 'DESC',
-			'orderby'       => 'ID',
-		);
-
-		// Check if there is a subscription, make sure we don't cancel this.
-		$subscription = $payment->get_subscription();
-
-		if ( $subscription ) {
-			$args['post__not_in'] = array(
-				$subscription->get_id(),
-			);
-		}
-
-		// Query.
-		$query = new WP_Query( $args );
-
-		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
-				$query->the_post();
-
-				$subscription = get_pronamic_subscription( get_the_ID() );
-
-				if ( $subscription ) {
-					// @todo Add note to subscription with info why subscription is cancelled?
-					$subscription->set_status( Statuses::CANCELLED );
-
-					$subscription->save();
-				}
-			}
-
-			wp_reset_postdata();
 		}
 	}
 

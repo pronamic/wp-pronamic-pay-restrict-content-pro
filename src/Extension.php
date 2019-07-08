@@ -56,6 +56,9 @@ class Extension {
 		add_action( 'rcp_payments_settings', array( $this, 'payments_settings' ) );
 		add_action( 'rcp_set_status', array( $this, 'rcp_set_status' ), 10, 3 );
 
+		add_filter( 'rcp_membership_can_cancel', array( $this, 'rcp_membership_can_cancel' ), 10, 3 );
+		add_filter( 'rcp_membership_payment_profile_cancelled', array( $this, 'rcp_membership_payment_profile_cancelled' ), 10, 5 );
+
 		add_action( 'pronamic_payment_status_update_restrictcontentpro', array( $this, 'status_update' ), 10, 1 );
 		add_filter( 'pronamic_payment_redirect_url_restrictcontentpro', array( $this, 'redirect_url' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_text_restrictcontentpro', array( $this, 'source_text' ), 10, 2 );
@@ -264,6 +267,63 @@ class Extension {
 
 			wp_reset_postdata();
 		}
+	}
+
+	/**
+	 * Restrict Content Pro membership can cancel.
+	 *
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/class-rcp-membership.php#L2239-2248
+	 *
+	 * @param bool           $can_cancel    Whether or not this membership can be cancelled.
+	 * @param int            $membership_id ID of the membership.
+	 * @param RCP_Membership $membership    Membership object.
+	 * @return bool
+	 */
+	public function rcp_membership_can_cancel( $can_cancel, $membership_id, $membership ) {
+		$gateways = $this->get_gateways();
+
+		if ( ! array_key_exists( $membership->get_gateway(), $gateways ) ) {
+			return $can_cancel;
+		}
+
+		if ( ! $membership->is_recurring() ) {
+			return $can_cancel;
+		}
+
+		if ( 'active' !== $membership->get_status() ) {
+			return $can_cancel;
+		}
+
+		if ( ! $membership->is_paid() ) {
+			return $can_cancel;
+		}
+
+		if ( $membership->is_expired() ) {
+			return $can_cancel;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Restrict Content Pro membership payment profile cancelled.
+	 *
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/class-rcp-membership.php#L2372-2385
+	 *
+	 * @param true|WP_Error  $success                 Whether or not the cancellation was successful.
+	 * @param string         $gateway                 Payment gateway for this membership.
+	 * @param string         $gateway_subscription_id Gateway subscription ID.
+	 * @param int            $membership_id           ID of the membership.
+	 * @param RCP_Membership $membership              Membership object.
+	 */
+	public function rcp_membership_payment_profile_cancelled( $success, $gateway, $gateway_subscription_id, $membership_id, $membership ) {
+		$gateways = $this->get_gateways();
+
+		if ( ! array_key_exists( $gateway, $gateways ) ) {
+			return $success;
+		}
+
+		return true;
 	}
 
 	/**

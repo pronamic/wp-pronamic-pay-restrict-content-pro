@@ -290,7 +290,7 @@ class Extension {
 
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription activated by %s', 'pronamic_ideal' ),
+					__( 'Subscription activated by %s.', 'pronamic_ideal' ),
 					__( 'Restrict Content Pro', 'pronamic_ideal' )
 				);
 
@@ -301,7 +301,7 @@ class Extension {
 
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription canceled by %s', 'pronamic_ideal' ),
+					__( 'Subscription canceled by %s.', 'pronamic_ideal' ),
 					__( 'Restrict Content Pro', 'pronamic_ideal' )
 				);
 
@@ -313,7 +313,7 @@ class Extension {
 
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription completed by %s', 'pronamic_ideal' ),
+					__( 'Subscription completed by %s.', 'pronamic_ideal' ),
 					__( 'Restrict Content Pro', 'pronamic_ideal' )
 				);
 
@@ -324,7 +324,7 @@ class Extension {
 
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription pending by %s', 'pronamic_ideal' ),
+					__( 'Subscription pending by %s.', 'pronamic_ideal' ),
 					__( 'Restrict Content Pro', 'pronamic_ideal' )
 				);
 

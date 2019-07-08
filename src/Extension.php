@@ -481,7 +481,7 @@ class Extension {
 	 * @return string
 	 */
 	public function source_description( $description, Payment $payment ) {
-		return __( 'Restrict Content Pro Order', 'pronamic_ideal' );
+		return __( 'Restrict Content Pro Payment', 'pronamic_ideal' );
 	}
 
 	/**
@@ -494,9 +494,12 @@ class Extension {
 	 */
 	public function source_url( $url, Payment $payment ) {
 		$url = add_query_arg(
-			'user_id',
-			$payment->post->post_author,
-			menu_page_url( 'rcp-payments', false )
+			array(
+				'page'       => 'rcp-payments',
+				'view'       => 'edit-payment',
+				'payment_id' => $payment->source_id,
+			),
+			admin_url( 'admin.php' )
 		);
 
 		return $url;

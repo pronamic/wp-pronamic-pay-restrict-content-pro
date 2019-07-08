@@ -37,7 +37,6 @@ class Extension {
 	 * Setup.
 	 */
 	public function setup() {
-		// The "plugins_loaded" is one of the earliest hooks after EDD is set up.
 		add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ) );
 	}
 

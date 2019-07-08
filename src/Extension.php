@@ -54,12 +54,11 @@ class Extension {
 
 		add_filter( 'rcp_payment_gateways', array( $this, 'register_pronamic_gateways' ) );
 		add_action( 'rcp_payments_settings', array( $this, 'payments_settings' ) );
+		add_action( 'rcp_set_status', array( $this, 'rcp_set_status' ), 10, 3 );
 
 		add_action( 'pronamic_payment_status_update_restrictcontentpro', array( $this, 'status_update' ), 10, 1 );
 		add_filter( 'pronamic_payment_redirect_url_restrictcontentpro', array( $this, 'redirect_url' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_text_restrictcontentpro', array( $this, 'source_text' ), 10, 2 );
-
-		add_action( 'rcp_set_status', array( $this, 'rcp_set_status' ), 10, 3 );
 	}
 
 	/**

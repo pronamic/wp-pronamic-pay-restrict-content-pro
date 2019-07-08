@@ -56,9 +56,6 @@ class Extension {
 		add_filter( 'rcp_payment_gateways', array( $this, 'register_pronamic_gateways' ) );
 		add_action( 'rcp_payments_settings', array( $this, 'payments_settings' ) );
 
-		// Member subscription cancellation.
-		add_filter( 'rcp_member_can_cancel', array( $this, 'member_can_cancel' ), 10, 2 );
-
 		add_action( 'pronamic_payment_status_update_restrictcontentpro', array( $this, 'status_update' ), 10, 1 );
 		add_filter( 'pronamic_payment_redirect_url_restrictcontentpro', array( $this, 'redirect_url' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_text_restrictcontentpro', array( $this, 'source_text' ), 10, 2 );
@@ -143,28 +140,6 @@ class Extension {
 
 			$gateway->payments_settings( $rcp_options );
 		}
-	}
-
-	/**
-	 * Member can cancel?
-	 *
-	 * @param bool $can_cancel Whether or not member can cancel.
-	 * @param int  $user_id    WordPress user ID.
-	 */
-	public function member_can_cancel( $can_cancel, $user_id ) {
-		$subscription = Util::get_subscription_by_user( $user_id );
-
-		if ( empty( $subscription ) ) {
-			return $can_cancel;
-		}
-
-		$member = new RCP_Member( $user_id );
-
-		if ( $member->is_recurring() && $member->is_active() && 'cancelled' !== $member->get_status() ) {
-			return true;
-		}
-
-		return false;
 	}
 
 	/**

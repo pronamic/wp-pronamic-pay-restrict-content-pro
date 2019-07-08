@@ -44,8 +44,8 @@ class Extension {
 	 * Plugins loaded.
 	 */
 	public function plugins_loaded() {
-		add_filter( 'pronamic_payment_source_description_restrictcontentpro', array( $this, 'source_description' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_url_restrictcontentpro', array( $this, 'source_url' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_description', array( $this, 'payment_source_description' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_url', array( $this, 'payment_source_url' ), 10, 2 );
 
 		// Test to see if the Restrict Content Pro plugin is active, then add all actions.
 		if ( ! RestrictContentPro::is_active() ) {
@@ -59,9 +59,14 @@ class Extension {
 		add_filter( 'rcp_membership_can_cancel', array( $this, 'rcp_membership_can_cancel' ), 10, 3 );
 		add_filter( 'rcp_membership_payment_profile_cancelled', array( $this, 'rcp_membership_payment_profile_cancelled' ), 10, 5 );
 
-		add_action( 'pronamic_payment_status_update_restrictcontentpro', array( $this, 'status_update' ), 10, 1 );
-		add_filter( 'pronamic_payment_redirect_url_restrictcontentpro', array( $this, 'redirect_url' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_text_restrictcontentpro', array( $this, 'source_text' ), 10, 2 );
+		add_action( 'pronamic_payment_status_update_rcp_payment', array( $this, 'payment_status_update' ), 10, 1 );
+		add_filter( 'pronamic_payment_redirect_url', array( $this, 'payment_redirect_url' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_text_restrictcontentpro', array( $this, 'payment_source_text' ), 10, 2 );
+
+		add_filter( 'pronamic_subscription_source_text_rcp_membership', array( $this, 'subscription_source_text' ), 10, 2 );
+
+		add_action( 'pronamic_pay_new_payment', array( $this, 'new_payment' ) );
+		add_action( 'pronamic_pay_update_payment', array( $this, 'update_payment' ) );
 	}
 
 	/**
@@ -154,7 +159,16 @@ class Extension {
 	 *
 	 * @return string
 	 */
-	public function redirect_url( $url, $payment ) {
+	public function payment_redirect_url( $url, $payment ) {
+		$sources = array(
+			'restrictcontentpro',
+			'rcp_payment',
+		);
+
+		if ( ! in_array( $payment->source, $sources ) ) {
+			return $url;
+		}
+
 		if ( Statuses::SUCCESS !== $payment->get_status() ) {
 			return $url;
 		}
@@ -169,7 +183,7 @@ class Extension {
 	 * @global RCP_Payments $rcp_payments_db Restrict Content Pro payments object.
 	 * @param Payment $payment Payment.
 	 */
-	public function status_update( Payment $payment ) {
+	public function payment_status_update( Payment $payment ) {
 		global $rcp_payments_db;
 
 		$source_id = $payment->get_source_id();
@@ -357,7 +371,7 @@ class Extension {
 	 *
 	 * @return string $text
 	 */
-	public function source_text( $text, Payment $payment ) {
+	public function payment_source_text( $text, Payment $payment ) {
 		$text = __( 'Restrict Content Pro', 'pronamic_ideal' ) . '<br />';
 
 		$source_url = add_query_arg(
@@ -377,35 +391,199 @@ class Extension {
 	}
 
 	/**
-	 * Source description.
+	 * Subscription source text.
+	 *
+	 * @param string       $text         Text.
+	 * @param Subscription $subscription Subscription.
+	 *
+	 * @return string $text
+	 */
+	public function subscription_source_text( $text, $subscription ) {
+		$text = __( 'Restrict Content Pro', 'pronamic_ideal' ) . '<br />';
+
+		$source_url = add_query_arg(
+			array(
+				'page'          => 'rcp-members',
+				'membership_id' => $subscription->source_id,
+				'view'          => 'edit',
+			),
+			admin_url( 'admin.php' )
+		);
+
+		$text .= sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( $source_url ),
+			/* translators: %s: source id */
+			sprintf( __( 'Membership %s', 'pronamic_ideal' ), $subscription->source_id )
+		);
+
+		return $text;
+	}
+
+	/**
+	 * Payment source description.
+	 *
+	 * @link https://github.com/wp-pay/core/blob/2.1.6/src/Payments/Payment.php#L659-L671
 	 *
 	 * @param string  $description Description.
 	 * @param Payment $payment     Payment.
 	 *
 	 * @return string
 	 */
-	public function source_description( $description, Payment $payment ) {
-		return __( 'Restrict Content Pro Payment', 'pronamic_ideal' );
+	public function payment_source_description( $description, Payment $payment ) {
+		switch ( $payment->source ) {
+			case 'restrictcontentpro':
+				return __( 'Restrict Content Pro', 'pronamic_ideal' );
+			case 'rcp_payment':
+				return __( 'Restrict Content Pro Payment', 'pronamic_ideal' );
+			default:
+				return $description;
+		}
 	}
 
 	/**
-	 * Source URL.
+	 * Payment source URL.
 	 *
 	 * @param string  $url     URL.
 	 * @param Payment $payment Payment.
 	 *
 	 * @return string
 	 */
-	public function source_url( $url, Payment $payment ) {
-		$url = add_query_arg(
+	public function payment_source_url( $url, Payment $payment ) {
+		switch ( $payment->source ) {
+			case 'restrictcontentpro':
+				return add_query_arg(
+					'user_id',
+					$payment->post->post_author,
+					menu_page_url( 'rcp-payments', false )
+				);
+			case 'rcp_payment':
+				return add_query_arg(
+					array(
+						'page'       => 'rcp-payments',
+						'view'       => 'edit-payment',
+						'payment_id' => $payment->source_id,
+					),
+					admin_url( 'admin.php' )
+				);
+			default:
+				return $url;
+		}
+	}
+
+	/**
+	 * This function is hooked into the `pronamic_pay_new_payment` routine.
+	 * It will check if the new payment is created from a Restrict Content Pro
+	 * membership. If that is the case it will create a new Restrict Content Pro
+	 * payment.
+	 *
+	 * @link https://github.com/wp-pay/core/blob/2.1.6/src/Payments/PaymentsDataStoreCPT.php#L234
+	 *
+	 * @param Payment $payment Payment.
+	 */
+	public function new_payment( Payment $payment ) {
+		/**
+		 * Check if the payment is from a Restrict Content Pro
+		 * membership.
+		 */
+		if ( 'rcp_membership' !== $payment->source ) {
+			return;
+		}
+
+		/**
+		 * Try to find the Restrict Content Pro membership from the
+		 * payment source ID.
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/membership-functions.php#L15-29
+		 */
+		$rcp_membership = rcp_get_membership( $payment->source_id );
+
+		if ( false === $rcp_membership ) {
+			throw new Exception(
+				sprintf(
+					'Could not find Restrict Content Pro membership with ID: %s.',
+					$payment->source_id
+				)
+			);
+		}
+
+		/**
+		 * Insert Restrict Content Pro payment.
+		 *
+	 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/class-rcp-payments.php#L55-191
+	 	 */
+		$rcp_payments = new RCP_Payments();
+
+		$result = $rcp_payments->insert( array(
+			'date'             => $payment->get_date()->format( 'Y-m-d g:i:s' ),
+			'payment_type'     => '',
+			'transaction_type' => 'renewal',
+			'user_id'          => $rcp_membership->get_customer()->get_user_id(),
+			'customer_id'      => $rcp_membership->get_customer_id(),
+			'membership_id'    => $rcp_membership->get_id(),
+			'amount'           => $payment->get_total_amount()->get_value(),
+			// Transaction ID can not be null therefor we use `strval` to cast `null` to an empty string.
+			'transaction_id'   => strval( $payment->get_transaction_id() ),
+			'subscription'     => rcp_get_subscription_name( $rcp_membership->get_object_id() ),
+			'subscription_key' => $rcp_membership->get_subscription_key(),
+			'object_type'      => 'subscription',
+			'object_id'        => $rcp_membership->get_object_id(),
+			'status'           => Util::core_payment_status_to_rcp( $payment->get_status() ),
+		) );
+
+		if ( false === $result ) {
+			throw new Exception(
+				sprintf(
+					'Could not create Restrict Content Pro payment for payment %s.',
+					$payment->get_id()
+				)
+			);
+		}
+
+		$rcp_payment_id = $result;
+
+		$payment->source    = 'rcp_payment';
+		$payment->source_id = $rcp_payment_id;
+
+		$payment->save();
+	}
+
+	/**
+	 * Update payment.
+	 *
+	 * @param Payment $payment Payment.
+	 */
+	public function update_payment( Payment $payment ) {
+		/**
+		 * Check if the payment is connected to a Restrict Content Pro
+		 * payment.
+		 */
+		if ( 'rcp_payment' !== $payment->source ) {
+			return;
+		}
+
+		/**
+		 * Update Restrict Content Pro payment.
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/master/includes/class-rcp-payments.php#L219-284
+		 */
+		$rcp_payments = new RCP_Payments();
+
+		$result = $rcp_payments->update(
+			$payment->source_id,
 			array(
-				'page'       => 'rcp-payments',
-				'view'       => 'edit-payment',
-				'payment_id' => $payment->source_id,
-			),
-			admin_url( 'admin.php' )
+				'status'         => Util::core_payment_status_to_rcp( $payment->get_status() ),
+				'transaction_id' => strval( $payment->get_transaction_id() ),
+			)
 		);
 
-		return $url;
+		if ( false === $result ) {
+			throw new Exception(
+				sprintf(
+					'Could not update Restrict Content Pro payment for payment %s.',
+					$payment->get_id()
+				)
+			);
+		}
 	}
 }

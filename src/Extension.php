@@ -64,8 +64,6 @@ class Extension {
 		add_filter( 'pronamic_payment_redirect_url_restrictcontentpro', array( $this, 'redirect_url' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_text_restrictcontentpro', array( $this, 'source_text' ), 10, 2 );
 
-		add_filter( 'rcp_payment_status_label', array( $this, 'rcp_status_label_cancelled' ), 10, 2 );
-
 		add_action( 'rcp_set_status', array( $this, 'rcp_set_status' ), 10, 3 );
 	}
 
@@ -217,33 +215,6 @@ class Extension {
 		wp_safe_redirect( $redirect );
 
 		exit;
-	}
-
-	/**
-	 * Restrict Content Pro payment status 'Cancelled' label.
-	 *
-	 * @param string $label  Label.
-	 * @param string $status Status.
-	 *
-	 * @return string
-	 */
-	public function rcp_status_label_cancelled( $label, $status ) {
-		switch ( $status ) {
-			case 'cancelled':
-				$label = _x( 'Cancelled', 'Payment status', 'pronamic_ideal' );
-
-				break;
-			case 'expired':
-				$label = _x( 'Expired', 'Payment status', 'pronamic_ideal' );
-
-				break;
-			case 'failed':
-				$label = _x( 'Failed', 'Payment status', 'pronamic_ideal' );
-
-				break;
-		}
-
-		return $label;
 	}
 
 	/**

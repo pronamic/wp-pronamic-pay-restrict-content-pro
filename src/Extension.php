@@ -87,7 +87,7 @@ class Extension {
 				__( 'Pronamic', 'pronamic_ideal' ),
 				$label
 			),
-			'class'       => __NAMESPACE__ . '\\' . $class,
+			'class'       => $class,
 		);
 	}
 
@@ -98,15 +98,15 @@ class Extension {
 	 */
 	public function get_gateways() {
 		$gateways = array(
-			'pronamic_pay'              => $this->get_gateway_data( __( 'Pay', 'pronamic_ideal' ), 'Gateway' ),
-			'pronamic_pay_bancontact'   => $this->get_gateway_data( __( 'Bancontact', 'pronamic_ideal' ), 'BancontactGateway' ),
-			'pronamic_pay_banktransfer' => $this->get_gateway_data( __( 'Bank Transfer', 'pronamic_ideal' ), 'BankTransferGateway' ),
-			'pronamic_pay_bitcoin'      => $this->get_gateway_data( __( 'Bitcoin', 'pronamic_ideal' ), 'BitcoinGateway' ),
-			'pronamic_pay_credit_card'  => $this->get_gateway_data( __( 'Credit Card', 'pronamic_ideal' ), 'CreditCardGateway' ),
-			'pronamic_pay_direct_debit' => $this->get_gateway_data( __( 'Direct Debit', 'pronamic_ideal' ), 'DirectDebitGateway' ),
-			'pronamic_pay_ideal'        => $this->get_gateway_data( __( 'iDEAL', 'pronamic_ideal' ), 'IDealGateway' ),
-			'pronamic_pay_paypal'       => $this->get_gateway_data( __( 'PayPal', 'pronamic_ideal' ), 'PayPalGateway' ),
-			'pronamic_pay_sofort'       => $this->get_gateway_data( __( 'SOFORT', 'pronamic_ideal' ), 'SofortGateway' ),
+			'pronamic_pay'              => $this->get_gateway_data( __( 'Pay', 'pronamic_ideal' ), Gateway::class ),
+			'pronamic_pay_bancontact'   => $this->get_gateway_data( __( 'Bancontact', 'pronamic_ideal' ), BancontactGateway::class ),
+			'pronamic_pay_banktransfer' => $this->get_gateway_data( __( 'Bank Transfer', 'pronamic_ideal' ), BankTransferGateway::class ),
+			'pronamic_pay_bitcoin'      => $this->get_gateway_data( __( 'Bitcoin', 'pronamic_ideal' ), BitcoinGateway::class ),
+			'pronamic_pay_credit_card'  => $this->get_gateway_data( __( 'Credit Card', 'pronamic_ideal' ), CreditCardGateway::class ),
+			'pronamic_pay_direct_debit' => $this->get_gateway_data( __( 'Direct Debit', 'pronamic_ideal' ), DirectDebitGateway::class ),
+			'pronamic_pay_ideal'        => $this->get_gateway_data( __( 'iDEAL', 'pronamic_ideal' ), IDealGateway::class ),
+			'pronamic_pay_paypal'       => $this->get_gateway_data( __( 'PayPal', 'pronamic_ideal' ), PayPalGateway::class ),
+			'pronamic_pay_sofort'       => $this->get_gateway_data( __( 'SOFORT', 'pronamic_ideal' ), SofortGateway::class ),
 		);
 
 		// Add direct debit recurring gateways only if no level set or level duration is not forever.
@@ -118,9 +118,9 @@ class Extension {
 			$gateways = array_merge(
 				$gateways,
 				array(
-					'pronamic_pay_direct_debit_bancontact' => $this->get_gateway_data( __( 'Direct Debit mandate via Bancontact', 'pronamic_ideal' ), 'DirectDebitBancontactGateway' ),
-					'pronamic_pay_direct_debit_ideal'      => $this->get_gateway_data( __( 'Direct Debit mandate via iDEAL', 'pronamic_ideal' ), 'DirectDebitIDealGateway' ),
-					'pronamic_pay_direct_debit_sofort'     => $this->get_gateway_data( __( 'Direct Debit mandate via SOFORT', 'pronamic_ideal' ), 'DirectDebitSofortGateway' ),
+					'pronamic_pay_direct_debit_bancontact' => $this->get_gateway_data( __( 'Direct Debit mandate via Bancontact', 'pronamic_ideal' ), DirectDebitBancontactGateway::class ),
+					'pronamic_pay_direct_debit_ideal'      => $this->get_gateway_data( __( 'Direct Debit mandate via iDEAL', 'pronamic_ideal' ), DirectDebitIDealGateway::class ),
+					'pronamic_pay_direct_debit_sofort'     => $this->get_gateway_data( __( 'Direct Debit mandate via SOFORT', 'pronamic_ideal' ), DirectDebitSofortGateway::class ),
 				)
 			);
 		}

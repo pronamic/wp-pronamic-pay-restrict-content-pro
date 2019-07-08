@@ -59,8 +59,6 @@ class Extension {
 		// Member subscription cancellation.
 		add_filter( 'rcp_member_can_cancel', array( $this, 'member_can_cancel' ), 10, 2 );
 
-		add_action( 'rcp_process_member_cancellation', array( $this, 'rcp_process_member_cancellation' ) );
-
 		add_action( 'pronamic_payment_status_update_restrictcontentpro', array( $this, 'status_update' ), 10, 1 );
 		add_filter( 'pronamic_payment_redirect_url_restrictcontentpro', array( $this, 'redirect_url' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_text_restrictcontentpro', array( $this, 'source_text' ), 10, 2 );
@@ -167,23 +165,6 @@ class Extension {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Restrict Content Pro process member cancellation.
-	 *
-	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/membership-actions.php#L68
-	 * @link https://developer.wordpress.org/reference/functions/get_current_user_id/
-	 *
-	 * @param int $user_id User ID.
-	 * @return void
-	 */
-	public function rcp_process_member_cancellation( $user_id ) {
-		$subscription = Util::get_subscription_by_user( $user_id );
-
-		$subscription->set_status( Statuses::CANCELLED );
-
-		$subscription->save();
 	}
 
 	/**

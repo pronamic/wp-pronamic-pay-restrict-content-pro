@@ -230,7 +230,7 @@ class Gateway extends RCP_Payment_Gateway {
 		$payment->config_id = $config_id;
 		$payment->method    = $this->payment_method;
 
-		$payment = Plugin::start_payment( $payment );
+		$payment = Plugin::start_payment( $payment, $gateway );
 
 		$error = $gateway->get_error();
 

@@ -99,6 +99,9 @@ class Util {
 
 		$payment->set_customer( $customer );
 
+		// Payment lines.
+		$payment->lines = self::new_payment_lines_from_rcp_gateway( $gateway );
+
 		// Subscription.
 		$payment->subscription = self::new_subscription_from_rcp_gateway( $gateway );
 
@@ -149,6 +152,74 @@ class Util {
 
 		// Result.
 		return $customer;
+	}
+
+	/**
+	 * New payment lines from Restrict Content Pro gateway object.
+	 *
+	 * @link https://restrictcontentpro.com/tour/payment-gateways/add-your-own/
+	 * @link http://docs.pippinsplugins.com/article/812-payment-gateway-api
+	 * @link https://github.com/wp-pay-extensions/woocommerce/blob/develop/src/Gateway.php
+	 *
+	 * @param RCP_Payment_Gateway $gateway Restrict Content Pro gateway object.
+	 * @return PaymentLines
+	 */
+	public static function new_payment_lines_from_rcp_gateway( $gateway ) {
+		$lines = new PaymentLines();
+
+		// Membership.
+		$line = $lines->new_line();
+
+		$line->set_id( $gateway->subscription_id );
+		$line->set_sku( null );
+		$line->set_type( PaymentLineType::DIGITAL );
+		$line->set_name( $gateway->subscription_name );
+		$line->set_quantity( 1 );
+		$line->set_unit_price( new TaxedMoney( $gateway->payment->subtotal, $gateway->currency ) );
+		$line->set_total_amount( new TaxedMoney( $gateway->payment->subtotal, $gateway->currency ) );
+		$line->set_product_url( null );
+		$line->set_image_url( null );
+		$line->set_product_category( null );
+
+		// Discount.
+		if ( $gateway->discount ) {
+			$line = $lines->new_line();
+
+			$line->set_id( null );
+			$line->set_sku( null );
+			$line->set_type( PaymentLineType::DISCOUNT );
+			$line->set_name(
+				sprintf(
+					__( 'Discount code `%s`', 'pronamic_ideal' ),
+					$gateway->discount_code
+				)
+			);
+			$line->set_quantity( 1 );
+			$line->set_unit_price( new TaxedMoney( -$gateway->discount, $gateway->currency ) );
+			$line->set_total_amount( new TaxedMoney( -$gateway->discount, $gateway->currency ) );
+			$line->set_product_url( null );
+			$line->set_image_url( null );
+			$line->set_product_category( null );
+		}
+
+		// Fees.
+		if ( $gateway->payment->fees ) {
+			$line = $lines->new_line();
+
+			$line->set_id( null );
+			$line->set_sku( null );
+			$line->set_type( PaymentLineType::FEE );
+			$line->set_name( __( 'Fees', 'pronamic_ideal' ) );
+			$line->set_quantity( 1 );
+			$line->set_unit_price( new TaxedMoney( $gateway->payment->fees, $gateway->currency ) );
+			$line->set_total_amount( new TaxedMoney( $gateway->payment->fees, $gateway->currency ) );
+			$line->set_product_url( null );
+			$line->set_image_url( null );
+			$line->set_product_category( null );
+		}
+
+		// Result.
+		return $lines;
 	}
 
 	/**

@@ -263,44 +263,4 @@ class Util {
 		// Result.
 		return $subscription;
 	}
-
-	/**
-	 * Get Pronamic RCP subscription for user.
-	 *
-	 * @param int|string $user_id WordPress user ID.
-	 *
-	 * @return Subscription|null
-	 */
-	public static function get_subscription_by_user( $user_id = null ) {
-		if ( empty( $user_id ) ) {
-			return;
-		}
-
-		$query = new WP_Query(
-			array(
-				'fields'         => 'ids',
-				'post_type'      => 'pronamic_pay_subscr',
-				'post_status'    => 'any',
-				'author'         => $user_id,
-				'meta_query'     => array(
-					array(
-						'key'   => '_pronamic_subscription_source',
-						'value' => 'restrictcontentpro',
-					),
-				),
-				'no_found_rows'  => true,
-				'order'          => 'DESC',
-				'orderby'        => 'ID',
-				'posts_per_page' => 1,
-			)
-		);
-
-		$post_id = reset( $query->posts );
-
-		if ( false === $post_id ) {
-			return;
-		}
-
-		return new Subscription( $post_id );
-	}
 }

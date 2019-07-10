@@ -9,7 +9,7 @@
 ?>
 <tr>
 	<th scope="row" class="row-title">
-		<?php esc_html_e( 'Pronamic Pay Payment:', 'pronamic_ideal' ); ?>
+		<?php esc_html_e( 'Pronamic Pay Payment', 'pronamic_ideal' ); ?>
 	</th>
 	<td>
 		<?php

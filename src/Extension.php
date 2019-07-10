@@ -180,15 +180,23 @@ class Extension {
 	/**
 	 * Update the status of the specified payment.
 	 *
-	 * @global RCP_Payments $rcp_payments_db Restrict Content Pro payments object.
 	 * @param Payment $payment Payment.
 	 */
 	public function payment_status_update( Payment $payment ) {
-		global $rcp_payments_db;
+		/**
+		 * Find the Restrict Content Pro payment.
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/class-rcp-payments.php#L309-334
+		 */
+		$rcp_payments = new RCP_Payments();
 
-		$source_id = $payment->get_source_id();
+		$rcp_payment_id = $payment->get_source_id();
 
-		$rcp_payment = $rcp_payments_db->get_payment( $source_id );
+		$rcp_payment = $rcp_payments->get_payment( $rcp_payment_id );
+
+		if ( is_null( $rcp_payment ) ) {
+			return;
+		}
 
 		// Only update if order is not completed.
 		if ( RestrictContentPro::PAYMENT_STATUS_COMPLETE === $rcp_payment->status ) {
@@ -199,28 +207,35 @@ class Extension {
 
 		switch ( $payment->get_status() ) {
 			case Statuses::CANCELLED:
-				$rcp_payments_db->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_CANCELLED ) );
+				$rcp_payments->update( $rcp_payment_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_CANCELLED ) );
 
 				break;
 			case Statuses::EXPIRED:
-				$rcp_payments_db->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_EXPIRED ) );
+				$rcp_payments->update( $rcp_payment_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_EXPIRED ) );
 
 				break;
 			case Statuses::FAILURE:
-				$rcp_payments_db->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_FAILED ) );
+				$rcp_payments->update( $rcp_payment_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_FAILED ) );
 
 				break;
 			case Statuses::SUCCESS:
-				$rcp_payments_db->update( $source_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_COMPLETE ) );
+				$rcp_payments->update( $rcp_payment_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_COMPLETE ) );
 
-				$subscription = $payment->get_subscription();
+				/**
+				 * Find and renew the Restrict Content Pro membership.
+				 *
+				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/membership-functions.php#L15-29
+				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/class-rcp-payments.php#L75
+				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/class-rcp-membership.php#L1700-1808
+				 */
+				$rcp_membership = rcp_get_membership( $rcp_payment->membership_id );
 
-				$recurring = empty( $subscription ) ? false : true;
+				if ( false !== $rcp_membership ) {
+					$subscription = $payment->get_subscription();
 
-				if ( ! is_callable( array( $member, 'get_pending_payment_id' ) ) || Recurring::RECURRING === $payment->recurring_type ) {
-					$member->renew( $recurring, 'active' );
-				} else {
-					$member->set_recurring( $recurring );
+					$recurring = empty( $subscription ) ? false : true;
+
+					$rcp_membership->renew( $recurring );
 				}
 
 				break;

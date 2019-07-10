@@ -54,7 +54,7 @@ class Extension {
 
 		add_filter( 'rcp_payment_gateways', array( $this, 'register_pronamic_gateways' ) );
 		add_action( 'rcp_payments_settings', array( $this, 'payments_settings' ) );
-		add_action( 'rcp_set_status', array( $this, 'rcp_set_status' ), 10, 3 );
+		add_action( 'rcp_transition_membership_status', array( $this, 'rcp_transition_membership_status' ), 10, 3 );
 
 		add_filter( 'rcp_membership_can_cancel', array( $this, 'rcp_membership_can_cancel' ), 10, 3 );
 		add_filter( 'rcp_membership_payment_profile_cancelled', array( $this, 'rcp_membership_payment_profile_cancelled' ), 10, 5 );
@@ -231,6 +231,114 @@ class Extension {
 	}
 
 	/**
+	 * Restrict Content Pro transition membership status.
+	 *
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/master/includes/memberships/class-rcp-membership.php#L673-683
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/master/includes/database/engine/class-query.php#L2061-2070
+	 *
+	 * @param string $old_status    Old membership status.
+	 * @param string $new_status    New membership status.
+	 * @param int    $membership_id ID of the membership.
+	 */
+	public function rcp_transition_membership_status( $old_status, $new_status, $membership_id ) {
+		$query = new WP_Query(
+			array(
+				'post_type'     => 'pronamic_pay_subscr',
+				'post_status'   => 'any',
+				'meta_query'    => array(
+					array(
+						'key'   => '_pronamic_subscription_source',
+						'value' => 'rcp_membership',
+					),
+					array(
+						'key'   => '_pronamic_subscription_source_id',
+						'value' => $membership_id,
+					),
+				),
+				'nopaging'      => true,
+				'no_found_rows' => true,
+				'order'         => 'DESC',
+				'orderby'       => 'ID',
+			)
+		);
+
+		if ( ! $query->have_posts() ) {
+			return;
+		}
+
+		$status = null;
+
+		switch ( $new_status ) {
+			case 'active':
+				$status = Statuses::ACTIVE;
+
+				$note = sprintf(
+					/* translators: %s: Restrict Content Pro */
+					__( 'Subscription activated by %s.', 'pronamic_ideal' ),
+					__( 'Restrict Content Pro', 'pronamic_ideal' )
+				);
+
+				break;
+
+			case 'cancelled':
+				$status = Statuses::CANCELLED;
+
+				$note = sprintf(
+					/* translators: %s: Restrict Content Pro */
+					__( 'Subscription canceled by %s.', 'pronamic_ideal' ),
+					__( 'Restrict Content Pro', 'pronamic_ideal' )
+				);
+
+				break;
+
+			case 'free':
+			case 'expired':
+				$status = Statuses::COMPLETED;
+
+				$note = sprintf(
+					/* translators: %s: Restrict Content Pro */
+					__( 'Subscription completed by %s.', 'pronamic_ideal' ),
+					__( 'Restrict Content Pro', 'pronamic_ideal' )
+				);
+
+				break;
+
+			case 'pending':
+				$status = Statuses::OPEN;
+
+				$note = sprintf(
+					/* translators: %s: Restrict Content Pro */
+					__( 'Subscription pending by %s.', 'pronamic_ideal' ),
+					__( 'Restrict Content Pro', 'pronamic_ideal' )
+				);
+
+				break;
+		}
+
+		if ( is_null( $status ) ) {
+			return;
+		}
+
+		while ( $query->have_posts() ) {
+			$query->the_post();
+
+			$subscription = get_pronamic_subscription( get_the_ID() );
+
+			if ( null === $subscription ) {
+				continue;
+			}
+
+			$subscription->set_status( $status );
+
+			$subscription->add_note( $note );
+
+			$subscription->save();
+		}
+
+		wp_reset_postdata();
+	}
+
+	/**
 	 * Restrict Content Pro membership can cancel.
 	 *
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/class-rcp-membership.php#L2239-2248
@@ -285,82 +393,6 @@ class Extension {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Restrict Content Pro user subscription status updated.
-	 *
-	 * @param string     $new_status New status.
-	 * @param string|int $user_id    User ID.
-	 * @param string     $old_status Old status.
-	 */
-	public function rcp_set_status( $new_status, $user_id, $old_status ) {
-		$subscription = Util::get_subscription_by_user( $user_id );
-
-		if ( ! $subscription ) {
-			return;
-		}
-
-		if ( $new_status === $old_status ) {
-			return;
-		}
-
-		$note = null;
-
-		switch ( $new_status ) {
-			case 'active':
-				$status = Statuses::ACTIVE;
-
-				$note = sprintf(
-					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription activated by %s.', 'pronamic_ideal' ),
-					__( 'Restrict Content Pro', 'pronamic_ideal' )
-				);
-
-				break;
-
-			case 'cancelled':
-				$status = Statuses::CANCELLED;
-
-				$note = sprintf(
-					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription canceled by %s.', 'pronamic_ideal' ),
-					__( 'Restrict Content Pro', 'pronamic_ideal' )
-				);
-
-				break;
-
-			case 'free':
-			case 'expired':
-				$status = Statuses::COMPLETED;
-
-				$note = sprintf(
-					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription completed by %s.', 'pronamic_ideal' ),
-					__( 'Restrict Content Pro', 'pronamic_ideal' )
-				);
-
-				break;
-
-			case 'pending':
-				$status = Statuses::OPEN;
-
-				$note = sprintf(
-					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription pending by %s.', 'pronamic_ideal' ),
-					__( 'Restrict Content Pro', 'pronamic_ideal' )
-				);
-
-				break;
-		}
-
-		if ( isset( $status ) ) {
-			$subscription->set_status( $status );
-
-			$subscription->add_note( $note );
-
-			$subscription->save();
-		}
 	}
 
 	/**

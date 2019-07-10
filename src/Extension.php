@@ -67,6 +67,9 @@ class Extension {
 
 		add_action( 'pronamic_pay_new_payment', array( $this, 'new_payment' ) );
 		add_action( 'pronamic_pay_update_payment', array( $this, 'update_payment' ) );
+
+		add_action( 'rcp_edit_membership_after', array( $this, 'rcp_edit_membership_after' ) );
+		add_action( 'rcp_edit_payment_after', array( $this, 'rcp_edit_payment_after' ) );
 	}
 
 	/**
@@ -184,7 +187,7 @@ class Extension {
 	 */
 	public function payment_status_update( Payment $payment ) {
 		/**
-		 * Find the Restrict Content Pro payment.
+		 * Find the related Restrict Content Pro payment.
 		 *
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/class-rcp-payments.php#L309-334
 		 */
@@ -202,8 +205,6 @@ class Extension {
 		if ( RestrictContentPro::PAYMENT_STATUS_COMPLETE === $rcp_payment->status ) {
 			return;
 		}
-
-		$member = new RCP_Member( $payment->get_customer()->get_user_id() );
 
 		switch ( $payment->get_status() ) {
 			case Statuses::CANCELLED:
@@ -227,6 +228,8 @@ class Extension {
 				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/membership-functions.php#L15-29
 				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/class-rcp-payments.php#L75
 				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/class-rcp-membership.php#L1700-1808
+				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/gateways/class-rcp-payment-gateway-paypal.php#L466
+				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/gateways/class-rcp-payment-gateway-paypal.php#L570-571
 				 */
 				$rcp_membership = rcp_get_membership( $rcp_payment->membership_id );
 
@@ -632,5 +635,27 @@ class Extension {
 				)
 			);
 		}
+	}
+
+	/**
+	 * Restrict Conent Pro edit membership after.
+	 *
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/memberships/edit-membership.php#L285-294
+	 *
+	 * @param RCP_Membership $membership
+	 */
+	public function rcp_edit_membership_after( $membership ) {
+
+	}
+
+	/**
+	 * Restrict Conent Pro edit membership after.
+	 *
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/payments/edit-payment.php#L127
+	 *
+	 * @param object $payment
+	 */
+	public function rcp_edit_payment_after( $payment ) {
+
 	}
 }

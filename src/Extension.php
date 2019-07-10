@@ -61,7 +61,7 @@ class Extension {
 
 		add_action( 'pronamic_payment_status_update_rcp_payment', array( $this, 'payment_status_update' ), 10, 1 );
 		add_filter( 'pronamic_payment_redirect_url', array( $this, 'payment_redirect_url' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_text_restrictcontentpro', array( $this, 'payment_source_text' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_text_rcp_payment', array( $this, 'payment_source_text' ), 10, 2 );
 
 		add_filter( 'pronamic_subscription_source_text_rcp_membership', array( $this, 'subscription_source_text' ), 10, 2 );
 
@@ -425,9 +425,12 @@ class Extension {
 		$text = __( 'Restrict Content Pro', 'pronamic_ideal' ) . '<br />';
 
 		$source_url = add_query_arg(
-			'user_id',
-			$payment->post->post_author,
-			menu_page_url( 'rcp-payments', false )
+			array(
+				'page'       => 'rcp-payments',
+				'payment_id' => $payment->source_id,
+				'view'       => 'edit-payment',
+			),
+			admin_url( 'admin.php' )
 		);
 
 		$text .= sprintf(
@@ -645,17 +648,63 @@ class Extension {
 	 * @param RCP_Membership $membership
 	 */
 	public function rcp_edit_membership_after( $membership ) {
+		$query = new WP_Query(
+			array(
+				'post_type'     => 'pronamic_pay_subscr',
+				'post_status'   => 'any',
+				'meta_query'    => array(
+					array(
+						'key'   => '_pronamic_subscription_source',
+						'value' => 'rcp_membership',
+					),
+					array(
+						'key'   => '_pronamic_subscription_source_id',
+						'value' => $membership->get_id(),
+					),
+				),
+				'nopaging'      => true,
+				'no_found_rows' => true,
+				'order'         => 'DESC',
+				'orderby'       => 'ID',
+			)
+		);
 
+		include __DIR__ . '/../views/edit-membership.php';
+
+		wp_reset_postdata();
 	}
 
 	/**
-	 * Restrict Conent Pro edit membership after.
+	 * Restrict Conent Pro edit payment after.
 	 *
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/payments/edit-payment.php#L127
 	 *
 	 * @param object $payment
 	 */
 	public function rcp_edit_payment_after( $payment ) {
+		$query = new WP_Query(
+			array(
+				'post_type'     => 'pronamic_payment',
+				'post_status'   => 'any',
+				'meta_query'    => array(
+					array(
+						'key'   => '_pronamic_payment_source',
+						'value' => 'rcp_payment',
+					),
+					array(
+						'key'   => '_pronamic_payment_source_id',
+						'value' => $payment->id,
+					),
+				),
+				'nopaging'      => true,
+				'no_found_rows' => true,
+				'order'         => 'DESC',
+				'orderby'       => 'ID',
+			)
+		);
 
+		include __DIR__ . '/../views/edit-payment.php';
+
+		wp_reset_postdata();
 	}
 }

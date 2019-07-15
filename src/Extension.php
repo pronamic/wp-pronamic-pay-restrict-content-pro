@@ -293,12 +293,10 @@ class Extension {
 			return;
 		}
 
-		$status = null;
+		$core_status = MembershipStatus::to_core( $new_status );
 
 		switch ( $new_status ) {
 			case MembershipStatus::ACTIVE:
-				$status = Statuses::ACTIVE;
-
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
 					__( 'Subscription activated by %s.', 'pronamic_ideal' ),
@@ -306,10 +304,7 @@ class Extension {
 				);
 
 				break;
-
 			case MembershipStatus::CANCELLED:
-				$status = Statuses::CANCELLED;
-
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
 					__( 'Subscription canceled by %s.', 'pronamic_ideal' ),
@@ -319,8 +314,6 @@ class Extension {
 				break;
 
 			case MembershipStatus::EXPIRED:
-				$status = Statuses::EXPIRED;
-
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
 					__( 'Subscription expired by %s.', 'pronamic_ideal' ),
@@ -330,8 +323,6 @@ class Extension {
 				break;
 
 			case MembershipStatus::PENDING:
-				$status = Statuses::OPEN;
-
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
 					__( 'Subscription pending by %s.', 'pronamic_ideal' ),
@@ -341,7 +332,7 @@ class Extension {
 				break;
 		}
 
-		if ( is_null( $status ) ) {
+		if ( is_null( $core_status ) ) {
 			return;
 		}
 
@@ -354,7 +345,7 @@ class Extension {
 				continue;
 			}
 
-			$subscription->set_status( $status );
+			$subscription->set_status( $core_status );
 
 			$subscription->add_note( $note );
 

@@ -47,7 +47,13 @@ Restrict Content Pro notice:
 
 #### Edit "Auto Renew"
 
-?
+Editing the Restrict Content Pro membership "Auto Renew" value will not affect
+the connected Pronamic Pay subscription. The Pronamic Pay subscription will not
+be cancelled. We are not doing this due to the following Restrict Content Pro notice:
+
+> Changing the recurring indicator will not set up or remove a subscription with the gateway. This checkbox is for updating RCP records only.
+
+![Restrict Content Pro edit auto renew notice](documentation/restrict-content-pro-3-edit-auto-renew-notice.png)
 
 ## Test
 

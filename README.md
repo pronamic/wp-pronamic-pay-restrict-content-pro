@@ -45,11 +45,9 @@ connected Pronamic Pay subscription will be updated accordingly.
 | Restrict Content Pro status | Pronamic Pay subscription status |
 | --------------------------- | -------------------------------- |
 | Active                      | Active                           |
-| Expired                     | Completed (?)                    |
+| Expired                     | Expired                          |
 | Cancelled                   | Cancelled                        |
 | Pending                     | Pending                          |
-
-- *Active*
 
 #### Edit "Date Created"
 

@@ -319,11 +319,11 @@ class Extension {
 				break;
 
 			case MembershipStatus::EXPIRED:
-				$status = Statuses::COMPLETED;
+				$status = Statuses::EXPIRED;
 
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription completed by %s.', 'pronamic_ideal' ),
+					__( 'Subscription expired by %s.', 'pronamic_ideal' ),
 					__( 'Restrict Content Pro', 'pronamic_ideal' )
 				);
 

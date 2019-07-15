@@ -318,7 +318,6 @@ class Extension {
 
 				break;
 
-			case 'free':
 			case MembershipStatus::EXPIRED:
 				$status = Statuses::COMPLETED;
 

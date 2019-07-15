@@ -26,7 +26,16 @@ Pronamic Pay subscription:
 
 #### Edit "Membership Level"
 
-?
+When you change the "Membership Level" of a Restrict Content Pro membership the
+connected Pronamic Pay subscription will be cancelled. If you click the 
+Restrict Content Pro "Change Level" button you will see a confirmation modal
+dialog with the following text:
+
+> Are you sure you want to change the membership level? The subscription will be cancelled at the payment gateway and this customer will not be automatically billed again. 
+
+If you confirm by selecting OK Restrict Content Pro will create a new membership.
+The other Restrict Content Pro membership will be marked as `disabled`. The new
+Restrict Content Pro membership will not be connected to a Pronamic Pay subscription.
 
 #### Edit "Date Created"
 

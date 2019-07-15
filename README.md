@@ -88,6 +88,7 @@ be cancelled. We are not doing this due to the following Restrict Content Pro no
 *	Lifetime membership.
 *	Free trial.
 *	Fee.
+*	Free member.
 
 ## Links
 

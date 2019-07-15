@@ -37,6 +37,20 @@ If you confirm by selecting OK Restrict Content Pro will create a new membership
 The other Restrict Content Pro membership will be marked as `disabled`. The new
 Restrict Content Pro membership will not be connected to a Pronamic Pay subscription.
 
+#### Edit "Membership Status"
+
+When you change the "Membership Status" of a Restrict Content Pro membership the
+connected Pronamic Pay subscription will be updated accordingly.
+
+| Restrict Content Pro status | Pronamic Pay subscription status |
+| --------------------------- | -------------------------------- |
+| Active                      | Active                           |
+| Expired                     | Completed (?)                    |
+| Cancelled                   | Cancelled                        |
+| Pending                     | Pending                          |
+
+- *Active*
+
 #### Edit "Date Created"
 
 Editing the Restrict Content Pro membership "Date Created" value will not affect

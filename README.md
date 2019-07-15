@@ -36,7 +36,14 @@ not be updated.
 
 #### Edit "Expiration Date"
 
-?
+Editing the Restrict Content Pro membership "Expiration Date" value will not affect
+the connected Pronamic Pay subscription. The Pronamic Pay subscription expiration
+date will not be updated. We are not updating this due to the following
+Restrict Content Pro notice:
+
+> Changing the expiration date will not affect when renewal payments are processed.
+
+![Restrict Content Pro edit expiration date notice](documentation/restrict-content-pro-3-edit-expiration-date-notice.png)
 
 #### Edit "Auto Renew"
 

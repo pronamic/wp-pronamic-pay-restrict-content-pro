@@ -12,7 +12,6 @@ namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
-use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Address;
@@ -32,31 +31,6 @@ use RCP_Payment_Gateway;
  * @since   1.0.0
  */
 class Util {
-	/**
-	 * Convert a core payment status to a Restrict Content Pro payment status.
-	 *
-	 * @link https://github.com/wp-pay/core/blob/2.1.6/src/Core/Statuses.php
-	 *
-	 * @param string|null $core_status Core payment status.
-	 * @return string|null Restrict Content Pro payment status.
-	 */
-	public static function core_payment_status_to_rcp( $core_status ) {
-		switch ( $core_status ) {
-			case Statuses::OPEN:
-				return RestrictContentPro::PAYMENT_STATUS_PENDING;
-			case Statuses::CANCELLED:
-				return RestrictContentPro::PAYMENT_STATUS_CANCELLED;
-			case Statuses::EXPIRED:
-				return RestrictContentPro::PAYMENT_STATUS_EXPIRED;
-			case Statuses::FAILURE:
-				return RestrictContentPro::PAYMENT_STATUS_FAILED;
-			case Statuses::SUCCESS:
-				return RestrictContentPro::PAYMENT_STATUS_COMPLETE;
-			default:
-				return null;
-		}
-	}
-
 	/**
 	 * Create new payment from Restrict Content Pro gateway object.
 	 *

@@ -205,25 +205,31 @@ class Extension {
 		}
 
 		// Only update if order is not completed.
-		if ( RestrictContentPro::PAYMENT_STATUS_COMPLETE === $rcp_payment->status ) {
+		if ( PaymentStatus::COMPLETE === $rcp_payment->status ) {
 			return;
 		}
 
-		switch ( $payment->get_status() ) {
+		$core_status = $payment->get_status();
+
+		$rcp_payment_data = array(
+			'status' => PaymentStatus::from_core( $core_status ),
+		);
+
+		switch ( $core_status ) {
 			case Statuses::CANCELLED:
-				$rcp_payments->update( $rcp_payment_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_CANCELLED ) );
+				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
 				break;
 			case Statuses::EXPIRED:
-				$rcp_payments->update( $rcp_payment_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_EXPIRED ) );
+				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
 				break;
 			case Statuses::FAILURE:
-				$rcp_payments->update( $rcp_payment_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_FAILED ) );
+				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
 				break;
 			case Statuses::SUCCESS:
-				$rcp_payments->update( $rcp_payment_id, array( 'status' => RestrictContentPro::PAYMENT_STATUS_COMPLETE ) );
+				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
 				/**
 				 * Find and renew the Restrict Content Pro membership.
@@ -290,7 +296,7 @@ class Extension {
 		$status = null;
 
 		switch ( $new_status ) {
-			case 'active':
+			case MembershipStatus::ACTIVE:
 				$status = Statuses::ACTIVE;
 
 				$note = sprintf(
@@ -301,7 +307,7 @@ class Extension {
 
 				break;
 
-			case 'cancelled':
+			case MembershipStatus::CANCELLED:
 				$status = Statuses::CANCELLED;
 
 				$note = sprintf(
@@ -313,7 +319,7 @@ class Extension {
 				break;
 
 			case 'free':
-			case 'expired':
+			case MembershipStatus::EXPIRED:
 				$status = Statuses::COMPLETED;
 
 				$note = sprintf(
@@ -324,7 +330,7 @@ class Extension {
 
 				break;
 
-			case 'pending':
+			case MembershipStatus::PENDING:
 				$status = Statuses::OPEN;
 
 				$note = sprintf(
@@ -380,7 +386,7 @@ class Extension {
 			return $can_cancel;
 		}
 
-		if ( 'active' !== $membership->get_status() ) {
+		if ( MembershipStatus::ACTIVE !== $membership->get_status() ) {
 			return $can_cancel;
 		}
 
@@ -586,7 +592,7 @@ class Extension {
 				'subscription_key' => $rcp_membership->get_subscription_key(),
 				'object_type'      => 'subscription',
 				'object_id'        => $rcp_membership->get_object_id(),
-				'status'           => Util::core_payment_status_to_rcp( $payment->get_status() ),
+				'status'           => PaymentStatus::from_core( $payment->get_status() ),
 			)
 		);
 
@@ -632,7 +638,7 @@ class Extension {
 		$result = $rcp_payments->update(
 			$payment->source_id,
 			array(
-				'status'         => Util::core_payment_status_to_rcp( $payment->get_status() ),
+				'status'         => PaymentStatus::from_core( $payment->get_status() ),
 				'transaction_id' => strval( $payment->get_transaction_id() ),
 			)
 		);

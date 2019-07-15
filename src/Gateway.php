@@ -175,7 +175,8 @@ class Gateway extends RCP_Payment_Gateway {
 	 * @see     https://github.com/restrictcontentpro/restrict-content-pro/blob/1.9.4/includes/checkout/template.php#L167
 	 */
 	public function payment_fields() {
-		echo $this->fields(); // WPCS: XSS ok.
+		// phpcs:ignore WordPress.Security.EscapeOutput
+		echo $this->fields();
 	}
 
 	/**
@@ -195,7 +196,8 @@ class Gateway extends RCP_Payment_Gateway {
 
 			if ( $input ) {
 				echo '<fieldset class="rcp_card_fieldset"><p>';
-				echo $input; // WPCS: XSS ok.
+				// phpcs:ignore WordPress.Security.EscapeOutput
+				echo $input;
 				echo '</p></fieldset>';
 			}
 		}

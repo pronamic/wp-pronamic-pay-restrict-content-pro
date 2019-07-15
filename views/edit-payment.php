@@ -1,7 +1,11 @@
 <?php
-
 /**
  * Restrict Conent Pro edit payment after.
+ *
+ * @author    Pronamic <info@pronamic.eu>
+ * @copyright 2005-2019 Pronamic
+ * @license   GPL-3.0-or-later
+ * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
  *
  * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/payments/edit-payment.php#L127
  */

@@ -116,22 +116,25 @@ class Extension {
 			'pronamic_pay_direct_debit'            => $this->get_gateway_data( __( 'Direct Debit', 'pronamic_ideal' ), DirectDebitGateway::class ),
 			'pronamic_pay_direct_debit_bancontact' => $this->get_gateway_data(
 				sprintf(
+					/* translators: %s: Payment method */
 					__( 'Direct Debit (mandate via %s)', 'pronamic_ideal' ),
-					__( 'Bancontact', 'pronamic_ideal' ),
+					__( 'Bancontact', 'pronamic_ideal' )
 				),
 				DirectDebitBancontactGateway::class
 			),
 			'pronamic_pay_direct_debit_ideal'      => $this->get_gateway_data(
 				sprintf(
+					/* translators: %s: Payment method */
 					__( 'Direct Debit (mandate via %s)', 'pronamic_ideal' ),
-					__( 'iDEAL', 'pronamic_ideal' ),
+					__( 'iDEAL', 'pronamic_ideal' )
 				),
 				DirectDebitIDealGateway::class
 			),
 			'pronamic_pay_direct_debit_sofort'     => $this->get_gateway_data(
 				sprintf(
+					/* translators: %s: Payment method */
 					__( 'Direct Debit (mandate via %s)', 'pronamic_ideal' ),
-					__( 'SOFORT', 'pronamic_ideal' ),
+					__( 'SOFORT', 'pronamic_ideal' )
 				),
 				DirectDebitSofortGateway::class
 			),
@@ -168,7 +171,7 @@ class Extension {
 			'rcp_payment',
 		);
 
-		if ( ! in_array( $payment->source, $sources ) ) {
+		if ( ! in_array( $payment->source, $sources, true ) ) {
 			return $url;
 		}
 
@@ -533,6 +536,7 @@ class Extension {
 	 * @link https://github.com/wp-pay/core/blob/2.1.6/src/Payments/PaymentsDataStoreCPT.php#L234
 	 *
 	 * @param Payment $payment Payment.
+	 * @throws Exception When Restrict Content Pro returns unexpected value.
 	 */
 	public function new_payment( Payment $payment ) {
 		/**
@@ -563,8 +567,8 @@ class Extension {
 		/**
 		 * Insert Restrict Content Pro payment.
 		 *
-		  * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/class-rcp-payments.php#L55-191
-		  */
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/class-rcp-payments.php#L55-191
+		 */
 		$rcp_payments = new RCP_Payments();
 
 		$result = $rcp_payments->insert(
@@ -607,6 +611,7 @@ class Extension {
 	 * Update payment.
 	 *
 	 * @param Payment $payment Payment.
+	 * @throws Exception When Restrict Content Pro returns unexpected value.
 	 */
 	public function update_payment( Payment $payment ) {
 		/**
@@ -647,7 +652,7 @@ class Extension {
 	 *
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/memberships/edit-membership.php#L285-294
 	 *
-	 * @param RCP_Membership $membership
+	 * @param RCP_Membership $membership Restrict Content Pro membership.
 	 */
 	public function rcp_edit_membership_after( $membership ) {
 		$query = new WP_Query(
@@ -677,11 +682,11 @@ class Extension {
 	}
 
 	/**
-	 * Restrict Conent Pro edit payment after.
+	 * Restrict Content Pro edit payment after.
 	 *
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/payments/edit-payment.php#L127
 	 *
-	 * @param object $payment
+	 * @param object $payment Restrict Content Pro payment.
 	 */
 	public function rcp_edit_payment_after( $payment ) {
 		$query = new WP_Query(

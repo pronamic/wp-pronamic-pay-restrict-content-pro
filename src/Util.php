@@ -37,7 +37,7 @@ class Util {
 	 *
 	 * @link https://github.com/wp-pay/core/blob/2.1.6/src/Core/Statuses.php
 	 *
-	 * @param string|null $status Core payment status.
+	 * @param string|null $core_status Core payment status.
 	 * @return string|null Restrict Content Pro payment status.
 	 */
 	public static function core_payment_status_to_rcp( $core_status ) {
@@ -72,8 +72,8 @@ class Util {
 		$payment = new Payment();
 
 		// Title.
-		/* translators: %s: order id */
 		$payment->title = sprintf(
+			/* translators: %s: Restrict Content Pro payment ID */
 			__( 'Restrict Content Pro payment %s', 'pronamic_ideal' ),
 			$gateway->payment->id
 		);
@@ -190,6 +190,7 @@ class Util {
 			$line->set_type( PaymentLineType::DISCOUNT );
 			$line->set_name(
 				sprintf(
+					/* translators: %s: Restrict Content Pro discount code */
 					__( 'Discount code `%s`', 'pronamic_ideal' ),
 					$gateway->discount_code
 				)

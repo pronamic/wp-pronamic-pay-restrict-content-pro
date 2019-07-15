@@ -563,26 +563,28 @@ class Extension {
 		/**
 		 * Insert Restrict Content Pro payment.
 		 *
-	 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/class-rcp-payments.php#L55-191
-	 	 */
+		  * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/class-rcp-payments.php#L55-191
+		  */
 		$rcp_payments = new RCP_Payments();
 
-		$result = $rcp_payments->insert( array(
-			'date'             => $payment->get_date()->format( 'Y-m-d g:i:s' ),
-			'payment_type'     => '',
-			'transaction_type' => 'renewal',
-			'user_id'          => $rcp_membership->get_customer()->get_user_id(),
-			'customer_id'      => $rcp_membership->get_customer_id(),
-			'membership_id'    => $rcp_membership->get_id(),
-			'amount'           => $payment->get_total_amount()->get_value(),
-			// Transaction ID can not be null therefor we use `strval` to cast `null` to an empty string.
-			'transaction_id'   => strval( $payment->get_transaction_id() ),
-			'subscription'     => rcp_get_subscription_name( $rcp_membership->get_object_id() ),
-			'subscription_key' => $rcp_membership->get_subscription_key(),
-			'object_type'      => 'subscription',
-			'object_id'        => $rcp_membership->get_object_id(),
-			'status'           => Util::core_payment_status_to_rcp( $payment->get_status() ),
-		) );
+		$result = $rcp_payments->insert(
+			array(
+				'date'             => $payment->get_date()->format( 'Y-m-d g:i:s' ),
+				'payment_type'     => '',
+				'transaction_type' => 'renewal',
+				'user_id'          => $rcp_membership->get_customer()->get_user_id(),
+				'customer_id'      => $rcp_membership->get_customer_id(),
+				'membership_id'    => $rcp_membership->get_id(),
+				'amount'           => $payment->get_total_amount()->get_value(),
+				// Transaction ID can not be null therefor we use `strval` to cast `null` to an empty string.
+				'transaction_id'   => strval( $payment->get_transaction_id() ),
+				'subscription'     => rcp_get_subscription_name( $rcp_membership->get_object_id() ),
+				'subscription_key' => $rcp_membership->get_subscription_key(),
+				'object_type'      => 'subscription',
+				'object_id'        => $rcp_membership->get_object_id(),
+				'status'           => Util::core_payment_status_to_rcp( $payment->get_status() ),
+			)
+		);
 
 		if ( false === $result ) {
 			throw new Exception(

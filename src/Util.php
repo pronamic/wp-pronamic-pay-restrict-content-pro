@@ -142,7 +142,7 @@ class Util {
 				$contact_name->set_last_name( $post_data['rcp_user_last'] );
 			}
 		}
-		
+
 		// Customer.
 		$customer = new Customer();
 

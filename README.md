@@ -76,6 +76,32 @@ be cancelled. We are not doing this due to the following Restrict Content Pro no
 
 ![Restrict Content Pro edit auto renew notice](documentation/restrict-content-pro-3-edit-auto-renew-notice.png)
 
+### Gateway supports
+
+Foreach Restrict Content Pro gateway it is possible to define which features are supported.
+In Restrict Content Pro version 3 the following supports values are available:
+
+| Support     | Description        |
+| ----------- | ------------------ |
+| `one-time`  | one time payments  |
+| `recurring` | recurring payments |
+| `fees`      | fees               |
+| `trial`     | free trials        |
+
+Source: https://docs.restrictcontentpro.com/article/1695-payment-gateway-api
+
+In the Pronamic Pay extension we try to set the supports values as correct as possible
+for the different gateays. Restrict Content Pro however will not hide/show gateways 
+based on the supports values.
+
+Restrict Content Pro membership levels with a recurring can be paid with a
+one-time payment gateway like iDEAL. And unlimited membership levels can 
+be paid with a recurring payment gateway like Direct Debit (mandate via iDEAL).
+
+Once a user pays a recurring membership level with a one-time payment gateway, 
+it will not be automatically renewed. Restrict Content Pro is not very clear 
+about this, so make sure you inform your users about this!
+
 ## Test
 
 *	Not logged in new membership.

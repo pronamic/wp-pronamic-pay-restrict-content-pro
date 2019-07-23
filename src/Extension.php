@@ -524,6 +524,88 @@ class Extension {
 	}
 
 	/**
+	 * Get Restrict Content Pro mebership from payment.
+	 *
+	 * @param Payment $payment Pronamic Pay payment.
+	 * @return RCP_Membership|null
+	 * @throws Exception When Restrict Content Pro membership can not be found.
+	 */
+	private function get_rcp_membership_from_payment( Payment $payment ) {
+		/**
+		 * In version <= 2.1.3 we used the source 'restrictcontentpro'
+		 * with a user ID.
+		 *
+		 * @link https://gist.github.com/remcotolsma/ecc33e2f14c5035aabc876d73fbe0b62
+		 */
+		if ( 'restrictcontentpro' === $payment->source ) {
+			$user_id = $payment->source_id;
+
+			/**
+			 * Get customer by user ID.
+			 *
+			 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/customers/customer-functions.php#L15-34
+			 */
+			$rcp_customer = rcp_get_customer_by_user_id( $user_id );
+
+			if ( false === $rcp_customer ) {
+				throw new Exception(
+					sprintf(
+						'Could not find Restrict Content Pro customer for user ID: %s.',
+						$user_id
+					)
+				);
+			}
+
+			/**
+			 * Get customer single membership by customer ID.
+			 *
+			 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/customers/customer-functions.php#L280-320
+			 */
+			$rcp_membership = rcp_get_customer_single_membership( $rcp_customer->get_id() );
+
+			if ( false === $rcp_membership ) {
+				throw new Exception(
+					sprintf(
+						'Could not find Restrict Content Pro membership for customer ID: %s.',
+						$rcp_customer->get_id()
+					)
+				);
+			}
+
+			return $rcp_membership;
+		}
+
+		/**
+		 * In version > 2.1.3 we use the source 'rcp_membership'
+		 * with a membership ID.
+		 */
+		if ( 'rcp_membership' === $payment->source ) {
+			$membership_id = $payment->source_id;
+
+			/**
+			 * Try to find the Restrict Content Pro membership from the
+			 * payment source ID.
+			 *
+			 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/membership-functions.php#L15-29
+			 */
+			$rcp_membership = rcp_get_membership( $membership_id );
+
+			if ( false === $rcp_membership ) {
+				throw new Exception(
+					sprintf(
+						'Could not find Restrict Content Pro membership with ID: %s.',
+						$membership_id
+					)
+				);
+			}
+
+			return $rcp_membership;
+		}
+
+		return null;
+	}
+
+	/**
 	 * This function is hooked into the `pronamic_pay_new_payment` routine.
 	 * It will check if the new payment is created from a Restrict Content Pro
 	 * membership. If that is the case it will create a new Restrict Content Pro
@@ -535,29 +617,10 @@ class Extension {
 	 * @throws Exception When Restrict Content Pro returns unexpected value.
 	 */
 	public function new_payment( Payment $payment ) {
-		/**
-		 * Check if the payment is from a Restrict Content Pro
-		 * membership.
-		 */
-		if ( 'rcp_membership' !== $payment->source ) {
+		$rcp_membership = $this->get_rcp_membership_from_payment( $payment );
+
+		if ( null === $rcp_membership ) {
 			return;
-		}
-
-		/**
-		 * Try to find the Restrict Content Pro membership from the
-		 * payment source ID.
-		 *
-		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/membership-functions.php#L15-29
-		 */
-		$rcp_membership = rcp_get_membership( $payment->source_id );
-
-		if ( false === $rcp_membership ) {
-			throw new Exception(
-				sprintf(
-					'Could not find Restrict Content Pro membership with ID: %s.',
-					$payment->source_id
-				)
-			);
 		}
 
 		/**

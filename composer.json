@@ -56,15 +56,15 @@
 	],
 	"require": {
 		"php": ">=5.6.20",
-		"wp-pay/core": "dev-develop as 2.2",
+		"wp-pay/core": "^2.2",
 		"pronamic/wp-money": "^1.2"
 	},
 	"require-dev": {
-		"dealerdirect/phpcodesniffer-composer-installer": "^0.5",
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.5.0",
 		"php-coveralls/php-coveralls": "^2.1",
-		"phpcompatibility/php-compatibility": "^9.1",
+		"phpcompatibility/php-compatibility": "^9.2",
 		"phpcompatibility/phpcompatibility-wp": "^2.0",
-		"phpmd/phpmd": "^2.4",
+		"phpmd/phpmd": "^2.7",
 		"phpunit/phpunit": "^5.7 || ^6.0",
 		"restrictcontentpro/restrict-content": "2.2.3",
 		"roots/wordpress": "^5.2",

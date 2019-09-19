@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
+use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\Recurring;
 use Pronamic\WordPress\Pay\Core\Statuses;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -217,22 +218,12 @@ class Extension {
 
 		switch ( $core_status ) {
 			case Statuses::CANCELLED:
-				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
-
-				break;
 			case Statuses::EXPIRED:
-				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
-
-				break;
 			case Statuses::FAILURE:
 				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
-				break;
-			case Statuses::SUCCESS:
-				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
-
 				/**
-				 * Find and renew the Restrict Content Pro membership.
+				 * Find and cancel the Restrict Content Pro membership.
 				 *
 				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/membership-functions.php#L15-29
 				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/class-rcp-payments.php#L75
@@ -243,12 +234,16 @@ class Extension {
 				$rcp_membership = rcp_get_membership( $rcp_payment->membership_id );
 
 				if ( false !== $rcp_membership ) {
-					$subscription = $payment->get_subscription();
+					// Set expiration date to yesterday.
+					$rcp_membership->expire();
 
-					$recurring = empty( $subscription ) ? false : true;
-
-					$rcp_membership->renew( $recurring );
+					// Set status to `pending` to prevent access to restricted content.
+					$rcp_membership->set_status( 'pending' );
 				}
+
+				break;
+			case Statuses::SUCCESS:
+				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
 				break;
 			case Statuses::OPEN:
@@ -658,6 +653,16 @@ class Extension {
 			);
 		}
 
+		// Renew membership.
+		$expiration = '';
+
+		if ( null !== $end_date ) {
+			$expiration = $payment->get_end_date()->format( DateTime::MYSQL );
+		}
+
+		$rcp_membership->renew( true, 'active', $expiration );
+
+		// Set source.
 		$rcp_payment_id = $result;
 
 		$payment->source    = 'rcp_payment';

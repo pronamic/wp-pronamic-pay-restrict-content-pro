@@ -656,8 +656,10 @@ class Extension {
 		// Renew membership.
 		$expiration = '';
 
+		$end_date = $payment->get_end_date();
+
 		if ( null !== $end_date ) {
-			$expiration = $payment->get_end_date()->format( DateTime::MYSQL );
+			$expiration = $end_date->format( DateTime::MYSQL );
 		}
 
 		$rcp_membership->renew( true, 'active', $expiration );

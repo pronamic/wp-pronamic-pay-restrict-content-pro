@@ -12,7 +12,7 @@ namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\Recurring;
-use Pronamic\WordPress\Pay\Core\Statuses;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use RCP_Member;
 use RCP_Payments;
@@ -176,7 +176,7 @@ class Extension {
 			return $url;
 		}
 
-		if ( Statuses::SUCCESS !== $payment->get_status() ) {
+		if ( PaymentStatus::SUCCESS !== $payment->get_status() ) {
 			return $url;
 		}
 
@@ -217,9 +217,9 @@ class Extension {
 		);
 
 		switch ( $core_status ) {
-			case Statuses::CANCELLED:
-			case Statuses::EXPIRED:
-			case Statuses::FAILURE:
+			case PaymentStatus::CANCELLED:
+			case PaymentStatus::EXPIRED:
+			case PaymentStatus::FAILURE:
 				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
 				/**
@@ -242,11 +242,11 @@ class Extension {
 				}
 
 				break;
-			case Statuses::SUCCESS:
+			case PaymentStatus::SUCCESS:
 				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
 				break;
-			case Statuses::OPEN:
+			case PaymentStatus::OPEN:
 				// Nothing to do?
 				break;
 		}

@@ -10,6 +10,8 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
+
 /**
  * Restrict Content Pro membership status
  *
@@ -64,16 +66,16 @@ class MembershipStatus {
 	 * @param string|null $rcp_status Restrict Content Pro membership status.
 	 * @return string|null Core subscription status.
 	 */
-	public static function to_core( $rcp_status ) {
+	public static function to_core_subscription_status( $rcp_status ) {
 		switch ( $rcp_status ) {
 			case self::ACTIVE:
-				return null;
+				return SubscriptionStatus::ACTIVE;
 			case self::EXPIRED:
-				return null;
+				return SubscriptionStatus::EXPIRED;
 			case self::CANCELLED:
-				return null;
+				return SubscriptionStatus::CANCELLED;
 			case self::PENDING:
-				return null;
+				return SubscriptionStatus::OPEN;
 			default:
 				return null;
 		}

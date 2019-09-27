@@ -12,7 +12,7 @@ namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\Recurring;
-use Pronamic\WordPress\Pay\Payments\PaymentStatus;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use RCP_Member;
 use RCP_Payments;
@@ -176,7 +176,7 @@ class Extension {
 			return $url;
 		}
 
-		if ( PaymentStatus::SUCCESS !== $payment->get_status() ) {
+		if ( Core_PaymentStatus::SUCCESS !== $payment->get_status() ) {
 			return $url;
 		}
 
@@ -217,9 +217,9 @@ class Extension {
 		);
 
 		switch ( $core_status ) {
-			case PaymentStatus::CANCELLED:
-			case PaymentStatus::EXPIRED:
-			case PaymentStatus::FAILURE:
+			case Core_PaymentStatus::CANCELLED:
+			case Core_PaymentStatus::EXPIRED:
+			case Core_PaymentStatus::FAILURE:
 				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
 				/**
@@ -242,11 +242,11 @@ class Extension {
 				}
 
 				break;
-			case PaymentStatus::SUCCESS:
+			case Core_PaymentStatus::SUCCESS:
 				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
 				break;
-			case PaymentStatus::OPEN:
+			case Core_PaymentStatus::OPEN:
 				// Nothing to do?
 				break;
 		}
@@ -288,7 +288,9 @@ class Extension {
 			return;
 		}
 
-		$core_status = MembershipStatus::to_core( $new_status );
+		$core_status = MembershipStatus::to_core_subscription_status( $new_status );
+
+		$note = null;
 
 		switch ( $new_status ) {
 			case MembershipStatus::ACTIVE:
@@ -334,14 +336,17 @@ class Extension {
 		while ( $query->have_posts() ) {
 			$query->the_post();
 
+			// Get subscription.
 			$subscription = get_pronamic_subscription( get_the_ID() );
 
 			if ( null === $subscription ) {
 				continue;
 			}
 
+			// Set subscription status.
 			$subscription->set_status( $core_status );
 
+			// Add note.
 			$subscription->add_note( $note );
 
 			$subscription->save();
@@ -355,9 +360,10 @@ class Extension {
 	 *
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/class-rcp-membership.php#L2239-2248
 	 *
-	 * @param bool           $can_cancel    Whether or not this membership can be cancelled.
-	 * @param int            $membership_id ID of the membership.
-	 * @param RCP_Membership $membership    Membership object.
+	 * @param bool            $can_cancel    Whether or not this membership can be cancelled.
+	 * @param int             $membership_id ID of the membership.
+	 * @param \RCP_Membership $membership    Membership object.
+	 *
 	 * @return bool
 	 */
 	public function rcp_membership_can_cancel( $can_cancel, $membership_id, $membership ) {
@@ -704,7 +710,7 @@ class Extension {
 		);
 
 		if ( false === $result ) {
-			throw new Exception(
+			throw new \Exception(
 				sprintf(
 					'Could not update Restrict Content Pro payment for payment %s.',
 					$payment->get_id()

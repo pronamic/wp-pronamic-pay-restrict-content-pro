@@ -24,6 +24,6 @@ class RestrictContentPro {
 	 * @return boolean
 	 */
 	public static function is_active() {
-		return defined( 'RCP_PLUGIN_VERSION' );
+		return defined( 'RCP_PLUGIN_VERSION' ) && \version_compare( RCP_PLUGIN_VERSION, '3.0', '>=' );
 	}
 }

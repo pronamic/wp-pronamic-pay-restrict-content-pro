@@ -10,7 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
-use Pronamic\WordPress\Pay\Core\Statuses;
+use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
 
 /**
  * Restrict Content Pro payment status
@@ -77,15 +77,15 @@ class PaymentStatus {
 	 */
 	public static function from_core( $core_status ) {
 		switch ( $core_status ) {
-			case Statuses::OPEN:
+			case Core_PaymentStatus::OPEN:
 				return self::PENDING;
-			case Statuses::CANCELLED:
+			case Core_PaymentStatus::CANCELLED:
 				return self::FAILED;
-			case Statuses::EXPIRED:
+			case Core_PaymentStatus::EXPIRED:
 				return self::ABANDONED;
-			case Statuses::FAILURE:
+			case Core_PaymentStatus::FAILURE:
 				return self::FAILED;
-			case Statuses::SUCCESS:
+			case Core_PaymentStatus::SUCCESS:
 				return self::COMPLETE;
 			default:
 				return null;

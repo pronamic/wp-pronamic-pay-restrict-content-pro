@@ -14,7 +14,7 @@ namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
  * Restrict Content Pro
  *
  * @author  Reüel van der Steege
- * @version 2.0.0
+ * @version 2.1.5
  * @since   1.0.0
  */
 class RestrictContentPro {
@@ -24,6 +24,6 @@ class RestrictContentPro {
 	 * @return boolean
 	 */
 	public static function is_active() {
-		return defined( 'RCP_PLUGIN_VERSION' );
+		return defined( 'RCP_PLUGIN_VERSION' ) && \version_compare( RCP_PLUGIN_VERSION, '3.0', '>=' );
 	}
 }

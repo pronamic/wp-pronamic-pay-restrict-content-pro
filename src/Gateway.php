@@ -227,15 +227,16 @@ class Gateway extends RCP_Payment_Gateway {
 			);
 		}
 
-		// Start.
-		try {
-			$payment = Util::new_payment_from_rcp_gateway( $this );
+		$payment = Util::new_payment_from_rcp_gateway( $this );
 
-			$payment->config_id = $config_id;
-			$payment->method    = $this->payment_method;
+		$payment->config_id = $config_id;
+		$payment->method    = $this->payment_method;
 
-			$payment = Plugin::start_payment( $payment, $gateway );
-		} catch ( \Pronamic\WordPress\Pay\PayException $e ) {
+		$payment = Plugin::start_payment( $payment, $gateway );
+
+		$error = $gateway->get_error();
+
+		if ( is_wp_error( $error ) ) {
 			do_action( 'rcp_registration_failed', $this );
 
 			wp_die(
@@ -243,7 +244,7 @@ class Gateway extends RCP_Payment_Gateway {
 					sprintf(
 						/* translators: %s: JSON encoded payment data */
 						__( 'Payment creation failed before sending buyer to the payment provider. Error: %s', 'pronamic_ideal' ),
-						$e->get_message()
+						$error->get_error_message()
 					)
 				),
 				esc_html__( 'Payment Error', 'pronamic_ideal' ),

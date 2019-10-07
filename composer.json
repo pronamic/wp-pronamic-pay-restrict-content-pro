@@ -62,13 +62,13 @@
 	"require-dev": {
 		"dealerdirect/phpcodesniffer-composer-installer": "^0.5.0",
 		"php-coveralls/php-coveralls": "^2.1",
-		"phpcompatibility/php-compatibility": "^9.2",
-		"phpcompatibility/phpcompatibility-wp": "^2.0",
+		"phpcompatibility/php-compatibility": "^9.3",
+		"phpcompatibility/phpcompatibility-wp": "^2.1",
 		"phpmd/phpmd": "^2.7",
 		"phpunit/phpunit": "^5.7 || ^6.0",
 		"restrictcontentpro/restrict-content": "2.2.3",
 		"roots/wordpress": "^5.2",
-		"squizlabs/php_codesniffer": "^3.4",
+		"squizlabs/php_codesniffer": "^3.5",
 		"wp-coding-standards/wpcs": "^2.1",
 		"wp-phpunit/wp-phpunit": "^5.2"
 	},

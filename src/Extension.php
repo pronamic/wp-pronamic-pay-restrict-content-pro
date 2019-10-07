@@ -22,7 +22,7 @@ use WP_Query;
  * Extension
  *
  * @author  Reüel van der Steege
- * @version 2.1.1
+ * @version 2.1.5
  * @since   1.0.0
  */
 class Extension {
@@ -528,8 +528,8 @@ class Extension {
 	 * Get Restrict Content Pro mebership from payment.
 	 *
 	 * @param Payment $payment Pronamic Pay payment.
-	 * @return RCP_Membership|null
-	 * @throws Exception When Restrict Content Pro membership can not be found.
+	 * @return \RCP_Membership|null
+	 * @throws \Exception When Restrict Content Pro membership can not be found.
 	 */
 	private function get_rcp_membership_from_payment( Payment $payment ) {
 		/**
@@ -546,11 +546,11 @@ class Extension {
 			 *
 			 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/customers/customer-functions.php#L15-34
 			 */
-			$rcp_customer = rcp_get_customer_by_user_id( $user_id );
+			$rcp_customer = \rcp_get_customer_by_user_id( $user_id );
 
 			if ( false === $rcp_customer ) {
-				throw new Exception(
-					sprintf(
+				throw new \Exception(
+					\sprintf(
 						'Could not find Restrict Content Pro customer for user ID: %s.',
 						$user_id
 					)
@@ -562,11 +562,11 @@ class Extension {
 			 *
 			 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/customers/customer-functions.php#L280-320
 			 */
-			$rcp_membership = rcp_get_customer_single_membership( $rcp_customer->get_id() );
+			$rcp_membership = \rcp_get_customer_single_membership( $rcp_customer->get_id() );
 
 			if ( false === $rcp_membership ) {
-				throw new Exception(
-					sprintf(
+				throw new \Exception(
+					\sprintf(
 						'Could not find Restrict Content Pro membership for customer ID: %s.',
 						$rcp_customer->get_id()
 					)
@@ -589,11 +589,11 @@ class Extension {
 			 *
 			 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/membership-functions.php#L15-29
 			 */
-			$rcp_membership = rcp_get_membership( $membership_id );
+			$rcp_membership = \rcp_get_membership( $membership_id );
 
 			if ( false === $rcp_membership ) {
-				throw new Exception(
-					sprintf(
+				throw new \Exception(
+					\sprintf(
 						'Could not find Restrict Content Pro membership with ID: %s.',
 						$membership_id
 					)
@@ -615,7 +615,7 @@ class Extension {
 	 * @link https://github.com/wp-pay/core/blob/2.1.6/src/Payments/PaymentsDataStoreCPT.php#L234
 	 *
 	 * @param Payment $payment Payment.
-	 * @throws Exception When Restrict Content Pro returns unexpected value.
+	 * @throws \Exception When Restrict Content Pro returns unexpected value.
 	 */
 	public function new_payment( Payment $payment ) {
 		$rcp_membership = $this->get_rcp_membership_from_payment( $payment );
@@ -629,7 +629,7 @@ class Extension {
 		 *
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/class-rcp-payments.php#L55-191
 		 */
-		$rcp_payments = new RCP_Payments();
+		$rcp_payments = new \RCP_Payments();
 
 		$result = $rcp_payments->insert(
 			array(
@@ -641,8 +641,8 @@ class Extension {
 				'membership_id'    => $rcp_membership->get_id(),
 				'amount'           => $payment->get_total_amount()->get_value(),
 				// Transaction ID can not be null therefor we use `strval` to cast `null` to an empty string.
-				'transaction_id'   => strval( $payment->get_transaction_id() ),
-				'subscription'     => rcp_get_subscription_name( $rcp_membership->get_object_id() ),
+				'transaction_id'   => \strval( $payment->get_transaction_id() ),
+				'subscription'     => \rcp_get_subscription_name( $rcp_membership->get_object_id() ),
 				'subscription_key' => $rcp_membership->get_subscription_key(),
 				'object_type'      => 'subscription',
 				'object_id'        => $rcp_membership->get_object_id(),
@@ -651,8 +651,8 @@ class Extension {
 		);
 
 		if ( false === $result ) {
-			throw new Exception(
-				sprintf(
+			throw new \Exception(
+				\sprintf(
 					'Could not create Restrict Content Pro payment for payment %s.',
 					$payment->get_id()
 				)
@@ -683,7 +683,7 @@ class Extension {
 	 * Update payment.
 	 *
 	 * @param Payment $payment Payment.
-	 * @throws Exception When Restrict Content Pro returns unexpected value.
+	 * @throws \Exception When Restrict Content Pro returns unexpected value.
 	 */
 	public function update_payment( Payment $payment ) {
 		/**
@@ -699,19 +699,19 @@ class Extension {
 		 *
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/master/includes/class-rcp-payments.php#L219-284
 		 */
-		$rcp_payments = new RCP_Payments();
+		$rcp_payments = new \RCP_Payments();
 
 		$result = $rcp_payments->update(
 			$payment->source_id,
 			array(
 				'status'         => PaymentStatus::from_core( $payment->get_status() ),
-				'transaction_id' => strval( $payment->get_transaction_id() ),
+				'transaction_id' => \strval( $payment->get_transaction_id() ),
 			)
 		);
 
 		if ( false === $result ) {
 			throw new \Exception(
-				sprintf(
+				\sprintf(
 					'Could not update Restrict Content Pro payment for payment %s.',
 					$payment->get_id()
 				)
@@ -727,7 +727,7 @@ class Extension {
 	 * @param RCP_Membership $membership Restrict Content Pro membership.
 	 */
 	public function rcp_edit_membership_after( $membership ) {
-		$query = new WP_Query(
+		$query = new \WP_Query(
 			array(
 				'post_type'     => 'pronamic_pay_subscr',
 				'post_status'   => 'any',
@@ -750,7 +750,7 @@ class Extension {
 
 		include __DIR__ . '/../views/edit-membership.php';
 
-		wp_reset_postdata();
+		\wp_reset_postdata();
 	}
 
 	/**
@@ -761,7 +761,7 @@ class Extension {
 	 * @param object $payment Restrict Content Pro payment.
 	 */
 	public function rcp_edit_payment_after( $payment ) {
-		$query = new WP_Query(
+		$query = new \WP_Query(
 			array(
 				'post_type'     => 'pronamic_payment',
 				'post_status'   => 'any',
@@ -784,6 +784,6 @@ class Extension {
 
 		include __DIR__ . '/../views/edit-payment.php';
 
-		wp_reset_postdata();
+		\wp_reset_postdata();
 	}
 }

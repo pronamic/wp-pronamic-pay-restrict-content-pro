@@ -25,22 +25,7 @@ use WP_Query;
  * @version 2.1.5
  * @since   1.0.0
  */
-class Extension {
-	/**
-	 * Bootstrap.
-	 */
-	public static function bootstrap() {
-		$extension = new self();
-		$extension->setup();
-	}
-
-	/**
-	 * Setup.
-	 */
-	public function setup() {
-		add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ) );
-	}
-
+class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	/**
 	 * Plugins loaded.
 	 */

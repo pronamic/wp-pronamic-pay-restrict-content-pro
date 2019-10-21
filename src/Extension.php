@@ -59,6 +59,21 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	}
 
 	/**
+	 * Get list of database update files.
+	 *
+	 * @link https://github.com/woocommerce/woocommerce/blob/3.7.0/includes/class-wc-install.php#L368-L376
+	 * @link https://github.com/woocommerce/woocommerce/blob/3.7.0/includes/wc-update-functions.php
+	 * @return array<array<string>>
+	 */
+	public function get_db_update_files() {
+		return array(
+			'2.1.6' => array(
+				__DIR__ . '/../updates/update-2.1.6-source-id.php',
+			),
+		);
+	}
+
+	/**
 	 * Register Pronamic gateways.
 	 *
 	 * @param array $gateways Gateways.

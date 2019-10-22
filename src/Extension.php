@@ -27,6 +27,18 @@ use WP_Query;
  */
 class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	/**
+	 * Construct Restrict Content Pro plugin integration.
+	 */
+	public function __construct() {
+		parent::__construct();
+
+		// Dependencies.
+		$dependencies = $this->get_dependencies();
+
+		$dependencies->add( new RestrictContentProDependency() );
+	}
+
+	/**
 	 * Plugins loaded.
 	 */
 	public function plugins_loaded() {

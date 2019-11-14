@@ -38,6 +38,10 @@ if ( $query->have_posts() ) {
 
 		$subscription_post_id = \get_the_ID();
 
+		if ( false === $subscription_post_id ) {
+			continue;
+		}
+
 		/**
 		 * Get subscription.
 		 *
@@ -153,6 +157,10 @@ if ( $query->have_posts() ) {
 		$query->the_post();
 
 		$payment_post_id = \get_the_ID();
+
+		if ( false === $payment_post_id ) {
+			continue;
+		}
 
 		/**
 		 * Get payment.

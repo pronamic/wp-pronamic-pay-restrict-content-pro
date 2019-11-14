@@ -10,8 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
-use Pronamic\WordPress\Pay\Payments\PaymentStatus;
-use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus as CoreSubscriptionStatus;
 
 /**
  * Update source ID of subscriptions.
@@ -65,7 +64,7 @@ if ( $query->have_posts() ) {
 		$rcp_customer = \rcp_get_customer_by_user_id( $potential_user_id );
 
 		if ( false === $rcp_customer ) {
-			$subscription->set_status( SubscriptionStatus::ON_HOLD );
+			$subscription->set_status( CoreSubscriptionStatus::ON_HOLD );
 
 			$subscription->add_note(
 				\sprintf(
@@ -88,7 +87,7 @@ if ( $query->have_posts() ) {
 		$rcp_membership = \rcp_get_customer_single_membership( $rcp_customer->get_id() );
 
 		if ( false === $rcp_membership ) {
-			$subscription->set_status( SubscriptionStatus::ON_HOLD );
+			$subscription->set_status( CoreSubscriptionStatus::ON_HOLD );
 
 			$subscription->add_note(
 				\sprintf(

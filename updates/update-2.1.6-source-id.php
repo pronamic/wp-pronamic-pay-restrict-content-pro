@@ -22,7 +22,7 @@ use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus as CoreSubscriptionS
 function get_rcp_payment_by_rcp_payment_id( $rcp_payment_id ) {
 	$rcp_payments = new \RCP_Payments();
 
-	$rcp_payment = $rcp_payments->get_payment( $potential_rcp_payment_id );
+	$rcp_payment = $rcp_payments->get_payment( $rcp_payment_id );
 
 	if ( null === $rcp_payment ) {
 		return null;
@@ -137,7 +137,7 @@ if ( $query->have_posts() ) {
 		 * In Restrict Content Pro versions before 3.0 we may have saved the Restrict Content Pro payment ID as source ID.
 		 */
 		if ( null === $rcp_membership ) {
-			$potential_rcp_payment_id = $old_subscription_source_id;
+			$potential_rcp_payment_id = $subscription_source_id;
 
 			$rcp_membership = get_rcp_membership_by_rcp_payment_id( $potential_rcp_payment_id );
 		}
@@ -146,7 +146,7 @@ if ( $query->have_posts() ) {
 		 * In Restrict Content Pro versions before 3.0 we may have saved the WordPress user ID as source ID.
 		 */
 		if ( null === $rcp_membership ) {
-			$potential_wp_user_id = $old_subscription_source_id;
+			$potential_wp_user_id = $subscription_source_id;
 
 			$rcp_membership = get_rcp_membership_by_wp_user_id( $potential_wp_user_id );
 		}
@@ -202,7 +202,7 @@ if ( $query->have_posts() ) {
 		 * Ok.
 		 */
 		$subscription->set_source( 'rcp_membership' );
-		$subscription->set_source_id( $membership->get_id() );
+		$subscription->set_source_id( $rcp_membership->get_id() );
 
 		$subscription->add_note(
 			\sprintf(
@@ -211,7 +211,7 @@ if ( $query->have_posts() ) {
 				$subscription_source,
 				$subscription_source_id,
 				'rcp_membership',
-				$membership->get_id()
+				$rcp_membership->get_id()
 			)
 		);
 

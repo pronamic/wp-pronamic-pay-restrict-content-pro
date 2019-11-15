@@ -179,12 +179,7 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	 * @return string
 	 */
 	public function payment_redirect_url( $url, $payment ) {
-		$sources = array(
-			'restrictcontentpro',
-			'rcp_payment',
-		);
-
-		if ( ! in_array( $payment->source, $sources, true ) ) {
+		if ( 'rcp_payment' !== $payment->source ) {
 			return $url;
 		}
 
@@ -497,8 +492,6 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	 */
 	public function payment_source_description( $description, Payment $payment ) {
 		switch ( $payment->source ) {
-			case 'restrictcontentpro':
-				return __( 'Restrict Content Pro', 'pronamic_ideal' );
 			case 'rcp_payment':
 				return __( 'Restrict Content Pro Payment', 'pronamic_ideal' );
 			default:
@@ -516,12 +509,6 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	 */
 	public function payment_source_url( $url, Payment $payment ) {
 		switch ( $payment->source ) {
-			case 'restrictcontentpro':
-				return add_query_arg(
-					'user_id',
-					$payment->post->post_author,
-					menu_page_url( 'rcp-payments', false )
-				);
 			case 'rcp_payment':
 				return add_query_arg(
 					array(

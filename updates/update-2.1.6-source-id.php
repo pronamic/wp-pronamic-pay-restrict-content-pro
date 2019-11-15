@@ -10,10 +10,76 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
+use Pronamic\WordPress\Pay\Subscriptions\Subscription as CoreSubscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus as CoreSubscriptionStatus;
 
 /**
- * Update source ID of subscriptions.
+ * Get Restrict Content Pro payment by a Restrict Content Pro payment ID.
+ *
+ * @param int $rcp_payment_id Restrict Content Pro payment ID.
+ * @return object|null
+ */
+function get_rcp_payment_by_rcp_payment_id( $rcp_payment_id ) {
+	$rcp_payments = new \RCP_Payments();
+
+	$rcp_payment = $rcp_payments->get_payment( $potential_rcp_payment_id );
+
+	if ( null === $rcp_payment ) {
+		return null;
+	}
+
+	return $rcp_payment;
+}
+
+/**
+ * Get Restrict Content Pro membership by Restrict Content Pro payment ID.
+ *
+ * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/class-rcp-payments.php
+ * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/database/engine/class-query.php#L1546-1564
+ * @param int $rcp_payment_id Restrict Content Pro payment ID.
+ * @return \RCP_Membership|null
+ */
+function get_rcp_membership_by_rcp_payment_id( $rcp_payment_id ) {
+	$rcp_payment = get_rcp_payment_by_rcp_payment_id( $rcp_payment_id );
+
+	if ( null === $rcp_payment ) {
+		return null;
+	}
+
+	$rcp_membership = \rcp_get_membership( $rcp_payment->membership_id );
+
+	if ( false === $rcp_membership ) {
+		return null;
+	}
+
+	return $rcp_membership;
+}
+
+/**
+ * Get Restrict Content Pro membership by WordPress user ID.
+ *
+ * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/customers/customer-functions.php#L15-34
+ * @param int $wp_user_id WordPress user ID.
+ * @return \RCP_Membership|null
+ */
+function get_rcp_membership_by_wp_user_id( $wp_user_id ) {
+	$rcp_customer = \rcp_get_customer_by_user_id( $wp_user_id );
+
+	if ( false === $rcp_customer ) {
+		return null;
+	}
+
+	$rcp_membership = \rcp_get_customer_single_membership( $rcp_customer->get_id() );
+
+	if ( false === $rcp_membership ) {
+		return null;
+	}
+
+	return $rcp_membership;
+}
+
+/**
+ * Update subscriptions source.
  */
 $query = new \WP_Query(
 	array(
@@ -56,25 +122,46 @@ if ( $query->have_posts() ) {
 		/**
 		 * Get source.
 		 */
+		$subscription_source    = \get_post_meta( $subscription_post_id, '_pronamic_subscription_source', true );
 		$subscription_source_id = \get_post_meta( $subscription_post_id, '_pronamic_subscription_source_id', true );
 
-		$potential_user_id = $subscription_source_id;
+		\update_post_meta( $subscription_post_id, '_pronamic_subscription_rcp_update_source', $subscription_source );
+		\update_post_meta( $subscription_post_id, '_pronamic_subscription_rcp_update_source_id', $subscription_source_id );
 
 		/**
-		 * Get customer by user ID.
-		 *
-		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/customers/customer-functions.php#L15-34
+		 * We have to find a matching Restrict Content Pro membership.
 		 */
-		$rcp_customer = \rcp_get_customer_by_user_id( $potential_user_id );
+		$rcp_membership = null;
 
-		if ( false === $rcp_customer ) {
+		/**
+		 * In Restrict Content Pro versions before 3.0 we may have saved the Restrict Content Pro payment ID as source ID.
+		 */
+		if ( null === $rcp_membership ) {
+			$potential_rcp_payment_id = $old_subscription_source_id;
+
+			$rcp_membership = get_rcp_membership_by_rcp_payment_id( $potential_rcp_payment_id );
+		}
+
+		/**
+		 * In Restrict Content Pro versions before 3.0 we may have saved the WordPress user ID as source ID.
+		 */
+		if ( null === $rcp_membership ) {
+			$potential_wp_user_id = $old_subscription_source_id;
+
+			$rcp_membership = get_rcp_membership_by_wp_user_id( $potential_wp_user_id );
+		}
+
+		/**
+		 * No match.
+		 */
+		if ( null === $rcp_membership ) {
 			$subscription->set_status( CoreSubscriptionStatus::ON_HOLD );
 
 			$subscription->add_note(
 				\sprintf(
 					/* translators: %s: Potential WordPress user ID. */
-					__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. Unfortunately, this subscription could not be linked to a Restrict Content Pro membership based on the WordPress user ID %s. That is why this subscription has been put on hold so that it can be corrected manually.', 'pronamic_ideal' ),
-					$potential_user_id
+					__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. Unfortunately, this subscription could not be linked to a Restrict Content Pro membership based on the source ID %s. That is why this subscription has been put on hold so that it can be corrected manually.', 'pronamic_ideal' ),
+					$subscription_source_id
 				)
 			);
 
@@ -84,20 +171,25 @@ if ( $query->have_posts() ) {
 		}
 
 		/**
-		 * Get customer single membership by customer ID.
+		 * Check if Restrict Content Pro membership customer matches subscription post author.
 		 *
-		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/customers/customer-functions.php#L280-320
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/memberships/class-rcp-membership.php#L376-391
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/customers/class-rcp-customer.php#L198-207
 		 */
-		$rcp_membership = \rcp_get_customer_single_membership( $rcp_customer->get_id() );
+		$rcp_customer = $rcp_membership->get_customer();
 
-		if ( false === $rcp_membership ) {
+		$pronamic_subscription_post_author_id = \intval( get_post_field( 'post_author', $subscription_post_id ) );
+
+		$rcp_customer_user_id = \intval( $rcp_customer->get_user_id() );
+
+		if ( $pronamic_subscription_post_author_id !== $rcp_customer_user_id ) {
 			$subscription->set_status( CoreSubscriptionStatus::ON_HOLD );
 
 			$subscription->add_note(
 				\sprintf(
-					/* translators: %s: Potential Restrict Content Pro customer ID. */
-					__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. Unfortunately, this subscription could not be linked to a Restrict Content Pro membership based on the Restrict Content Pro customer ID %s. That is why this subscription has been put on hold so that it can be corrected manually.', 'pronamic_ideal' ),
-					$rcp_customer->get_id()
+					/* translators: %s: Potential WordPress user ID. */
+					__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. Unfortunately, this subscription could not be linked to a Restrict Content Pro membership based on the source ID %s. That is why this subscription has been put on hold so that it can be corrected manually.', 'pronamic_ideal' ),
+					$subscription_source_id
 				)
 			);
 
@@ -107,33 +199,30 @@ if ( $query->have_posts() ) {
 		}
 
 		/**
-		 * Update meta.
-		 *
-		 * @link https://developer.wordpress.org/reference/functions/update_post_meta/
-		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/memberships/class-rcp-membership.php#L354-363
+		 * Ok.
 		 */
-		$result = \update_post_meta( $subscription_post_id, '_pronamic_payment_source', 'rcp_membership' );
+		$subscription->set_source( 'rcp_membership' );
+		$subscription->set_source_id( $membership->get_id() );
 
-		if ( false === $result ) {
-			// What to do?
+		$subscription->add_note(
+			\sprintf(
+				/* translators: 1: Old source, 2: Old source ID, 3: New source, 4: New source ID. */
+				__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. That\'s why source "%1$s" with ID "%2$s" was updated to source "%3$s" with ID "%4$s".', 'pronamic_ideal' ),
+				$subscription_source,
+				$subscription_source_id,
+				'rcp_membership',
+				$membership->get_id()
+			)
+		);
 
-			continue;
-		}
-
-		$result = \update_post_meta( $subscription_post_id, '_pronamic_payment_source_id', $rcp_membership->get_id() );
-
-		if ( false === $result ) {
-			// What to do?
-
-			continue;
-		}
+		$subscription->save();
 	}
 
 	\wp_reset_postdata();
 }
 
 /**
- * Update source ID of payments.
+ * Update payments source.
  */
 $query = new \WP_Query(
 	array(
@@ -174,59 +263,64 @@ if ( $query->have_posts() ) {
 		}
 
 		/**
-		 * Source.
+		 * Get source.
 		 */
+		$payment_source    = \get_post_meta( $payment_post_id, '_pronamic_payment_source', true );
 		$payment_source_id = \get_post_meta( $payment_post_id, '_pronamic_payment_source_id', true );
 
-		$potential_user_id = $payment_source_id;
+		\update_post_meta( $payment_post_id, '_pronamic_payment_rcp_update_source', $payment_source );
+		\update_post_meta( $payment_post_id, '_pronamic_payment_rcp_update_source_id', $payment_source_id );
 
 		/**
-		 * Get customer by user ID.
-		 *
-		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/customers/customer-functions.php#L15-34
+		 * We have to find a matching Restrict Content Pro payment.
 		 */
-		$rcp_customer = \rcp_get_customer_by_user_id( $potential_user_id );
+		$rcp_payment = null;
 
-		if ( false === $rcp_customer ) {
-			// What to do?
+		/**
+		 * In Restrict Content Pro versions before 3.0 we may have saved the Restrict Content Pro payment ID as source ID.
+		 */
+		if ( null === $rcp_payment ) {
+			$potential_rcp_payment_id = $payment_source_id;
 
-			continue;
+			$rcp_payment = get_rcp_payment_by_rcp_payment_id( $potential_rcp_payment_id );
 		}
 
 		/**
-		 * Get customer single membership by customer ID.
-		 *
-		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/customers/customer-functions.php#L280-320
+		 * No match, no problem.
 		 */
-		$rcp_membership = \rcp_get_customer_single_membership( $rcp_customer->get_id() );
-
-		if ( false === $rcp_membership ) {
-			// What to do?
-
+		if ( null === $rcp_payment ) {
 			continue;
 		}
 
 		/**
-		 * Update meta.
-		 *
-		 * @link https://developer.wordpress.org/reference/functions/update_post_meta/
-		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/memberships/class-rcp-membership.php#L354-363
+		 * Check if Restrict Content Pro payment user ID matches payment post author.
 		 */
-		$result = \update_post_meta( $payment_post_id, '_pronamic_payment_source', 'rcp_membership' );
+		$pronamic_payment_post_author_id = \intval( get_post_field( 'post_author', $payment_post_id ) );
 
-		if ( false === $result ) {
-			// What to do?
+		$rcp_payment_user_id = \intval( $rcp_payment->user_id );
 
+		if ( $pronamic_payment_post_author_id !== $rcp_payment_user_id ) {
 			continue;
 		}
 
-		$result = \update_post_meta( $payment_post_id, '_pronamic_payment_source_id', $rcp_membership->get_id() );
+		/**
+		 * Ok.
+		 */
+		$payment->set_source( 'rcp_payment' );
+		$payment->set_source_id( $rcp_payment->id );
 
-		if ( false === $result ) {
-			// What to do?
+		$payment->add_note(
+			\sprintf(
+				/* translators: 1: Old source, 2: Old source ID, 3: New source, 4: New source ID. */
+				__( 'Since Restrict Content Pro 3 a payment must be linked to a Restrict Content Pro payment. That\'s why source "%1$s" with ID "%2$s" was updated to source "%3$s" with ID %4$s".', 'pronamic_ideal' ),
+				$payment_source,
+				$payment_source_id,
+				'rcp_payment',
+				$rcp_payment->id
+			)
+		);
 
-			continue;
-		}
+		$payment->save();
 	}
 
 	\wp_reset_postdata();

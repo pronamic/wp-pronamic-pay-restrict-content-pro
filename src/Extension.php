@@ -31,7 +31,7 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	 *
 	 * @param array $args Arguments.
 	 */
-	public function __construct( $arg = array() ) {
+	public function __construct( $args = array() ) {
 		parent::__construct( $args );
 
 		// Dependencies.

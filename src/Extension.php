@@ -318,7 +318,6 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 				);
 
 				break;
-
 			case MembershipStatus::EXPIRED:
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
@@ -327,7 +326,6 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 				);
 
 				break;
-
 			case MembershipStatus::PENDING:
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */

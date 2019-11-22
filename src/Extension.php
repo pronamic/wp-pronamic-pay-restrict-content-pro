@@ -48,7 +48,7 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 		add_filter( 'pronamic_payment_source_url', array( $this, 'payment_source_url' ), 10, 2 );
 
 		// Test to see if the Restrict Content Pro plugin is active, then add all actions.
-		if ( ! RestrictContentPro::is_active() ) {
+		if ( ! $this->get_dependencies()->are_met(); ) {
 			return;
 		}
 

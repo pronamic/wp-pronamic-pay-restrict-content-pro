@@ -113,6 +113,7 @@ about this, so make sure you inform your users about this!
 *	Free trial.
 *	Fee.
 *	Free member.
+*	Billing Cycle:	€7.00 initially, then €3.00 every day.
 
 ## Links
 

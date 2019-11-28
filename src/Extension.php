@@ -14,6 +14,7 @@ use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\Pay\Core\Recurring;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
+use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use RCP_Member;
 use RCP_Payments;
 use WP_Query;
@@ -46,6 +47,8 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	public function plugins_loaded() {
 		add_filter( 'pronamic_payment_source_description', array( $this, 'payment_source_description' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_url', array( $this, 'payment_source_url' ), 10, 2 );
+		add_filter( 'pronamic_subscription_source_description', array( $this, 'subscription_source_description' ), 10, 2 );
+		add_filter( 'pronamic_subscription_source_url', array( $this, 'subscription_source_url' ), 10, 2 );
 
 		// Test to see if the Restrict Content Pro plugin is active, then add all actions.
 		if ( ! $this->get_dependencies()->are_met() ) {
@@ -451,36 +454,6 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	}
 
 	/**
-	 * Subscription source text.
-	 *
-	 * @param string       $text         Text.
-	 * @param Subscription $subscription Subscription.
-	 *
-	 * @return string $text
-	 */
-	public function subscription_source_text( $text, $subscription ) {
-		$text = __( 'Restrict Content Pro', 'pronamic_ideal' ) . '<br />';
-
-		$source_url = add_query_arg(
-			array(
-				'page'          => 'rcp-members',
-				'membership_id' => $subscription->source_id,
-				'view'          => 'edit',
-			),
-			admin_url( 'admin.php' )
-		);
-
-		$text .= sprintf(
-			'<a href="%s">%s</a>',
-			esc_url( $source_url ),
-			/* translators: %s: source id */
-			sprintf( __( 'Membership %s', 'pronamic_ideal' ), $subscription->source_id )
-		);
-
-		return $text;
-	}
-
-	/**
 	 * Payment source description.
 	 *
 	 * @link https://github.com/wp-pay/core/blob/2.1.6/src/Payments/Payment.php#L659-L671
@@ -515,6 +488,79 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 						'page'       => 'rcp-payments',
 						'view'       => 'edit-payment',
 						'payment_id' => $payment->source_id,
+					),
+					admin_url( 'admin.php' )
+				);
+			default:
+				return $url;
+		}
+	}
+
+	/**
+	 * Subscription source description.
+	 *
+	 * @link https://github.com/wp-pay/core/blob/2.1.6/src/Payments/Payment.php#L659-L671
+	 *
+	 * @param string       $description  Description.
+	 * @param Subscription $subscription Subscription.
+	 *
+	 * @return string
+	 */
+	public function subscription_source_description( $description, Subscription $subscription ) {
+		switch ( $subscription->get_source() ) {
+			case 'rcp_membership':
+				return __( 'Restrict Content Pro Membership', 'pronamic_ideal' );
+			default:
+				return $description;
+		}
+	}
+
+	/**
+	 * Subscription source text.
+	 *
+	 * @param string       $text         Text.
+	 * @param Subscription $subscription Subscription.
+	 *
+	 * @return string $text
+	 */
+	public function subscription_source_text( $text, Subscription $subscription ) {
+		$text = __( 'Restrict Content Pro', 'pronamic_ideal' ) . '<br />';
+
+		$source_url = add_query_arg(
+			array(
+				'page'          => 'rcp-members',
+				'membership_id' => $subscription->get_source_id(),
+				'view'          => 'edit',
+			),
+			admin_url( 'admin.php' )
+		);
+
+		$text .= sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( $source_url ),
+			/* translators: %s: source id */
+			sprintf( __( 'Membership %s', 'pronamic_ideal' ), $subscription->get_source_id() )
+		);
+
+		return $text;
+	}
+
+	/**
+	 * Subscription source URL.
+	 *
+	 * @param string       $url          URL.
+	 * @param Subscription $subscription Subscription.
+	 *
+	 * @return string
+	 */
+	public function subscription_source_url( $url, Subscription $subscription ) {
+		switch ( $subscription->get_source() ) {
+			case 'rcp_membership':
+				return add_query_arg(
+					array(
+						'page'          => 'rcp-members',
+						'view'          => 'edit',
+						'membership_id' => $subscription->get_source_id(),
 					),
 					admin_url( 'admin.php' )
 				);

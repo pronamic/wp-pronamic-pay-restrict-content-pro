@@ -21,9 +21,16 @@ use Pronamic\WordPress\Pay\Upgrades\Upgrade;
  */
 class Upgrade216 extends Upgrade {
 	/**
+	 * Construct 2.1.6 upgrade.
+	 */
+	public function __construct() {
+		parent::__construct( '2.1.6' );
+	}
+
+	/**
 	 * Execute.
 	 */
-	abstract public function execute() {
-		include __DIR__ . '/../updates/update-2.1.6-source-id.php';
+	public function execute() {
+		include __DIR__ . '/../upgrades/upgrade-2.1.6-source-id.php';
 	}
 }

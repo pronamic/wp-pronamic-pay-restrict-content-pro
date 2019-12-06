@@ -1,6 +1,6 @@
 <?php
 /**
- * Updated 2.1.6 source ID.
+ * Upgrade 2.1.6 source ID.
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2019 Pronamic

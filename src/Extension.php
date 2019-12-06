@@ -40,6 +40,19 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 		$dependencies = $this->get_dependencies();
 
 		$dependencies->add( new RestrictContentProDependency() );
+
+		// Upgrades.
+		$upgrades = $this->get_upgrades();
+
+		/**
+		 * Upgrades are only executable when no Restrict Content Pro upgrade is needed.
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/admin/upgrades.php#L11-39
+		 * @link https://basecamp.com/1810084/projects/10966871/todos/404760254
+		 */
+		$upgrades->set_executable( ! \rcp_check_if_upgrade_needed() );
+
+		$upgrades->add( new Upgrade216() );
 	}
 
 	/**
@@ -74,21 +87,6 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 
 		add_action( 'rcp_edit_membership_after', array( $this, 'rcp_edit_membership_after' ) );
 		add_action( 'rcp_edit_payment_after', array( $this, 'rcp_edit_payment_after' ) );
-	}
-
-	/**
-	 * Get upgrades.
-	 *
-	 * @link https://github.com/woocommerce/woocommerce/blob/3.7.0/includes/class-wc-install.php#L368-L376
-	 * @link https://github.com/woocommerce/woocommerce/blob/3.7.0/includes/wc-update-functions.php
-	 * @return Upgrades|null
-	 */
-	public function get_upgrades() {
-		return array(
-			'2.1.6' => array(
-				__DIR__ . '/../updates/update-2.1.6-source-id.php',
-			),
-		);
 	}
 
 	/**

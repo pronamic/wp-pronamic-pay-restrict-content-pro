@@ -84,14 +84,43 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	}
 
 	/**
-	 * Upgrades are only executable when no Restrict Content Pro upgrade is needed.
+	 * Are upgrades executable.
 	 *
-	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/admin/upgrades.php#L11-39
-	 * @link https://basecamp.com/1810084/projects/10966871/todos/404760254
-	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/class-restrict-content-pro.php#L199-215
+	 * @return boolean True if upgrades are executable, false otherwise.
+	 */
+	private function are_upgrades_executable() {
+		/**
+		 * Check if upgrade needed.
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/admin/upgrades.php#L11-39
+		 * @link https://basecamp.com/1810084/projects/10966871/todos/404760254
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/class-restrict-content-pro.php#L199-215
+		 */
+		if ( \rcp_check_if_upgrade_needed() ) {
+			return false;
+		}
+
+		/**
+		 * Check for incomplete jobs.
+		 *
+	 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/batch/batch-functions.php#L254-277
+		 */
+		$queue = \RCP\Utils\Batch\get_jobs( array(
+			'status' => 'incomplete'
+		) );
+
+		if ( ! empty( $queue ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Upgrades are only executable when no Restrict Content Pro upgrade is needed.
 	 */
 	public function admin_init_upgrades_executable() {
-		$this->get_upgrades()->set_executable( ! \rcp_check_if_upgrade_needed() );
+		$this->get_upgrades()->set_executable( $this->are_upgrades_executable() );
 	}
 
 	/**

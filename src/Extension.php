@@ -61,13 +61,7 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 			return;
 		}
 
-		/**
-		 * Upgrades are only executable when no Restrict Content Pro upgrade is needed.
-		 *
-		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/admin/upgrades.php#L11-39
-		 * @link https://basecamp.com/1810084/projects/10966871/todos/404760254
-		 */
-		$this->get_upgrades()->set_executable( ! \rcp_check_if_upgrade_needed() );
+		add_action( 'admin_init', array( $this, 'admin_init_upgrades_executable' ) );
 
 		add_filter( 'rcp_payment_gateways', array( $this, 'register_pronamic_gateways' ) );
 		add_action( 'rcp_payments_settings', array( $this, 'payments_settings' ) );
@@ -87,6 +81,17 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 
 		add_action( 'rcp_edit_membership_after', array( $this, 'rcp_edit_membership_after' ) );
 		add_action( 'rcp_edit_payment_after', array( $this, 'rcp_edit_payment_after' ) );
+	}
+
+	/**
+	 * Upgrades are only executable when no Restrict Content Pro upgrade is needed.
+	 *
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/admin/upgrades.php#L11-39
+	 * @link https://basecamp.com/1810084/projects/10966871/todos/404760254
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/class-restrict-content-pro.php#L199-215
+	 */
+	public function admin_init_upgrades_executable() {
+		$this->get_upgrades()->set_executable( ! \rcp_check_if_upgrade_needed() );
 	}
 
 	/**

@@ -61,7 +61,14 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 			return;
 		}
 
-		add_action( 'admin_init', array( $this, 'admin_init_upgrades_executable' ) );
+		/**
+		 * On admin initialize we mark the upgrades as executable. This needs to run before
+		 * the `wp-pay/core` admin init install routine (priority 5).
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/class-restrict-content-pro.php#L199-215
+		 * @link https://github.com/wp-pay/core/blob/2.2.0/src/Admin/Install.php#L65
+		 */
+		add_action( 'admin_init', array( $this, 'admin_init_upgrades_executable' ), 4 );
 
 		add_filter( 'rcp_payment_gateways', array( $this, 'register_pronamic_gateways' ) );
 		add_action( 'rcp_payments_settings', array( $this, 'payments_settings' ) );
@@ -87,8 +94,18 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	 * Are upgrades executable.
 	 *
 	 * @return boolean True if upgrades are executable, false otherwise.
+	 * @throws \Exception When this function is called outside the WordPress admin environment.
 	 */
 	private function are_upgrades_executable() {
+		/**
+		 * This function can only run in the admin.
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/class-restrict-content-pro.php#L199-215
+		 */
+		if ( ! is_admin() ) {
+			throw new \Exception( 'Can not run `are_upgrades_executable` function outside the WordPress admin environment.' );
+		}
+
 		/**
 		 * Check if upgrade needed.
 		 *

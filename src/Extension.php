@@ -120,11 +120,13 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 		/**
 		 * Check for incomplete jobs.
 		 *
-	 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/batch/batch-functions.php#L254-277
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/batch/batch-functions.php#L254-277
 		 */
-		$queue = \RCP\Utils\Batch\get_jobs( array(
-			'status' => 'incomplete'
-		) );
+		$queue = \RCP\Utils\Batch\get_jobs(
+			array(
+				'status' => 'incomplete',
+			)
+		);
 
 		if ( ! empty( $queue ) ) {
 			return false;

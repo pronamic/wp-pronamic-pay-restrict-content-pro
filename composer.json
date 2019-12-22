@@ -69,7 +69,7 @@
 		"restrictcontentpro/restrict-content": "2.2.3",
 		"roots/wordpress": "^5.2",
 		"squizlabs/php_codesniffer": "^3.5",
-		"wp-coding-standards/wpcs": "^2.1",
+		"wp-coding-standards/wpcs": "^2.2",
 		"wp-phpunit/wp-phpunit": "^5.2"
 	},
 	"scripts": {

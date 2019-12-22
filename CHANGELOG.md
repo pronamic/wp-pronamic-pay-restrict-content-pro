@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
+## [Unreleased][unreleased]
+-
+
+## [2.1.6] - 2019-12-22
+- Added support for new dependencies system.
+- Added support for new upgrades system.
+- Added upgrade script for payment and subscriptions source.
+- Improved error handling with exceptions.
+- Updated subscription source details.
+
 ## [2.1.5] - 2019-10-07
 - Restrict Content Pro 3.0 is required.
 - Renew membership during `pronamic_pay_new_payment` routine and update membership expiration date and status on cancelled/expired/failed payment status update.
@@ -40,7 +50,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2017-12-13
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.1.5...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.1.6...HEAD
+[2.1.6]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.1.5...2.1.6
 [2.1.5]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.1.4...2.1.5
 [2.1.4]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.1.3...2.1.4
 [2.1.3]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.1.2...2.1.3

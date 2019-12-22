@@ -21,7 +21,7 @@ use RCP_Payments;
  * Gateway
  *
  * @author  Reüel van der Steege
- * @version 2.1.1
+ * @version 2.1.6
  * @since   1.0.0
  */
 class Gateway extends RCP_Payment_Gateway {
@@ -232,11 +232,9 @@ class Gateway extends RCP_Payment_Gateway {
 		$payment->config_id = $config_id;
 		$payment->method    = $this->payment_method;
 
-		$payment = Plugin::start_payment( $payment, $gateway );
-
-		$error = $gateway->get_error();
-
-		if ( is_wp_error( $error ) ) {
+		try {
+			$payment = Plugin::start_payment( $payment, $gateway );
+		} catch ( \Exception $e ) {
 			do_action( 'rcp_registration_failed', $this );
 
 			wp_die(
@@ -244,7 +242,7 @@ class Gateway extends RCP_Payment_Gateway {
 					sprintf(
 						/* translators: %s: JSON encoded payment data */
 						__( 'Payment creation failed before sending buyer to the payment provider. Error: %s', 'pronamic_ideal' ),
-						$error->get_error_message()
+						$e->getMessage()
 					)
 				),
 				esc_html__( 'Payment Error', 'pronamic_ideal' ),
@@ -253,11 +251,13 @@ class Gateway extends RCP_Payment_Gateway {
 		}
 
 		// Transaction ID.
-		if ( '' !== $payment->get_transaction_id() ) {
+		$transaction_id = $payment->get_transaction_id();
+
+		if ( null !== $transaction_id ) {
 			$rcp_payments_db->update(
 				$this->payment->id,
 				array(
-					'transaction_id' => $payment->get_transaction_id(),
+					'transaction_id' => $transaction_id,
 				)
 			);
 		}

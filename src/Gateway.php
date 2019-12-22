@@ -21,7 +21,7 @@ use RCP_Payments;
  * Gateway
  *
  * @author  Reüel van der Steege
- * @version 2.1.1
+ * @version 2.1.6
  * @since   1.0.0
  */
 class Gateway extends RCP_Payment_Gateway {

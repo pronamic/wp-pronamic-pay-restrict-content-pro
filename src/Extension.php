@@ -24,7 +24,7 @@ use WP_Query;
  * Extension
  *
  * @author  Reüel van der Steege
- * @version 2.1.5
+ * @version 2.1.6
  * @since   1.0.0
  */
 class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {

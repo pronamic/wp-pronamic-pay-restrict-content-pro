@@ -16,8 +16,8 @@ use Pronamic\WordPress\Pay\Upgrades\Upgrade;
  * Upgrade 2.1.6
  *
  * @author  Remco Tolsma
- * @version unreleased
- * @since   unreleased
+ * @version 2.1.6
+ * @since   2.1.6
  */
 class Upgrade216 extends Upgrade {
 	/**

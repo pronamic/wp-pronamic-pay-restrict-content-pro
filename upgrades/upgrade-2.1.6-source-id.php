@@ -180,7 +180,11 @@ if ( $query->have_posts() ) {
 
 		$pronamic_subscription_post_author_id = \intval( get_post_field( 'post_author', $subscription_post_id ) );
 
-		$rcp_customer_user_id = \intval( $rcp_customer->get_user_id() );
+		$rcp_customer_user_id = null;
+
+		if ( $rcp_customer instanceof \RCP_Customer ) {
+			$rcp_customer_user_id = \intval( $rcp_customer->get_user_id() );
+		}
 
 		if ( $pronamic_subscription_post_author_id !== $rcp_customer_user_id ) {
 			$subscription->set_status( CoreSubscriptionStatus::ON_HOLD );

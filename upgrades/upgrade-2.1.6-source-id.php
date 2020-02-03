@@ -3,7 +3,7 @@
  * Upgrade 2.1.6 source ID.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2019 Pronamic
+ * @copyright 2005-2020 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
  */
@@ -180,7 +180,11 @@ if ( $query->have_posts() ) {
 
 		$pronamic_subscription_post_author_id = \intval( get_post_field( 'post_author', $subscription_post_id ) );
 
-		$rcp_customer_user_id = \intval( $rcp_customer->get_user_id() );
+		$rcp_customer_user_id = null;
+
+		if ( $rcp_customer instanceof \RCP_Customer ) {
+			$rcp_customer_user_id = \intval( $rcp_customer->get_user_id() );
+		}
 
 		if ( $pronamic_subscription_post_author_id !== $rcp_customer_user_id ) {
 			$subscription->set_status( CoreSubscriptionStatus::ON_HOLD );

@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.1.7] - 2020-02-03
+- Fixed possible "Fatal error: Call to a member function `get_user_id()` on boolean" in updater.
+
 ## [2.1.6] - 2019-12-22
 - Added support for new dependencies system.
 - Added support for new upgrades system.

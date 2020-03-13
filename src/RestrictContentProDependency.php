@@ -5,7 +5,7 @@
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2020 Pronamic
  * @license   GPL-3.0-or-later
- * @package   Pronamic\WordPress\Pay\Dependencies
+ * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
  */
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;

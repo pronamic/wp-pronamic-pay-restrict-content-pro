@@ -15,7 +15,6 @@ use Pronamic\WordPress\Pay\Core\Recurring;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
-use Pronamic\WordPress\Pay\Upgrades\Upgrades;
 use RCP_Member;
 use RCP_Payments;
 use WP_Query;
@@ -48,16 +47,30 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	}
 
 	/**
-	 * Plugins loaded.
+	 * Setup plugin integration.
+	 *
+	 * @return void
 	 */
-	public function plugins_loaded() {
+	public function setup() {
 		add_filter( 'pronamic_payment_source_description', array( $this, 'payment_source_description' ), 10, 2 );
 		add_filter( 'pronamic_payment_source_url', array( $this, 'payment_source_url' ), 10, 2 );
 		add_filter( 'pronamic_subscription_source_description', array( $this, 'subscription_source_description' ), 10, 2 );
 		add_filter( 'pronamic_subscription_source_url', array( $this, 'subscription_source_url' ), 10, 2 );
 
-		// Test to see if the Restrict Content Pro plugin is active, then add all actions.
-		if ( ! $this->get_dependencies()->are_met() ) {
+		/*
+		 * The Restrict Content Pro plugin gets bootstrapped with priority `4`.
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/restrict-content-pro.php#L119
+		 */
+		add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ), 5 );
+	}
+
+	/**
+	 * Plugins loaded.
+	 */
+	public function plugins_loaded() {
+		// Check if dependencies are met and integration is active.
+		if ( ! $this->is_active() ) {
 			return;
 		}
 

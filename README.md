@@ -165,7 +165,7 @@ $ wp pronamic-pay restrict-content-pro upgrade-216 upgrade-subscriptions
 ```
 
 ```bash
-$ wp pronamic-pay restrict-content-pro upgrade-216 upgrade-subscriptions --skip-notes --status='Active'
+$ wp pronamic-pay restrict-content-pro upgrade-216 upgrade-subscriptions --skip-notes --status='Active' --dry-run
 ```
 
 ## Links

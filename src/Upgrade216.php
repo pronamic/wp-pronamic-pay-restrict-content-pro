@@ -85,6 +85,7 @@ class Upgrade216 extends Upgrade {
 						'skip-no-match' => \WP_CLI\Utils\get_flag_value( $assoc_args, 'skip-no-match', true ),
 						'reactivate'    => \WP_CLI\Utils\get_flag_value( $assoc_args, 'reactivate', true ),
 						'dry-run'       => \WP_CLI\Utils\get_flag_value( $assoc_args, 'dry-run', true ),
+						'post__in'      => \WP_CLI\Utils\get_flag_value( $assoc_args, 'post__in', null ),
 					)
 				);
 			},
@@ -111,25 +112,24 @@ class Upgrade216 extends Upgrade {
 	/**
 	 * Get subscription posts to upgrade.
 	 *
+	 * @param array $args Query arguments.
 	 * @return array
 	 */
-	private function get_subscription_posts() {
-		$query = new \WP_Query(
+	private function get_subscription_posts( $args = array() ) {
+		$args['post_type']     = 'pronamic_pay_subscr';
+		$args['post_status']   = 'any';
+		$args['nopaging']      = true;
+		$args['no_found_rows'] = true;
+		$args['order']         = 'DESC';
+		$args['orderby']       = 'ID';
+		$args['meta_query']    = array(
 			array(
-				'post_type'     => 'pronamic_pay_subscr',
-				'post_status'   => 'any',
-				'meta_query'    => array(
-					array(
-						'key'   => '_pronamic_subscription_source',
-						'value' => 'restrictcontentpro',
-					),
-				),
-				'nopaging'      => true,
-				'no_found_rows' => true,
-				'order'         => 'DESC',
-				'orderby'       => 'ID',
-			)
+				'key'   => '_pronamic_subscription_source',
+				'value' => 'restrictcontentpro',
+			),
 		);
+
+		$query = new \WP_Query( $args );
 
 		return $query->posts;
 	}
@@ -210,6 +210,7 @@ class Upgrade216 extends Upgrade {
 				'skip-no-match' => false,
 				'reactivate'    => false,
 				'dry-run'       => false,
+				'post__in'      => null,
 			)
 		);
 
@@ -217,7 +218,13 @@ class Upgrade216 extends Upgrade {
 		$reactivate    = \filter_var( $args['reactivate'], FILTER_VALIDATE_BOOLEAN );
 		$dry_run       = \filter_var( $args['dry-run'], FILTER_VALIDATE_BOOLEAN );
 
-		$subscription_posts = $this->get_subscription_posts();
+		$query_args = array();
+
+		if ( null !== $args['post__in'] ) {
+			$query_args['post__in'] = \explode( ',', $args['post__in'] );
+		}
+
+		$subscription_posts = $this->get_subscription_posts( $query_args );
 
 		$this->log(
 			\sprintf(
@@ -472,13 +479,27 @@ class Upgrade216 extends Upgrade {
 			return null;
 		}
 
-		$rcp_membership = \rcp_get_membership( $rcp_payment->membership_id );
+		$rcp_membership_id = \intval( $rcp_payment->membership_id );
 
-		if ( false === $rcp_membership ) {
-			return null;
+		if ( 0 !== $rcp_membership_id ) {
+			$rcp_membership = \rcp_get_membership( $rcp_membership_id );
+
+			if ( false !== $rcp_membership ) {
+				return $rcp_membership;
+			}
 		}
 
-		return $rcp_membership;
+		$rcp_customer_id = \intval( $rcp_payment->customer_id );
+
+		if ( 0 !== $rcp_customer_id ) {
+			$rcp_membership = \rcp_get_customer_single_membership( $rcp_customer_id );
+
+			if ( false !== $rcp_membership ) {
+				return $rcp_membership;
+			}
+		}
+
+		return null;
 	}
 
 	/**

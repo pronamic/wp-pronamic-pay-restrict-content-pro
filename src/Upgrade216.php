@@ -80,11 +80,13 @@ class Upgrade216 extends Upgrade {
 			function( $args, $assoc_args ) {
 				\WP_CLI::log( 'Upgrade 2.1.6 - Subscriptions' );
 
-				$this->upgrade_subscriptions( array(
-					'skip-notes' => \WP_CLI\Utils\get_flag_value( $assoc_args, 'skip-notes', true ),
-					'status'     => \WP_CLI\Utils\get_flag_value( $assoc_args, 'status', null ),
-					'dry-run'    => \WP_CLI\Utils\get_flag_value( $assoc_args, 'dry-run', true ),
-				) );
+				$this->upgrade_subscriptions(
+					array(
+						'skip-no-match' => \WP_CLI\Utils\get_flag_value( $assoc_args, 'skip-no-match', true ),
+						'reactivate'    => \WP_CLI\Utils\get_flag_value( $assoc_args, 'reactivate', true ),
+						'dry-run'       => \WP_CLI\Utils\get_flag_value( $assoc_args, 'dry-run', true ),
+					)
+				);
 			},
 			array(
 				'shortdesc' => 'Execute Restrict Content Pro upgrade 2.1.6.',
@@ -172,22 +174,57 @@ class Upgrade216 extends Upgrade {
 	}
 
 	/**
+	 * Check if Restrict Content Pro membership customer is connected to the specified WordPress user ID.
+	 *
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/memberships/class-rcp-membership.php#L376-391
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/customers/class-rcp-customer.php#L198-207
+	 * @param \RCP_Membership|null $rcp_membership Restrict Content Pro membership.
+	 * @param int                  $wp_user_id     WordPress user ID.
+	 * @return boolean True if Restrict Content Pro membership is for the specified WordPress user ID, false otherwise.
+	 */
+	private function is_rcp_membership_for_wp_user_id( $rcp_membership, $wp_user_id ) {
+		if ( null === $rcp_membership ) {
+			return false;
+		}
+
+		$rcp_customer = $rcp_membership->get_customer();
+
+		$rcp_customer_user_id = null;
+
+		if ( $rcp_customer instanceof \RCP_Customer ) {
+			$rcp_customer_user_id = \intval( $rcp_customer->get_user_id() );
+		}
+
+		return ( $wp_user_id === $rcp_customer_user_id );
+	}
+
+	/**
 	 * Upgrade subscriptions.
 	 *
-	 * @param array $args       Arguments.
-	 * @param array $assoc_args Associative arguments.
+	 * @param array $args Arguments.
 	 */
 	private function upgrade_subscriptions( $args = array() ) {
-		$args = \wp_parse_args( $args, array(
-			'skip-notes' => true,
-			'status'     => null,
-			'dry-run'    => false,
-		) );
+		$args = \wp_parse_args(
+			$args,
+			array(
+				'skip-no-match' => false,
+				'reactivate'    => false,
+				'dry-run'       => false,
+			)
+		);
 
-		$add_note = ! \filter_var( $args['skip-notes'], FILTER_VALIDATE_BOOLEAN );
-		$dry_run  = \filter_var( $args['dry-run'], FILTER_VALIDATE_BOOLEAN );
+		$skip_no_match = \filter_var( $args['skip-no-match'], FILTER_VALIDATE_BOOLEAN );
+		$reactivate    = \filter_var( $args['reactivate'], FILTER_VALIDATE_BOOLEAN );
+		$dry_run       = \filter_var( $args['dry-run'], FILTER_VALIDATE_BOOLEAN );
 
 		$subscription_posts = $this->get_subscription_posts();
+
+		$this->log(
+			\sprintf(
+				'Processing %d subscription posts…',
+				\number_format_i18n( \count( $subscription_posts ) )
+			)
+		);
 
 		foreach ( $subscription_posts as $subscription_post ) {
 			$subscription_post_id = $subscription_post->ID;
@@ -210,6 +247,8 @@ class Upgrade216 extends Upgrade {
 				continue;
 			}
 
+			$pronamic_subscription_post_author_id = \intval( get_post_field( 'post_author', $subscription_post_id ) );
+
 			/**
 			 * Get source.
 			 */
@@ -220,7 +259,7 @@ class Upgrade216 extends Upgrade {
 			\update_post_meta( $subscription_post_id, '_pronamic_subscription_rcp_update_source_id', $subscription_source_id );
 
 			/**
-			 * We have to find a matching Restrict Content Pro membership.
+			 * We have to find a matching Restrict Content Pro memberships.
 			 */
 			$rcp_membership = null;
 
@@ -230,10 +269,18 @@ class Upgrade216 extends Upgrade {
 			if ( null === $rcp_membership ) {
 				$potential_rcp_payment_id = $subscription_source_id;
 
-				$rcp_membership = $this->get_rcp_membership_by_rcp_payment_id( $potential_rcp_payment_id );
+				$potential_rcp_membership = $this->get_rcp_membership_by_rcp_payment_id( $potential_rcp_payment_id );
 
-				if ( null !== $rcp_membership ) {
-					$this->log( '- Found Restrict Content Pro membership through potential Restrict Content Pro payment ID.' );
+				if ( $this->is_rcp_membership_for_wp_user_id( $potential_rcp_membership, $pronamic_subscription_post_author_id ) ) {
+					$rcp_membership = $potential_rcp_membership;
+
+					$this->log(
+						\sprintf(
+							'- Found Restrict Content Pro membership `%s` through potential Restrict Content Pro payment ID `%s`.',
+							$rcp_membership->get_id(),
+							$potential_rcp_payment_id
+						)
+					);
 				}
 			}
 
@@ -243,10 +290,18 @@ class Upgrade216 extends Upgrade {
 			if ( null === $rcp_membership ) {
 				$potential_wp_user_id = $subscription_source_id;
 
-				$rcp_membership = $this->get_rcp_membership_by_wp_user_id( $potential_wp_user_id );
+				$potential_rcp_membership = $this->get_rcp_membership_by_wp_user_id( $potential_wp_user_id );
 
-				if ( null !== $rcp_membership ) {
-					$this->log( '- Found Restrict Content Pro membership through potential WordPress user ID.' );
+				if ( $this->is_rcp_membership_for_wp_user_id( $potential_rcp_membership, $pronamic_subscription_post_author_id ) ) {
+					$rcp_membership = $potential_rcp_membership;
+
+					$this->log(
+						\sprintf(
+							'- Found Restrict Content Pro membership `%s` through potential WordPress user ID `%s`.',
+							$rcp_membership->get_id(),
+							$potential_wp_user_id
+						)
+					);
 				}
 			}
 
@@ -256,56 +311,16 @@ class Upgrade216 extends Upgrade {
 			if ( null === $rcp_membership ) {
 				$this->log( '- No Restrict Content Pro membership found.' );
 
-				if ( false === $dry_run ) {
+				if ( false === $dry_run && false === $skip_no_match ) {
 					$subscription->set_status( SubscriptionStatus::ON_HOLD );
 
-					if ( true === $add_note ) {
-						$subscription->add_note(
-							\sprintf(
-								/* translators: %s: Potential WordPress user ID. */
-								__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. Unfortunately, this subscription could not be linked to a Restrict Content Pro membership based on the source ID %s. That is why this subscription has been put on hold so that it can be corrected manually.', 'pronamic_ideal' ),
-								$subscription_source_id
-							)
-						);
-					}
-
-					$subscription->save();
-				}
-
-				continue;
-			}
-
-			/**
-			 * Check if Restrict Content Pro membership customer matches subscription post author.
-			 *
-			 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/memberships/class-rcp-membership.php#L376-391
-			 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/customers/class-rcp-customer.php#L198-207
-			 */
-			$rcp_customer = $rcp_membership->get_customer();
-
-			$pronamic_subscription_post_author_id = \intval( get_post_field( 'post_author', $subscription_post_id ) );
-
-			$rcp_customer_user_id = null;
-
-			if ( $rcp_customer instanceof \RCP_Customer ) {
-				$rcp_customer_user_id = \intval( $rcp_customer->get_user_id() );
-			}
-
-			if ( $pronamic_subscription_post_author_id !== $rcp_customer_user_id ) {
-				$this->log( '- Pronamic subscription post author does not match Restrict Content Pro customer user ID.' );
-
-				if ( false === $dry_run ) {
-					$subscription->set_status( SubscriptionStatus::ON_HOLD );
-
-					if ( true === $add_note ) {
-						$subscription->add_note(
-							\sprintf(
-								/* translators: %s: Potential WordPress user ID. */
-								__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. Unfortunately, this subscription could not be linked to a Restrict Content Pro membership based on the source ID %s. That is why this subscription has been put on hold so that it can be corrected manually.', 'pronamic_ideal' ),
-								$subscription_source_id
-							)
-						);
-					}
+					$subscription->add_note(
+						\sprintf(
+							/* translators: %s: Potential WordPress user ID. */
+							__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. Unfortunately, this subscription could not be linked to a Restrict Content Pro membership based on the source ID %s. That is why this subscription has been put on hold so that it can be corrected manually.', 'pronamic_ideal' ),
+							$subscription_source_id
+						)
+					);
 
 					$subscription->save();
 				}
@@ -319,32 +334,26 @@ class Upgrade216 extends Upgrade {
 			$status = $args['status'];
 
 			if ( false === $dry_run ) {
-				$this->log( '- Pronamic subscription post author does not match Restrict Content Pro customer user ID.' );
-
-				if ( null !== $status ) {
-					$subscription->set_status( $status );
+				if ( true === $reactivate && SubscriptionStatus::ON_HOLD === $subscription->get_status() ) {
+					$subscription->set_status( SubscriptionStatus::ACTIVE );
 				}
 
 				$subscription->set_source( 'rcp_membership' );
 				$subscription->set_source_id( $rcp_membership->get_id() );
 
-				if ( true === $add_note ) {
-					$subscription->add_note(
-						\sprintf(
-							/* translators: 1: Old source, 2: Old source ID, 3: New source, 4: New source ID. */
-							__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. That\'s why source "%1$s" with ID "%2$s" was updated to source "%3$s" with ID "%4$s".', 'pronamic_ideal' ),
-							$subscription_source,
-							$subscription_source_id,
-							'rcp_membership',
-							$rcp_membership->get_id()
-						)
-					);
-				}
+				$subscription->add_note(
+					\sprintf(
+						/* translators: 1: Old source, 2: Old source ID, 3: New source, 4: New source ID. */
+						__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. That\'s why source "%1$s" with ID "%2$s" was updated to source "%3$s" with ID "%4$s".', 'pronamic_ideal' ),
+						$subscription_source,
+						$subscription_source_id,
+						'rcp_membership',
+						$rcp_membership->get_id()
+					)
+				);
 
 				$subscription->save();
 			}
-
-			$this->log( '' );
 		}
 	}
 

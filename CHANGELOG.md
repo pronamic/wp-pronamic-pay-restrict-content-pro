@@ -7,6 +7,11 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.2.1] - 2020-04-03
+- Improved CLI commands.
+- Improved 2.1.6 upgrade.
+- Set plugin integration name.
+
 ## [2.2.0] - 2020-03-19
 - Extension extends from abstract plugin integration with dependency.
 
@@ -56,7 +61,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2017-12-13
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.2.0...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.2.1...HEAD
+[2.2.1]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.2.0...2.2.1
 [2.2.0]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.1.7...2.2.0
 [2.1.7]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.1.6...2.1.7
 [2.1.6]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.1.5...2.1.6

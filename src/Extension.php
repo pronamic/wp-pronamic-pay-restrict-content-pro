@@ -33,6 +33,8 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 	 * @param array $args Arguments.
 	 */
 	public function __construct( $args = array() ) {
+		$args['name'] = __( 'Restrict Content Pro', 'pronamic_ideal' );
+
 		parent::__construct( $args );
 
 		// Dependencies.

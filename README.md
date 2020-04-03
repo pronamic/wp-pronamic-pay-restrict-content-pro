@@ -115,6 +115,59 @@ about this, so make sure you inform your users about this!
 *	Free member.
 *	Billing Cycle:	€7.00 initially, then €3.00 every day.
 
+## WP-CLI
+
+### What is WP-CLI?
+
+For those who have never heard before WP-CLI, here's a brief description extracted from the [official website](https://wp-cli.org/).
+
+> **WP-CLI** is a set of command-line tools for managing WordPress installations. You can update plugins, set up multisite installs and much more, without using a web browser.
+
+### Commands
+
+```bash
+$ wp pronamic-pay restrict-content-pro
+usage: wp pronamic-pay restrict-content-pro upgrade-216 <command>
+
+See 'wp help pronamic-pay restrict-content-pro <command>' for more information on a specific command.
+```
+
+### Command `pronamic-pay restrict-content-pro upgrade-216 execute`
+
+Execute 2.1.6 upgrade.
+
+```bash
+$ wp pronamic-pay restrict-content-pro upgrade-216 execute
+```
+
+### Command `pronamic-pay restrict-content-pro upgrade-216 list-payments`
+
+List payments for 2.1.6 upgrade.
+
+```bash
+$ wp pronamic-pay restrict-content-pro upgrade-216 list-payments
+```
+
+### Command `pronamic-pay restrict-content-pro upgrade-216 list-subscriptions`
+
+List subscriptions for 2.1.6 upgrade.
+
+```bash
+$ wp pronamic-pay restrict-content-pro upgrade-216 list-subscriptions
+```
+
+### Command `pronamic-pay restrict-content-pro upgrade-216 upgrade-subscriptions`
+
+Upgrade subscriptions for 2.1.6.
+
+```bash
+$ wp pronamic-pay restrict-content-pro upgrade-216 upgrade-subscriptions
+```
+
+```bash
+$ wp pronamic-pay restrict-content-pro upgrade-216 upgrade-subscriptions --skip-no-match=true --reactivate=true --dry-run=false
+```
+
 ## Links
 
 *	[Restrict Content Pro](https://restrictcontentpro.com/)

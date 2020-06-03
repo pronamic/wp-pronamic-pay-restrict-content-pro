@@ -77,7 +77,10 @@ class Util {
 		$payment->lines = self::new_payment_lines_from_rcp_gateway( $gateway );
 
 		// Subscription.
-		$payment->subscription = self::new_subscription_from_rcp_gateway( $gateway );
+		$subscription = self::new_subscription_from_rcp_gateway( $gateway );
+
+		$payment->subscription    = $subscription;
+		$payment->subscription_id = $subscription->get_id();
 
 		// Total amount.
 		$payment->set_total_amount(
@@ -216,7 +219,14 @@ class Util {
 			return null;
 		}
 
-		$subscription = new Subscription();
+		// Get existing subscription for membership.
+		$subscriptions = \get_pronamic_subscriptions_by_source( 'rcp_membership', $gateway->membership->get_id() );
+
+		$subscription = array_shift( $subscriptions );
+
+		if ( null === $subscription ) {
+			$subscription = new Subscription();
+		}
 
 		$subscription->frequency       = null;
 		$subscription->interval        = $gateway->length;

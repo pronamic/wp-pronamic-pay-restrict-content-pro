@@ -15,6 +15,7 @@ use Pronamic\WordPress\Pay\Core\Recurring;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use RCP_Member;
 use RCP_Payments;
 use WP_Query;
@@ -312,7 +313,21 @@ class Extension extends \Pronamic\WordPress\Pay\AbstractPluginIntegration {
 				 */
 				$rcp_membership = rcp_get_membership( $rcp_payment->membership_id );
 
-				if ( false !== $rcp_membership ) {
+				$should_expire = false !== $rcp_membership;
+
+				// Do not expire membership if first payment expires and subscription is active,
+				// because a newer completed payment activated the subscription.
+				$subscription = $payment->get_subscription();
+
+				if ( Core_PaymentStatus::EXPIRED === $core_status && null !== $subscription ) {
+					$first_payment = $subscription->get_first_payment();
+
+					if ( $first_payment->get_id() === $payment->get_id() && SubscriptionStatus::ACTIVE === $subscription->get_status() ) {
+						$should_expire = false;
+					}
+				}
+
+				if ( $should_expire ) {
 					// Set expiration date to yesterday.
 					$rcp_membership->expire();
 

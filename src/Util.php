@@ -228,7 +228,19 @@ class Util {
 			$subscription = new Subscription();
 		}
 
-		$subscription->frequency       = null;
+		/**
+		 * Maximum number of times to renew this membership. Default is `0` for unlimited.
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/memberships/class-rcp-membership.php#L138-143
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/memberships/class-rcp-membership.php#L1169-1178
+		 */
+		$maximum_renewals = $gateway->membership->get_maximum_renewals();
+
+		$maximum_renewals = \intval( $maximum_renewals );
+
+		$subscription->frequency = ( 0 === $maximum_renewals ) ? null : ( $maximum_renewals + 1 );
+
+		// Length.
 		$subscription->interval        = $gateway->length;
 		$subscription->interval_period = Core_Util::to_period( $gateway->length_unit );
 		$subscription->description     = $gateway->subscription_name;

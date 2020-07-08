@@ -10,24 +10,21 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
-use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
-use Pronamic\WordPress\Pay\Address;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
-use WP_Query;
 use RCP_Payment_Gateway;
 
 /**
  * Util
  *
  * @author  Reüel van der Steege
- * @version 2.0.0
+ * @version 2.2.2
  * @since   1.0.0
  */
 class Util {
@@ -77,7 +74,10 @@ class Util {
 		$payment->lines = self::new_payment_lines_from_rcp_gateway( $gateway );
 
 		// Subscription.
-		$payment->subscription = self::new_subscription_from_rcp_gateway( $gateway );
+		$subscription = self::new_subscription_from_rcp_gateway( $gateway );
+
+		$payment->subscription    = $subscription;
+		$payment->subscription_id = $subscription->get_id();
 
 		// Total amount.
 		$payment->set_total_amount(
@@ -216,9 +216,28 @@ class Util {
 			return null;
 		}
 
-		$subscription = new Subscription();
+		// Get existing subscription for membership.
+		$subscriptions = \get_pronamic_subscriptions_by_source( 'rcp_membership', $gateway->membership->get_id() );
 
-		$subscription->frequency       = null;
+		$subscription = array_shift( $subscriptions );
+
+		if ( null === $subscription ) {
+			$subscription = new Subscription();
+		}
+
+		/**
+		 * Maximum number of times to renew this membership. Default is `0` for unlimited.
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/memberships/class-rcp-membership.php#L138-143
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/memberships/class-rcp-membership.php#L1169-1178
+		 */
+		$maximum_renewals = $gateway->membership->get_maximum_renewals();
+
+		$maximum_renewals = \intval( $maximum_renewals );
+
+		$subscription->frequency = ( 0 === $maximum_renewals ) ? null : ( $maximum_renewals + 1 );
+
+		// Length.
 		$subscription->interval        = $gateway->length;
 		$subscription->interval_period = Core_Util::to_period( $gateway->length_unit );
 		$subscription->description     = $gateway->subscription_name;

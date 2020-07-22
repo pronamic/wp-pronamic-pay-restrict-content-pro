@@ -76,8 +76,11 @@ class Util {
 		// Subscription.
 		$subscription = self::new_subscription_from_rcp_gateway( $gateway );
 
-		$payment->subscription    = $subscription;
-		$payment->subscription_id = $subscription->get_id();
+		$payment->subscription = $subscription;
+
+		if ( null !== $subscription ) {
+			$payment->subscription_id = $subscription->get_id();
+		}
 
 		// Total amount.
 		$payment->set_total_amount(

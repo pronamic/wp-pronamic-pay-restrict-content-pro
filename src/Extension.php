@@ -202,7 +202,7 @@ class Extension extends AbstractPluginIntegration {
 			'pronamic_pay_direct_debit'            => $this->get_gateway_data( __( 'Direct Debit', 'pronamic_ideal' ), DirectDebitGateway::class ),
 			'pronamic_pay_direct_debit_bancontact' => $this->get_gateway_data(
 				sprintf(
-					/* translators: %s: Payment method */
+					/* translators: %s: payment method */
 					__( 'Direct Debit (mandate via %s)', 'pronamic_ideal' ),
 					__( 'Bancontact', 'pronamic_ideal' )
 				),
@@ -210,7 +210,7 @@ class Extension extends AbstractPluginIntegration {
 			),
 			'pronamic_pay_direct_debit_ideal'      => $this->get_gateway_data(
 				sprintf(
-					/* translators: %s: Payment method */
+					/* translators: %s: payment method */
 					__( 'Direct Debit (mandate via %s)', 'pronamic_ideal' ),
 					__( 'iDEAL', 'pronamic_ideal' )
 				),
@@ -218,7 +218,7 @@ class Extension extends AbstractPluginIntegration {
 			),
 			'pronamic_pay_direct_debit_sofort'     => $this->get_gateway_data(
 				sprintf(
-					/* translators: %s: Payment method */
+					/* translators: %s: payment method */
 					__( 'Direct Debit (mandate via %s)', 'pronamic_ideal' ),
 					__( 'SOFORT', 'pronamic_ideal' )
 				),
@@ -528,7 +528,7 @@ class Extension extends AbstractPluginIntegration {
 		$text .= sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( $source_url ),
-			/* translators: %s: source id */
+			/* translators: %s: payment number */
 			sprintf( __( 'Payment %s', 'pronamic_ideal' ), $payment->source_id )
 		);
 

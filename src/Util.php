@@ -10,25 +10,22 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
-use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhaseBuilder;
-use Pronamic\WordPress\Pay\Address;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
-use WP_Query;
 use RCP_Payment_Gateway;
 
 /**
  * Util
  *
  * @author  Reüel van der Steege
- * @version 2.0.0
+ * @version 2.2.2
  * @since   1.0.0
  */
 class Util {
@@ -80,8 +77,11 @@ class Util {
 		// Subscription.
 		$subscription = self::new_subscription_from_rcp_gateway( $gateway );
 
-		$payment->subscription    = $subscription;
-		$payment->subscription_id = $subscription->get_id();
+		$payment->subscription = $subscription;
+
+		if ( null !== $subscription ) {
+			$payment->subscription_id = $subscription->get_id();
+		}
 
 		// Total amount.
 		$payment->set_total_amount(

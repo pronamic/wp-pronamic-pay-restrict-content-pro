@@ -14,6 +14,7 @@ use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Money\TaxedMoney;
 use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhaseBuilder;
 use Pronamic\WordPress\Pay\Address;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
@@ -239,6 +240,31 @@ class Util {
 		$maximum_renewals = \intval( $maximum_renewals );
 
 		$subscription->frequency = ( 0 === $maximum_renewals ) ? null : ( $maximum_renewals + 1 );
+
+		// Initial phase.
+		$start_date = new \DateTimeImmutable();
+
+		if ( $gateway->initial_amount !== $gateway->amount ) {
+			$initial_phase = SubscriptionPhaseBuilder::new()
+				->with_start_date( $start_date )
+				->with_amount( new TaxedMoney( $gateway->initial_amount, $gateway->currency ) )
+				->with_interval( 1, LengthUnit::to_core( $gateway->length_unit ) )
+				->with_number_recurrences( 1 )
+				->create();
+
+			$subscription->phases[] = $initial_phase;
+
+			$start_date = $initial_phase->get_end_date();
+		}
+
+		$regular_phase = SubscriptionPhaseBuilder::new()
+			->with_start_date( $start_date )
+			->with_amount( new TaxedMoney( $gateway->amount, $gateway->currency ) )
+			->with_interval( $gateway->length, LengthUnit::to_core( $gateway->length_unit ) )
+			->with_number_recurrences( ( 0 === $maximum_renewals ) ? null : ( $maximum_renewals + 1 ) )
+			->create();
+
+		$subscription->phases[] = $regular_phase;
 
 		// Length.
 		$subscription->interval        = $gateway->length;

@@ -239,8 +239,6 @@ class Util {
 
 		$maximum_renewals = \intval( $maximum_renewals );
 
-		$subscription->frequency = ( 0 === $maximum_renewals ) ? null : ( $maximum_renewals + 1 );
-
 		// Initial phase.
 		$start_date = new \DateTimeImmutable();
 
@@ -261,15 +259,13 @@ class Util {
 			->with_start_date( $start_date )
 			->with_amount( new TaxedMoney( $gateway->amount, $gateway->currency ) )
 			->with_interval( $gateway->length, LengthUnit::to_core( $gateway->length_unit ) )
-			->with_number_recurrences( ( 0 === $maximum_renewals ) ? null : ( $maximum_renewals + 1 ) )
+			->with_number_recurrences( ( 0 === $maximum_renewals ) ? null : $maximum_renewals )
 			->create();
 
 		$subscription->phases[] = $regular_phase;
 
-		// Length.
-		$subscription->interval        = $gateway->length;
-		$subscription->interval_period = Core_Util::to_period( $gateway->length_unit );
-		$subscription->description     = $gateway->subscription_name;
+		// Other.
+		$subscription->description = $gateway->subscription_name;
 
 		// Source.
 		$subscription->source    = 'rcp_membership';

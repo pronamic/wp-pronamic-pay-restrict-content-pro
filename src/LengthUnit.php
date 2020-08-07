@@ -55,7 +55,7 @@ class LengthUnit {
 				return 'D';
 			case self::MONTH:
 				return 'M';
-			case self::YEAR;
+			case self::YEAR:
 				return 'Y';
 			default:
 				return null;

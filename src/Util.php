@@ -236,27 +236,20 @@ class Util {
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/memberships/class-rcp-membership.php#L1169-1178
 		 */
 		$maximum_renewals = $gateway->membership->get_maximum_renewals();
-
 		$maximum_renewals = \intval( $maximum_renewals );
 
 		// Initial phase.
-		$start_date = new \DateTimeImmutable();
+		$initial_phase = SubscriptionPhaseBuilder::new()
+			->with_start_date( new \DateTimeImmutable() )
+			->with_amount( new TaxedMoney( $gateway->initial_amount, $gateway->currency ) )
+			->with_interval( 1, LengthUnit::to_core( $gateway->length_unit ) )
+			->with_number_recurrences( 1 )
+			->create();
 
-		if ( $gateway->initial_amount !== $gateway->amount ) {
-			$initial_phase = SubscriptionPhaseBuilder::new()
-				->with_start_date( $start_date )
-				->with_amount( new TaxedMoney( $gateway->initial_amount, $gateway->currency ) )
-				->with_interval( 1, LengthUnit::to_core( $gateway->length_unit ) )
-				->with_number_recurrences( 1 )
-				->create();
-
-			$subscription->phases[] = $initial_phase;
-
-			$start_date = $initial_phase->get_end_date();
-		}
+		$subscription->phases[] = $initial_phase;
 
 		$regular_phase = SubscriptionPhaseBuilder::new()
-			->with_start_date( $start_date )
+			->with_start_date( $initial_phase->get_end_date() )
 			->with_amount( new TaxedMoney( $gateway->amount, $gateway->currency ) )
 			->with_interval( $gateway->length, LengthUnit::to_core( $gateway->length_unit ) )
 			->with_number_recurrences( ( 0 === $maximum_renewals ) ? null : $maximum_renewals )

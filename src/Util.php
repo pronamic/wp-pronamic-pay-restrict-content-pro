@@ -246,7 +246,7 @@ class Util {
 			->with_number_recurrences( 1 )
 			->create();
 
-		$subscription->phases[] = $initial_phase;
+		$subscription->add_phase( $initial_phase );
 
 		$regular_phase = SubscriptionPhaseBuilder::new()
 			->with_start_date( $initial_phase->get_end_date() )
@@ -255,7 +255,7 @@ class Util {
 			->with_number_recurrences( ( 0 === $maximum_renewals ) ? null : $maximum_renewals )
 			->create();
 
-		$subscription->phases[] = $regular_phase;
+		$subscription->add_phase( $regular_phase );
 
 		// Other.
 		$subscription->description = $gateway->subscription_name;

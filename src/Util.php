@@ -251,7 +251,7 @@ class Util {
 		$regular_phase = ( new SubscriptionPhaseBuilder() )
 			->with_start_date( $initial_phase->get_end_date() )
 			->with_amount( new TaxedMoney( $gateway->amount, $gateway->currency ) )
-			->with_interval( $gateway->length, LengthUnit::to_core( $gateway->length_unit ) )
+			->with_interval( \intval( $gateway->length ), LengthUnit::to_core( $gateway->length_unit ) )
 			->with_number_recurrences( ( 0 === $maximum_renewals ) ? null : $maximum_renewals )
 			->create();
 

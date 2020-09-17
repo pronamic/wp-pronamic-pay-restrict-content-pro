@@ -242,7 +242,7 @@ class Util {
 		$initial_phase = ( new SubscriptionPhaseBuilder() )
 			->with_start_date( new \DateTimeImmutable() )
 			->with_amount( new TaxedMoney( $gateway->initial_amount, $gateway->currency ) )
-			->with_interval( 1, LengthUnit::to_core( $gateway->length_unit ) )
+			->with_interval( 'P' . 1 . LengthUnit::to_core( $gateway->length_unit ) )
 			->with_total_periods( 1 )
 			->create();
 
@@ -251,7 +251,7 @@ class Util {
 		$regular_phase = ( new SubscriptionPhaseBuilder() )
 			->with_start_date( $initial_phase->get_end_date() )
 			->with_amount( new TaxedMoney( $gateway->amount, $gateway->currency ) )
-			->with_interval( \intval( $gateway->length ), LengthUnit::to_core( $gateway->length_unit ) )
+			->with_interval( 'P' . \intval( $gateway->length ) . LengthUnit::to_core( $gateway->length_unit ) )
 			->with_total_periods( ( 0 === $maximum_renewals ) ? null : $maximum_renewals )
 			->create();
 

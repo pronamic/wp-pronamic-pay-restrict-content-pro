@@ -11,8 +11,8 @@
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\Money\TaxedMoney;
-use Pronamic\WordPress\Pay\Core\Util as Core_Util;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionBuilder;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhaseBuilder;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
@@ -225,10 +225,6 @@ class Util {
 
 		$subscription = array_shift( $subscriptions );
 
-		if ( null === $subscription ) {
-			$subscription = new Subscription();
-		}
-
 		/**
 		 * Maximum number of times to renew this membership. Default is `0` for unlimited.
 		 *
@@ -242,11 +238,9 @@ class Util {
 		$initial_phase = ( new SubscriptionPhaseBuilder() )
 			->with_start_date( new \DateTimeImmutable() )
 			->with_amount( new TaxedMoney( $gateway->initial_amount, $gateway->currency ) )
-			->with_interval( 'P' . 1 . LengthUnit::to_core( $gateway->length_unit ) )
+			->with_interval( 'P1' . LengthUnit::to_core( $gateway->length_unit ) )
 			->with_total_periods( 1 )
 			->create();
-
-		$subscription->add_phase( $initial_phase );
 
 		$regular_phase = ( new SubscriptionPhaseBuilder() )
 			->with_start_date( $initial_phase->get_end_date() )
@@ -255,7 +249,17 @@ class Util {
 			->with_total_periods( ( 0 === $maximum_renewals ) ? null : $maximum_renewals )
 			->create();
 
-		$subscription->add_phase( $regular_phase );
+		if ( null === $subscription ) {
+			// Build subscription.
+			$subscription = ( new SubscriptionBuilder() )
+				->with_phase( $initial_phase )
+				->with_phase( $regular_phase )
+				->create();
+		} else {
+			// Add phases to existing subscription.
+			$subscription->add_phase( $initial_phase );
+			$subscription->add_phase( $regular_phase );
+		}
 
 		// Other.
 		$subscription->description = $gateway->subscription_name;
@@ -264,15 +268,6 @@ class Util {
 		$subscription->source    = 'rcp_membership';
 		$subscription->source_id = $gateway->membership->get_id();
 
-		// Total amount.
-		$subscription->set_total_amount(
-			new TaxedMoney(
-				$gateway->amount,
-				$gateway->currency
-			)
-		);
-
-		// Result.
 		return $subscription;
 	}
 }

@@ -403,14 +403,6 @@ class Extension extends AbstractPluginIntegration {
 				);
 
 				break;
-			case MembershipStatus::EXPIRED:
-				$note = sprintf(
-					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription expired by %s.', 'pronamic_ideal' ),
-					__( 'Restrict Content Pro', 'pronamic_ideal' )
-				);
-
-				break;
 			case MembershipStatus::PENDING:
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */

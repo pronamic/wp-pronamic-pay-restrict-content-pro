@@ -104,6 +104,14 @@ class Extension extends AbstractPluginIntegration {
 
 		add_action( 'rcp_edit_membership_after', array( $this, 'rcp_edit_membership_after' ) );
 		add_action( 'rcp_edit_payment_after', array( $this, 'rcp_edit_payment_after' ) );
+
+		/**
+		 * Filter the subscription next payment delivery date.
+		 *
+		 * Priority is set to 9 so payment gateways can override with priority 10.
+		 * @link https://github.com/wp-pay-gateways/mollie/blob/2.1.4/src/Integration.php#L272-L344
+		 */
+		\add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', array( $this, 'next_payment_delivery_date' ), 9, 2 );
 	}
 
 	/**
@@ -856,5 +864,34 @@ class Extension extends AbstractPluginIntegration {
 		include __DIR__ . '/../views/edit-payment.php';
 
 		\wp_reset_postdata();
+	}
+
+	/**
+	 * Next payment delivery date.
+	 *
+	 * The Restrict Content Pro will check for expired memberships on a daily base:
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/cron-functions.php#L29-31
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/cron-functions.php#L47-106
+	 *
+	 * To ensure that renewal payments are started on time, we set the next payment date 1 day earlier.
+	 *
+	 * Otherwise Restrict Content Pro will send an expiration email when the renewal payment was created too late:
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/email-functions.php#L328-348
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/email-functions.php#L207-242
+	 *
+	 * @param \DateTime    $next_payment_delivery_date Next payment delivery date.
+	 * @param Subscription $subscription               Subscription.
+	 * @return \DateTime
+	 */
+	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Subscription $subscription ) {
+		if ( 'rcp_membership' !== $subscription->source ) {
+			return $next_payment_delivery_date;
+		}
+
+		$date = clone $next_payment_delivery_date;
+
+		$date = $date->modify( '-1 day' );
+
+		return $date;
 	}
 }

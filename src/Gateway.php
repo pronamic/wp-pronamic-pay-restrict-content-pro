@@ -63,6 +63,7 @@ class Gateway extends RCP_Payment_Gateway {
 		if ( PaymentMethods::is_direct_debit_method( $this->payment_method ) ) {
 			$this->supports = array(
 				'recurring',
+				'trial',
 			);
 		}
 	}

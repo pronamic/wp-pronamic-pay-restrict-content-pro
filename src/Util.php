@@ -11,14 +11,14 @@
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\Money\TaxedMoney;
-use Pronamic\WordPress\Pay\Subscriptions\Subscription;
-use Pronamic\WordPress\Pay\Subscriptions\SubscriptionBuilder;
-use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhaseBuilder;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
+use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionInterval;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhase;
 use RCP_Payment_Gateway;
 
 /**
@@ -225,6 +225,10 @@ class Util {
 
 		$subscription = array_shift( $subscriptions );
 
+		if ( null === $subscription ) {
+			$subscription = new Subscription();
+		}
+
 		/**
 		 * Maximum number of times to renew this membership. Default is `0` for unlimited.
 		 *
@@ -235,31 +239,29 @@ class Util {
 		$maximum_renewals = \intval( $maximum_renewals );
 
 		// Initial phase.
-		$initial_phase = ( new SubscriptionPhaseBuilder() )
-			->with_start_date( new \DateTimeImmutable() )
-			->with_amount( new TaxedMoney( $gateway->initial_amount, $gateway->currency ) )
-			->with_interval( 'P1' . LengthUnit::to_core( $gateway->length_unit ) )
-			->with_total_periods( 1 )
-			->create();
+		$initial_phase = new SubscriptionPhase(
+			$subscription,
+			new \DateTimeImmutable(),
+			new SubscriptionInterval( 'P1' . LengthUnit::to_core( $gateway->length_unit ) ),
+			new TaxedMoney( $gateway->initial_amount, $gateway->currency )
+		);
 
-		$regular_phase = ( new SubscriptionPhaseBuilder() )
-			->with_start_date( $initial_phase->get_end_date() )
-			->with_amount( new TaxedMoney( $gateway->amount, $gateway->currency ) )
-			->with_interval( 'P' . \intval( $gateway->length ) . LengthUnit::to_core( $gateway->length_unit ) )
-			->with_total_periods( ( 0 === $maximum_renewals ) ? null : $maximum_renewals )
-			->create();
+		$initial_phase->set_total_periods( 1 );
 
-		if ( null === $subscription ) {
-			// Build subscription.
-			$subscription = ( new SubscriptionBuilder() )
-				->with_phase( $initial_phase )
-				->with_phase( $regular_phase )
-				->create();
-		} else {
-			// Add phases to existing subscription.
-			$subscription->add_phase( $initial_phase );
-			$subscription->add_phase( $regular_phase );
+		$regular_phase = new SubscriptionPhase(
+			$subscription,
+			$initial_phase->get_end_date(),
+			new SubscriptionInterval( 'P' . \intval( $gateway->length ) . LengthUnit::to_core( $gateway->length_unit ) ),
+			new TaxedMoney( $gateway->amount, $gateway->currency )
+		);
+
+		if ( 0 !== $maximum_renewals ) {
+			$regular_phase->set_total_periods( $maximum_renewals );
 		}
+
+		// Add phases to subscription.
+		$subscription->add_phase( $initial_phase );
+		$subscription->add_phase( $regular_phase );
 
 		// Other.
 		$subscription->description = $gateway->subscription_name;

@@ -84,12 +84,11 @@ class Util {
 		}
 
 		// Total amount.
-		$payment->set_total_amount(
-			new TaxedMoney(
-				$gateway->initial_amount,
-				$gateway->currency
-			)
-		);
+		$amount = new TaxedMoney( $gateway->initial_amount, $gateway->currency );
+
+		$amount = $amount->add( new TaxedMoney( $gateway->payment->fees, $gateway->currency ) );
+
+		$payment->set_total_amount( $amount );
 
 		// Result.
 		return $payment;

@@ -81,6 +81,8 @@ class Util {
 
 		if ( null !== $subscription ) {
 			$payment->subscription_id = $subscription->get_id();
+
+			$payment->add_period( $subscription->new_period() );
 		}
 
 		// Total amount.
@@ -238,10 +240,18 @@ class Util {
 		$maximum_renewals = \intval( $maximum_renewals );
 
 		// Initial phase.
+		$interval_spec = 'P' . \intval( $gateway->length ) . LengthUnit::to_core( $gateway->length_unit );
+
+		$trial_duration = $gateway->subscription_data['trial_duration'];
+
+		if ( 0 !== \intval( $trial_duration ) ) {
+			$interval_spec = 'P' . $trial_duration . LengthUnit::to_core( $gateway->subscription_data['trial_duration_unit'] );
+		}
+
 		$initial_phase = new SubscriptionPhase(
 			$subscription,
 			new \DateTimeImmutable(),
-			new SubscriptionInterval( 'P1' . LengthUnit::to_core( $gateway->length_unit ) ),
+			new SubscriptionInterval( $interval_spec ),
 			new TaxedMoney( $gateway->initial_amount, $gateway->currency )
 		);
 

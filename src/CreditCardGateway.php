@@ -55,6 +55,7 @@ class CreditCardGateway extends Gateway {
 		if ( $gateway && $gateway->supports( 'recurring_credit_card' ) ) {
 			$this->supports = array(
 				'recurring',
+				'trial',
 			);
 		}
 	}

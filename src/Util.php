@@ -11,13 +11,14 @@
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\Money\TaxedMoney;
-use Pronamic\WordPress\Pay\Core\Util as Core_Util;
-use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
+use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionInterval;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhase;
 use RCP_Payment_Gateway;
 
 /**
@@ -80,15 +81,16 @@ class Util {
 
 		if ( null !== $subscription ) {
 			$payment->subscription_id = $subscription->get_id();
+
+			$payment->add_period( $subscription->new_period() );
 		}
 
 		// Total amount.
-		$payment->set_total_amount(
-			new TaxedMoney(
-				$gateway->initial_amount,
-				$gateway->currency
-			)
-		);
+		$amount = new TaxedMoney( $gateway->initial_amount, $gateway->currency );
+
+		$amount = $amount->add( new TaxedMoney( $gateway->payment->fees, $gateway->currency ) );
+
+		$payment->set_total_amount( $amount );
 
 		// Result.
 		return $payment;
@@ -235,29 +237,48 @@ class Util {
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/memberships/class-rcp-membership.php#L1169-1178
 		 */
 		$maximum_renewals = $gateway->membership->get_maximum_renewals();
-
 		$maximum_renewals = \intval( $maximum_renewals );
 
-		$subscription->frequency = ( 0 === $maximum_renewals ) ? null : ( $maximum_renewals + 1 );
+		// Initial phase.
+		$interval_spec = 'P' . \intval( $gateway->length ) . LengthUnit::to_core( $gateway->length_unit );
 
-		// Length.
-		$subscription->interval        = $gateway->length;
-		$subscription->interval_period = Core_Util::to_period( $gateway->length_unit );
-		$subscription->description     = $gateway->subscription_name;
+		$trial_duration = $gateway->subscription_data['trial_duration'];
+
+		if ( 0 !== \intval( $trial_duration ) ) {
+			$interval_spec = 'P' . $trial_duration . LengthUnit::to_core( $gateway->subscription_data['trial_duration_unit'] );
+		}
+
+		$initial_phase = new SubscriptionPhase(
+			$subscription,
+			new \DateTimeImmutable(),
+			new SubscriptionInterval( $interval_spec ),
+			new TaxedMoney( $gateway->initial_amount, $gateway->currency )
+		);
+
+		$initial_phase->set_total_periods( 1 );
+
+		$regular_phase = new SubscriptionPhase(
+			$subscription,
+			$initial_phase->get_end_date(),
+			new SubscriptionInterval( 'P' . \intval( $gateway->length ) . LengthUnit::to_core( $gateway->length_unit ) ),
+			new TaxedMoney( $gateway->amount, $gateway->currency )
+		);
+
+		if ( 0 !== $maximum_renewals ) {
+			$regular_phase->set_total_periods( $maximum_renewals );
+		}
+
+		// Add phases to subscription.
+		$subscription->add_phase( $initial_phase );
+		$subscription->add_phase( $regular_phase );
+
+		// Other.
+		$subscription->description = $gateway->subscription_name;
 
 		// Source.
 		$subscription->source    = 'rcp_membership';
 		$subscription->source_id = $gateway->membership->get_id();
 
-		// Total amount.
-		$subscription->set_total_amount(
-			new TaxedMoney(
-				$gateway->amount,
-				$gateway->currency
-			)
-		);
-
-		// Result.
 		return $subscription;
 	}
 }

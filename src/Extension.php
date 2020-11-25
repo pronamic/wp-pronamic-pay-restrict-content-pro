@@ -185,8 +185,10 @@ class Extension extends AbstractPluginIntegration {
 	 * @return array
 	 */
 	private function get_gateway_data( $label, $class ) {
+		$gateway = new $class();
+
 		return array(
-			'label'       => $label,
+			'label'       => $gateway->get_label(),
 			'admin_label' => sprintf(
 				'%s - %s',
 				__( 'Pronamic', 'pronamic_ideal' ),

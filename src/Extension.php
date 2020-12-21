@@ -350,6 +350,21 @@ class Extension extends AbstractPluginIntegration {
 			case Core_PaymentStatus::SUCCESS:
 				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
+				// Renew membership if not active.
+				$rcp_membership = rcp_get_membership( $rcp_payment->membership_id );
+
+				if ( MembershipStatus::ACTIVE !== $rcp_membership->get_status() ) {
+					$expiration = '';
+
+					$end_date = $payment->get_end_date();
+
+					if ( null !== $end_date ) {
+						$expiration = $end_date->format( DateTime::MYSQL );
+					}
+
+					$rcp_membership->renew( true, 'active', $expiration );
+				}
+
 				break;
 			case Core_PaymentStatus::OPEN:
 				// Nothing to do?

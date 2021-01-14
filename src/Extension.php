@@ -109,6 +109,7 @@ class Extension extends AbstractPluginIntegration {
 		 * Filter the subscription next payment delivery date.
 		 *
 		 * Priority is set to 9 so payment gateways can override with priority 10.
+		 *
 		 * @link https://github.com/wp-pay-gateways/mollie/blob/2.1.4/src/Integration.php#L272-L344
 		 */
 		\add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', array( $this, 'next_payment_delivery_date' ), 9, 2 );
@@ -184,8 +185,10 @@ class Extension extends AbstractPluginIntegration {
 	 * @return array
 	 */
 	private function get_gateway_data( $label, $class ) {
+		$gateway = new $class();
+
 		return array(
-			'label'       => $label,
+			'label'       => $gateway->get_label(),
 			'admin_label' => sprintf(
 				'%s - %s',
 				__( 'Pronamic', 'pronamic_ideal' ),
@@ -346,6 +349,21 @@ class Extension extends AbstractPluginIntegration {
 				break;
 			case Core_PaymentStatus::SUCCESS:
 				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
+
+				// Renew membership if not active.
+				$rcp_membership = rcp_get_membership( $rcp_payment->membership_id );
+
+				if ( MembershipStatus::ACTIVE !== $rcp_membership->get_status() ) {
+					$expiration = '';
+
+					$end_date = $payment->get_end_date();
+
+					if ( null !== $end_date ) {
+						$expiration = $end_date->format( DateTime::MYSQL );
+					}
+
+					$rcp_membership->renew( true, 'active', $expiration );
+				}
 
 				break;
 			case Core_PaymentStatus::OPEN:
@@ -870,12 +888,14 @@ class Extension extends AbstractPluginIntegration {
 	 * Next payment delivery date.
 	 *
 	 * The Restrict Content Pro will check for expired memberships on a daily base:
+	 *
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/cron-functions.php#L29-31
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/cron-functions.php#L47-106
 	 *
 	 * To ensure that renewal payments are started on time, we set the next payment date 1 day earlier.
 	 *
 	 * Otherwise Restrict Content Pro will send an expiration email when the renewal payment was created too late:
+	 *
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/email-functions.php#L328-348
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/email-functions.php#L207-242
 	 *

@@ -7,6 +7,11 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [2.3.1] - 2021-01-14
+- Renew inactive membership on successful (retry) payment.
+- Fix not using checkout label setting.
+- Coding standards.
+
 ## [2.3.0] - 2020-11-09
 - Changed setting the next payment date 1 day earlier, to prevent temporary membership expirations.
 - No longer mark Pronamic Pay subscriptions as expired when a Restrict Content Pro membership expires.
@@ -76,7 +81,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2017-12-13
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.3.0...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.3.1...HEAD
+[2.3.1]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.3.0...2.3.1
 [2.3.0]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.2.3...2.3.0
 [2.2.3]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.2.2...2.2.3
 [2.2.2]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.2.1...2.2.2

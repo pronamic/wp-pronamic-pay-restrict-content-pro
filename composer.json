@@ -56,21 +56,21 @@
 	],
 	"require": {
 		"php": ">=5.6.20",
-		"wp-pay/core": "^2.4",
-		"pronamic/wp-money": "^1.2"
+		"pronamic/wp-money": "^1.2",
+		"wp-pay/core": "^2.6"
 	},
 	"require-dev": {
-		"dealerdirect/phpcodesniffer-composer-installer": "^0.5.0",
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
 		"php-coveralls/php-coveralls": "^2.1",
 		"phpcompatibility/php-compatibility": "^9.3",
 		"phpcompatibility/phpcompatibility-wp": "^2.1",
 		"phpmd/phpmd": "^2.7",
 		"phpunit/phpunit": "^5.7 || ^6.0",
 		"restrictcontentpro/restrict-content": "2.2.3",
-		"roots/wordpress": "^5.2",
+		"roots/wordpress": "^5.6",
 		"squizlabs/php_codesniffer": "^3.5",
 		"wp-coding-standards/wpcs": "^2.2",
-		"wp-phpunit/wp-phpunit": "^5.2"
+		"wp-phpunit/wp-phpunit": "^5.6"
 	},
 	"scripts": {
 		"coveralls": "vendor/bin/coveralls -v",

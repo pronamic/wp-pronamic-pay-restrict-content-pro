@@ -670,7 +670,7 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
-	 * Get Restrict Content Pro mebership from payment.
+	 * Get Restrict Content Pro membership from payment.
 	 *
 	 * @param Payment $payment Pronamic Pay payment.
 	 * @return \RCP_Membership|null
@@ -737,7 +737,7 @@ class Extension extends AbstractPluginIntegration {
 				'customer_id'      => $rcp_membership->get_customer_id(),
 				'membership_id'    => $rcp_membership->get_id(),
 				'amount'           => $payment->get_total_amount()->get_value(),
-				// Transaction ID can not be null therefor we use `strval` to cast `null` to an empty string.
+				// Transaction ID can not be null therefore we use `strval` to cast `null` to an empty string.
 				'transaction_id'   => \strval( $payment->get_transaction_id() ),
 				'subscription'     => \rcp_get_subscription_name( $rcp_membership->get_object_id() ),
 				'subscription_key' => $rcp_membership->get_subscription_key(),
@@ -817,7 +817,7 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
-	 * Restrict Conent Pro edit membership after.
+	 * Restrict Content Pro edit membership after.
 	 *
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/memberships/edit-membership.php#L285-294
 	 *

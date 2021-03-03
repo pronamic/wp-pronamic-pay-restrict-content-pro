@@ -54,7 +54,7 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 - Updated packages.
 
 ## [2.1.3] - 2018-01-24
-- Use taxed money object for subscripption amount.
+- Use taxed money object for subscription amount.
 
 ## [2.1.2] - 2018-01-17
 - Added support for subscription cancellation.

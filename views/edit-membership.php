@@ -1,6 +1,6 @@
 <?php
 /**
- * Restrict Conent Pro edit membership after.
+ * Restrict Content Pro edit membership after.
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2021 Pronamic

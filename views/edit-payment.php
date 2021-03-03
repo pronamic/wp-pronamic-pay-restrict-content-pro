@@ -1,6 +1,6 @@
 <?php
 /**
- * Restrict Conent Pro edit payment after.
+ * Restrict Content Pro edit payment after.
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2021 Pronamic

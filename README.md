@@ -91,7 +91,7 @@ In Restrict Content Pro version 3 the following supports values are available:
 Source: https://docs.restrictcontentpro.com/article/1695-payment-gateway-api
 
 In the Pronamic Pay extension we try to set the supports values as correct as possible
-for the different gateays. Restrict Content Pro however will not hide/show gateways 
+for the different gateways. Restrict Content Pro however will not hide/show gateways 
 based on the supports values.
 
 Restrict Content Pro membership levels with a recurring can be paid with a

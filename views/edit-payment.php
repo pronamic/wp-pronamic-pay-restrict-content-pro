@@ -1,9 +1,9 @@
 <?php
 /**
- * Restrict Conent Pro edit payment after.
+ * Restrict Content Pro edit payment after.
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2020 Pronamic
+ * @copyright 2005-2021 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
  *

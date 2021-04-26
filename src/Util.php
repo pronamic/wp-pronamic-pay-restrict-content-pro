@@ -3,7 +3,7 @@
  * Util
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2020 Pronamic
+ * @copyright 2005-2021 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
  */
@@ -85,10 +85,16 @@ class Util {
 			$payment->add_period( $subscription->new_period() );
 		}
 
-		// Total amount.
+		/**
+		 * Total amount.
+		 *
+		 * The `$gateway->initial_amount` property contains the normal price + fees.
+		 * In previous version of this library we added the fees, this was wrong.
+		 *
+		 * @link https://github.com/wp-pay-extensions/restrict-content-pro/issues/1
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.4.4/includes/registration-functions.php#L1784-1788
+		 */
 		$amount = new TaxedMoney( $gateway->initial_amount, $gateway->currency );
-
-		$amount = $amount->add( new TaxedMoney( $gateway->payment->fees, $gateway->currency ) );
 
 		$payment->set_total_amount( $amount );
 

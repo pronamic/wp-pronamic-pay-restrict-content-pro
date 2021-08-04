@@ -10,7 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
-use Pronamic\WordPress\Money\TaxedMoney;
+use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -94,7 +94,7 @@ class Util {
 		 * @link https://github.com/wp-pay-extensions/restrict-content-pro/issues/1
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.4.4/includes/registration-functions.php#L1784-1788
 		 */
-		$amount = new TaxedMoney( $gateway->initial_amount, $gateway->currency );
+		$amount = new Money( $gateway->initial_amount, $gateway->currency );
 
 		$payment->set_total_amount( $amount );
 
@@ -160,8 +160,8 @@ class Util {
 		$line->set_type( PaymentLineType::DIGITAL );
 		$line->set_name( $gateway->subscription_name );
 		$line->set_quantity( 1 );
-		$line->set_unit_price( new TaxedMoney( $gateway->payment->subtotal, $gateway->currency ) );
-		$line->set_total_amount( new TaxedMoney( $gateway->payment->subtotal, $gateway->currency ) );
+		$line->set_unit_price( new Money( $gateway->payment->subtotal, $gateway->currency ) );
+		$line->set_total_amount( new Money( $gateway->payment->subtotal, $gateway->currency ) );
 		$line->set_product_url( null );
 		$line->set_image_url( null );
 		$line->set_product_category( null );
@@ -181,8 +181,8 @@ class Util {
 				)
 			);
 			$line->set_quantity( 1 );
-			$line->set_unit_price( new TaxedMoney( -$gateway->discount, $gateway->currency ) );
-			$line->set_total_amount( new TaxedMoney( -$gateway->discount, $gateway->currency ) );
+			$line->set_unit_price( new Money( -$gateway->discount, $gateway->currency ) );
+			$line->set_total_amount( new Money( -$gateway->discount, $gateway->currency ) );
 			$line->set_product_url( null );
 			$line->set_image_url( null );
 			$line->set_product_category( null );
@@ -197,8 +197,8 @@ class Util {
 			$line->set_type( PaymentLineType::FEE );
 			$line->set_name( __( 'Fees', 'pronamic_ideal' ) );
 			$line->set_quantity( 1 );
-			$line->set_unit_price( new TaxedMoney( $gateway->payment->fees, $gateway->currency ) );
-			$line->set_total_amount( new TaxedMoney( $gateway->payment->fees, $gateway->currency ) );
+			$line->set_unit_price( new Money( $gateway->payment->fees, $gateway->currency ) );
+			$line->set_total_amount( new Money( $gateway->payment->fees, $gateway->currency ) );
 			$line->set_product_url( null );
 			$line->set_image_url( null );
 			$line->set_product_category( null );
@@ -258,7 +258,7 @@ class Util {
 			$subscription,
 			new \DateTimeImmutable(),
 			new SubscriptionInterval( $interval_spec ),
-			new TaxedMoney( $gateway->initial_amount, $gateway->currency )
+			new Money( $gateway->initial_amount, $gateway->currency )
 		);
 
 		$initial_phase->set_total_periods( 1 );
@@ -267,7 +267,7 @@ class Util {
 			$subscription,
 			$initial_phase->get_end_date(),
 			new SubscriptionInterval( 'P' . \intval( $gateway->length ) . LengthUnit::to_core( $gateway->length_unit ) ),
-			new TaxedMoney( $gateway->amount, $gateway->currency )
+			new Money( $gateway->amount, $gateway->currency )
 		);
 
 		if ( 0 !== $maximum_renewals ) {

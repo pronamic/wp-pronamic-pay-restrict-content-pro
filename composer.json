@@ -61,22 +61,18 @@
 	},
 	"require-dev": {
 		"bamarni/composer-bin-plugin": "^1.4",
-		"dealerdirect/phpcodesniffer-composer-installer": "^0.7",
 		"php-coveralls/php-coveralls": "^2.4",
-		"phpcompatibility/php-compatibility": "^9.3",
-		"phpcompatibility/phpcompatibility-wp": "^2.1",
 		"phpmd/phpmd": "^2.7",
 		"phpunit/phpunit": "^5.7 || ^6.0",
+		"pronamic/wp-coding-standards": "^1.0",
 		"restrictcontentpro/restrict-content": "2.2.3",
-		"roots/wordpress": "^5.6",
-		"squizlabs/php_codesniffer": "^3.5",
-		"wp-coding-standards/wpcs": "^2.3",
-		"wp-phpunit/wp-phpunit": "^5.6"
+		"roots/wordpress": "^5.8",
+		"wp-phpunit/wp-phpunit": "^5.8"
 	},
 	"scripts": {
 		"coveralls": "vendor/bin/php-coveralls -v",
 		"phpcbf": "vendor/bin/phpcbf",
-		"phpcs": "vendor/bin/phpcs -s -v",
+		"phpcs": "XDEBUG_MODE=off vendor/bin/phpcs -s -v",
 		"phplint": "find src tests -name '*.php' | xargs -n 1 -P 4 php -l",
 		"phpmd": "vendor/bin/phpmd src,tests text phpmd.ruleset.xml --suffixes php",
 		"phpstan": "vendor/bin/phpstan analyse",

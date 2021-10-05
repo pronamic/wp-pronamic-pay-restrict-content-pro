@@ -62,7 +62,7 @@ class Util {
 			$post_data = $gateway->subscription_data['post_data'];
 
 			if ( array_key_exists( 'pronamic_ideal_issuer_id', $post_data ) ) {
-				$payment->issuer = $post_data['pronamic_ideal_issuer_id'];
+				$payment->set_meta( 'issuer', $post_data['pronamic_ideal_issuer_id'] );
 			}
 		}
 

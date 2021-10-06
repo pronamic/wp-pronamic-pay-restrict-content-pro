@@ -51,7 +51,7 @@ class Util {
 		);
 
 		// Description.
-		$payment->description = $gateway->subscription_name;
+		$payment->set_description( $gateway->subscription_name );
 
 		// Source.
 		$payment->source    = 'rcp_payment';

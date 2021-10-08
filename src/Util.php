@@ -277,7 +277,7 @@ class Util {
 		$subscription->add_phase( $regular_phase );
 
 		// Other.
-		$subscription->description = $gateway->subscription_name;
+		$subscription->set_description( $gateway->subscription_name );
 
 		// Source.
 		$subscription->source    = 'rcp_membership';

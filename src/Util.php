@@ -77,9 +77,8 @@ class Util {
 		// Subscription.
 		$subscription = self::new_subscription_from_rcp_gateway( $gateway );
 
-		$payment->subscription = $subscription;
-
 		if ( null !== $subscription ) {
+			$payment->add_subscription( $subscription );
 			$payment->add_period( $subscription->new_period() );
 		}
 

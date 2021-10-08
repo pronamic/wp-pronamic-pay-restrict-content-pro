@@ -80,8 +80,6 @@ class Util {
 		$payment->subscription = $subscription;
 
 		if ( null !== $subscription ) {
-			$payment->subscription_id = $subscription->get_id();
-
 			$payment->add_period( $subscription->new_period() );
 		}
 

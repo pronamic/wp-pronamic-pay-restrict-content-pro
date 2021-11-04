@@ -356,9 +356,15 @@ class Extension extends AbstractPluginIntegration {
 				if ( MembershipStatus::ACTIVE !== $rcp_membership->get_status() ) {
 					$expiration = '';
 
-					$end_date = $payment->get_end_date();
+					$periods = $payment->get_periods();
 
-					if ( null !== $end_date ) {
+					if ( null !== $periods ) {
+						$end_date = null;
+
+						foreach ( $periods as $period ) {
+							$end_date = \max( $end_date, $period->get_end_date() );
+						}
+
 						$expiration = $end_date->format( DateTime::MYSQL );
 					}
 
@@ -759,9 +765,15 @@ class Extension extends AbstractPluginIntegration {
 		// Renew membership.
 		$expiration = '';
 
-		$end_date = $payment->get_end_date();
+		$periods = $payment->get_periods();
 
-		if ( null !== $end_date ) {
+		if ( null !== $periods ) {
+			$end_date = null;
+
+			foreach ( $periods as $period ) {
+				$end_date = \max( $end_date, $period->get_end_date() );
+			}
+
 			$expiration = $end_date->format( DateTime::MYSQL );
 		}
 

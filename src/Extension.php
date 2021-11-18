@@ -328,14 +328,26 @@ class Extension extends AbstractPluginIntegration {
 
 				// Do not expire membership if first payment expires and subscription is active,
 				// because a newer completed payment activated the subscription.
-				$subscription = $payment->get_subscription();
+				$subscriptions = $payment->get_subscriptions();
 
-				if ( Core_PaymentStatus::EXPIRED === $core_status && null !== $subscription ) {
-					$first_payment = $subscription->get_first_payment();
-
-					if ( $first_payment->get_id() === $payment->get_id() && SubscriptionStatus::ACTIVE === $subscription->get_status() ) {
-						$should_expire = false;
+				foreach ( $subscriptions as $subscription ) {
+					// Check expired payment status.
+					if ( Core_PaymentStatus::EXPIRED !== $core_status ) {
+						continue;
 					}
+
+					// Check if first payment for subscription.
+					if ( ! $subscription->is_first_payment( $payment ) ) {
+						continue;
+					}
+
+					// Check if subscription is active.
+					if ( SubscriptionStatus::ACTIVE !== $subscription->get_status() ) {
+						continue;
+					}
+
+					// Do not expire membership because a newer completed payment activated the subscription.
+					$should_expire = false;
 				}
 
 				if ( $should_expire ) {

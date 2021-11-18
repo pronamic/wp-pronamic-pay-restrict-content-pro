@@ -67,7 +67,8 @@
 		"pronamic/wp-coding-standards": "^1.0",
 		"restrictcontentpro/restrict-content": "2.2.3",
 		"roots/wordpress": "^5.8",
-		"wp-phpunit/wp-phpunit": "^5.8"
+		"wp-phpunit/wp-phpunit": "^5.8",
+		"yoast/phpunit-polyfills": "^1.0"
 	},
 	"scripts": {
 		"coveralls": "vendor/bin/php-coveralls -v",

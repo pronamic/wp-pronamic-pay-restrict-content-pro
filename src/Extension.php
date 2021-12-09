@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\DateTime\DateTimeImmutable;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -923,11 +924,11 @@ class Extension extends AbstractPluginIntegration {
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/email-functions.php#L328-348
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/email-functions.php#L207-242
 	 *
-	 * @param \DateTime    $next_payment_delivery_date Next payment delivery date.
-	 * @param Subscription $subscription               Subscription.
-	 * @return \DateTime
+	 * @param DateTimeImmutable $next_payment_delivery_date Next payment delivery date.
+	 * @param Subscription      $subscription               Subscription.
+	 * @return DateTimeImmutable
 	 */
-	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Subscription $subscription ) {
+	public function next_payment_delivery_date( DateTimeImmutable $next_payment_delivery_date, Subscription $subscription ) {
 		if ( 'rcp_membership' !== $subscription->source ) {
 			return $next_payment_delivery_date;
 		}

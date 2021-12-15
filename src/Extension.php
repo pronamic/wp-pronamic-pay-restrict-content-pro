@@ -30,6 +30,13 @@ use WP_Query;
  */
 class Extension extends AbstractPluginIntegration {
 	/**
+	 * Registered gateways.
+	 *
+	 * @var array<string, array<string, string>>
+	 */
+	private $gateways;
+
+	/**
 	 * Construct Restrict Content Pro plugin integration.
 	 *
 	 * @param array $args Arguments.
@@ -181,20 +188,15 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * Get gateway data.
 	 *
-	 * @param string $label Label.
 	 * @param string $class Class.
 	 * @return array
 	 */
-	private function get_gateway_data( $label, $class ) {
+	private function get_gateway_data( $class ) {
 		$gateway = new $class();
 
 		return array(
 			'label'       => $gateway->get_label(),
-			'admin_label' => sprintf(
-				'%s - %s',
-				__( 'Pronamic', 'pronamic_ideal' ),
-				$label
-			),
+			'admin_label' => $gateway->get_admin_label(),
 			'class'       => $class,
 		);
 	}
@@ -205,41 +207,25 @@ class Extension extends AbstractPluginIntegration {
 	 * @return array
 	 */
 	private function get_gateways() {
-		return array(
-			'pronamic_pay'                         => $this->get_gateway_data( __( 'Pay', 'pronamic_ideal' ), Gateway::class ),
-			'pronamic_pay_bancontact'              => $this->get_gateway_data( __( 'Bancontact', 'pronamic_ideal' ), BancontactGateway::class ),
-			'pronamic_pay_banktransfer'            => $this->get_gateway_data( __( 'Bank Transfer', 'pronamic_ideal' ), BankTransferGateway::class ),
-			'pronamic_pay_bitcoin'                 => $this->get_gateway_data( __( 'Bitcoin', 'pronamic_ideal' ), BitcoinGateway::class ),
-			'pronamic_pay_credit_card'             => $this->get_gateway_data( __( 'Credit Card', 'pronamic_ideal' ), CreditCardGateway::class ),
-			'pronamic_pay_direct_debit'            => $this->get_gateway_data( __( 'Direct Debit', 'pronamic_ideal' ), DirectDebitGateway::class ),
-			'pronamic_pay_direct_debit_bancontact' => $this->get_gateway_data(
-				sprintf(
-					/* translators: %s: payment method */
-					__( 'Direct Debit (mandate via %s)', 'pronamic_ideal' ),
-					__( 'Bancontact', 'pronamic_ideal' )
-				),
-				DirectDebitBancontactGateway::class
-			),
-			'pronamic_pay_direct_debit_ideal'      => $this->get_gateway_data(
-				sprintf(
-					/* translators: %s: payment method */
-					__( 'Direct Debit (mandate via %s)', 'pronamic_ideal' ),
-					__( 'iDEAL', 'pronamic_ideal' )
-				),
-				DirectDebitIDealGateway::class
-			),
-			'pronamic_pay_direct_debit_sofort'     => $this->get_gateway_data(
-				sprintf(
-					/* translators: %s: payment method */
-					__( 'Direct Debit (mandate via %s)', 'pronamic_ideal' ),
-					__( 'SOFORT', 'pronamic_ideal' )
-				),
-				DirectDebitSofortGateway::class
-			),
-			'pronamic_pay_ideal'                   => $this->get_gateway_data( __( 'iDEAL', 'pronamic_ideal' ), IDealGateway::class ),
-			'pronamic_pay_paypal'                  => $this->get_gateway_data( __( 'PayPal', 'pronamic_ideal' ), PayPalGateway::class ),
-			'pronamic_pay_sofort'                  => $this->get_gateway_data( __( 'SOFORT', 'pronamic_ideal' ), SofortGateway::class ),
-		);
+		if ( null === $this->gateways ) {
+			$this->gateways = array(
+				'pronamic_pay'                         => $this->get_gateway_data( Gateway::class ),
+				'pronamic_pay_apple_pay'               => $this->get_gateway_data( ApplePayGateway::class ),
+				'pronamic_pay_bancontact'              => $this->get_gateway_data( BancontactGateway::class ),
+				'pronamic_pay_banktransfer'            => $this->get_gateway_data( BankTransferGateway::class ),
+				'pronamic_pay_bitcoin'                 => $this->get_gateway_data( BitcoinGateway::class ),
+				'pronamic_pay_credit_card'             => $this->get_gateway_data( CreditCardGateway::class ),
+				'pronamic_pay_direct_debit'            => $this->get_gateway_data( DirectDebitGateway::class ),
+				'pronamic_pay_direct_debit_bancontact' => $this->get_gateway_data( DirectDebitBancontactGateway::class ),
+				'pronamic_pay_direct_debit_ideal'      => $this->get_gateway_data( DirectDebitIDealGateway::class ),
+				'pronamic_pay_direct_debit_sofort'     => $this->get_gateway_data( DirectDebitSofortGateway::class ),
+				'pronamic_pay_ideal'                   => $this->get_gateway_data( IDealGateway::class ),
+				'pronamic_pay_paypal'                  => $this->get_gateway_data( PayPalGateway::class ),
+				'pronamic_pay_sofort'                  => $this->get_gateway_data( SofortGateway::class ),
+			);
+		}
+
+		return $this->gateways;
 	}
 
 	/**

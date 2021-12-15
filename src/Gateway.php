@@ -40,26 +40,9 @@ class Gateway extends RCP_Payment_Gateway {
 	protected $payment_method;
 
 	/**
-	 * Admin label
-	 *
-	 * @var string
-	 */
-	protected $admin_label;
-
-	/**
-	 * Label
-	 *
-	 * @var string
-	 */
-	protected $label;
-
-	/**
 	 * Initialize.
 	 */
 	public function init() {
-		$this->label       = $this->get_label();
-		$this->admin_label = PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
-
 		if ( PaymentMethods::is_direct_debit_method( $this->payment_method ) ) {
 			$this->supports = array(
 				'recurring',
@@ -72,19 +55,25 @@ class Gateway extends RCP_Payment_Gateway {
 	 * Get the Pronamic configuration ID for this gateway.
 	 *
 	 * @global array $rcp_options Restrict Content Pro options.
-	 * @return string
+	 * @return string|null
 	 */
-	private function get_pronamic_config_id() {
+	protected function get_pronamic_config_id() {
 		global $rcp_options;
 
 		$key = $this->id . '_config_id';
+
+		$config_id = null;
 
 		if ( array_key_exists( $key, $rcp_options ) ) {
 			$config_id = $rcp_options[ $key ];
 		}
 
 		if ( empty( $config_id ) ) {
-			$config_id = get_option( 'pronamic_pay_config_id' );
+			$default_config_id = get_option( 'pronamic_pay_config_id' );
+
+			if ( false !== $default_config_id ) {
+				$config_id = $default_config_id;
+			}
 		}
 
 		return $config_id;
@@ -116,6 +105,19 @@ class Gateway extends RCP_Payment_Gateway {
 	}
 
 	/**
+	 * Get admin label.
+	 *
+	 * @return string
+	 */
+	public function get_admin_label() {
+		return \sprintf(
+			'%s - %s',
+			\__( 'Pronamic', 'pronamic_ideal' ),
+			PaymentMethods::get_name( $this->payment_method )
+		);
+	}
+
+	/**
 	 * Add the iDEAL configuration settings to the Restrict Content Pro payment gateways settings page.
 	 *
 	 * @link https://github.com/restrictcontentpro/restrict-content-pro/blob/2.2.8/includes/admin/settings/register-settings.php#L126
@@ -139,7 +141,7 @@ class Gateway extends RCP_Payment_Gateway {
 							sprintf(
 								/* translators: %s: admin label */
 								__( '%s Settings', 'pronamic_ideal' ),
-								$this->admin_label
+								$this->get_admin_label()
 							)
 						)
 					);
@@ -153,17 +155,7 @@ class Gateway extends RCP_Payment_Gateway {
 					<label for="rcp_settings[<?php echo esc_attr( $this->id . '_label' ); ?>]"><?php esc_html_e( 'Checkout label', 'pronamic_ideal' ); ?></label>
 				</th>
 				<td>
-					<?php
-
-					$label = $this->label;
-
-					if ( isset( $rcp_options[ $label_option ] ) ) {
-						$label = $rcp_options[ $label_option ];
-					}
-
-					?>
-
-					<input class="regular-text" id="rcp_settings[<?php echo esc_attr( $label_option ); ?>]" style="width: 300px;" name="rcp_settings[<?php echo esc_attr( $label_option ); ?>]" value="<?php echo esc_attr( $label ); ?>"/>
+					<input class="regular-text" id="rcp_settings[<?php echo esc_attr( $label_option ); ?>]" style="width: 300px;" name="rcp_settings[<?php echo esc_attr( $label_option ); ?>]" value="<?php echo esc_attr( $this->get_label() ); ?>"/>
 
 					<p class="description"><?php esc_html_e( 'Enter a label to display at checkout.', 'pronamic_ideal' ); ?></p>
 				</td>

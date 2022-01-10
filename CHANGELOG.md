@@ -7,6 +7,11 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.0.0] - 2022-01-10
+### Changed
+- Updated to https://github.com/pronamic/wp-pay-core/releases/tag/4.0.0.
+- Simplified gateway registration and add Apple Pay gateway.
+
 ## [3.0.0] - 2021-08-05
 - Updated to `pronamic/wp-pay-core`  version `3.0.0`.
 - Updated to `pronamic/wp-money`  version `2.0.0`.
@@ -90,7 +95,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2017-12-13
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/3.0.0...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/4.0.0...HEAD
+[4.0.0]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/3.0.0...4.0.0
 [3.0.0]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.3.2...3.0.0
 [2.3.2]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.3.1...2.3.2
 [2.3.1]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.3.0...2.3.1

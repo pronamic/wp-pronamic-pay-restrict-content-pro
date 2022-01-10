@@ -3,7 +3,7 @@
  * Extension
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2021 Pronamic
+ * @copyright 2005-2022 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
  */
@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\DateTime\DateTime;
+use Pronamic\WordPress\DateTime\DateTimeImmutable;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -28,6 +29,13 @@ use WP_Query;
  * @since   1.0.0
  */
 class Extension extends AbstractPluginIntegration {
+	/**
+	 * Registered gateways.
+	 *
+	 * @var array<string, array<string, string>>
+	 */
+	private $gateways;
+
 	/**
 	 * Construct Restrict Content Pro plugin integration.
 	 *
@@ -180,20 +188,15 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * Get gateway data.
 	 *
-	 * @param string $label Label.
 	 * @param string $class Class.
 	 * @return array
 	 */
-	private function get_gateway_data( $label, $class ) {
+	private function get_gateway_data( $class ) {
 		$gateway = new $class();
 
 		return array(
 			'label'       => $gateway->get_label(),
-			'admin_label' => sprintf(
-				'%s - %s',
-				__( 'Pronamic', 'pronamic_ideal' ),
-				$label
-			),
+			'admin_label' => $gateway->get_admin_label(),
 			'class'       => $class,
 		);
 	}
@@ -204,41 +207,25 @@ class Extension extends AbstractPluginIntegration {
 	 * @return array
 	 */
 	private function get_gateways() {
-		return array(
-			'pronamic_pay'                         => $this->get_gateway_data( __( 'Pay', 'pronamic_ideal' ), Gateway::class ),
-			'pronamic_pay_bancontact'              => $this->get_gateway_data( __( 'Bancontact', 'pronamic_ideal' ), BancontactGateway::class ),
-			'pronamic_pay_banktransfer'            => $this->get_gateway_data( __( 'Bank Transfer', 'pronamic_ideal' ), BankTransferGateway::class ),
-			'pronamic_pay_bitcoin'                 => $this->get_gateway_data( __( 'Bitcoin', 'pronamic_ideal' ), BitcoinGateway::class ),
-			'pronamic_pay_credit_card'             => $this->get_gateway_data( __( 'Credit Card', 'pronamic_ideal' ), CreditCardGateway::class ),
-			'pronamic_pay_direct_debit'            => $this->get_gateway_data( __( 'Direct Debit', 'pronamic_ideal' ), DirectDebitGateway::class ),
-			'pronamic_pay_direct_debit_bancontact' => $this->get_gateway_data(
-				sprintf(
-					/* translators: %s: payment method */
-					__( 'Direct Debit (mandate via %s)', 'pronamic_ideal' ),
-					__( 'Bancontact', 'pronamic_ideal' )
-				),
-				DirectDebitBancontactGateway::class
-			),
-			'pronamic_pay_direct_debit_ideal'      => $this->get_gateway_data(
-				sprintf(
-					/* translators: %s: payment method */
-					__( 'Direct Debit (mandate via %s)', 'pronamic_ideal' ),
-					__( 'iDEAL', 'pronamic_ideal' )
-				),
-				DirectDebitIDealGateway::class
-			),
-			'pronamic_pay_direct_debit_sofort'     => $this->get_gateway_data(
-				sprintf(
-					/* translators: %s: payment method */
-					__( 'Direct Debit (mandate via %s)', 'pronamic_ideal' ),
-					__( 'SOFORT', 'pronamic_ideal' )
-				),
-				DirectDebitSofortGateway::class
-			),
-			'pronamic_pay_ideal'                   => $this->get_gateway_data( __( 'iDEAL', 'pronamic_ideal' ), IDealGateway::class ),
-			'pronamic_pay_paypal'                  => $this->get_gateway_data( __( 'PayPal', 'pronamic_ideal' ), PayPalGateway::class ),
-			'pronamic_pay_sofort'                  => $this->get_gateway_data( __( 'SOFORT', 'pronamic_ideal' ), SofortGateway::class ),
-		);
+		if ( null === $this->gateways ) {
+			$this->gateways = array(
+				'pronamic_pay'                         => $this->get_gateway_data( Gateway::class ),
+				'pronamic_pay_apple_pay'               => $this->get_gateway_data( ApplePayGateway::class ),
+				'pronamic_pay_bancontact'              => $this->get_gateway_data( BancontactGateway::class ),
+				'pronamic_pay_banktransfer'            => $this->get_gateway_data( BankTransferGateway::class ),
+				'pronamic_pay_bitcoin'                 => $this->get_gateway_data( BitcoinGateway::class ),
+				'pronamic_pay_credit_card'             => $this->get_gateway_data( CreditCardGateway::class ),
+				'pronamic_pay_direct_debit'            => $this->get_gateway_data( DirectDebitGateway::class ),
+				'pronamic_pay_direct_debit_bancontact' => $this->get_gateway_data( DirectDebitBancontactGateway::class ),
+				'pronamic_pay_direct_debit_ideal'      => $this->get_gateway_data( DirectDebitIDealGateway::class ),
+				'pronamic_pay_direct_debit_sofort'     => $this->get_gateway_data( DirectDebitSofortGateway::class ),
+				'pronamic_pay_ideal'                   => $this->get_gateway_data( IDealGateway::class ),
+				'pronamic_pay_paypal'                  => $this->get_gateway_data( PayPalGateway::class ),
+				'pronamic_pay_sofort'                  => $this->get_gateway_data( SofortGateway::class ),
+			);
+		}
+
+		return $this->gateways;
 	}
 
 	/**
@@ -328,14 +315,26 @@ class Extension extends AbstractPluginIntegration {
 
 				// Do not expire membership if first payment expires and subscription is active,
 				// because a newer completed payment activated the subscription.
-				$subscription = $payment->get_subscription();
+				$subscriptions = $payment->get_subscriptions();
 
-				if ( Core_PaymentStatus::EXPIRED === $core_status && null !== $subscription ) {
-					$first_payment = $subscription->get_first_payment();
-
-					if ( $first_payment->get_id() === $payment->get_id() && SubscriptionStatus::ACTIVE === $subscription->get_status() ) {
-						$should_expire = false;
+				foreach ( $subscriptions as $subscription ) {
+					// Check expired payment status.
+					if ( Core_PaymentStatus::EXPIRED !== $core_status ) {
+						continue;
 					}
+
+					// Check if first payment for subscription.
+					if ( ! $subscription->is_first_payment( $payment ) ) {
+						continue;
+					}
+
+					// Check if subscription is active.
+					if ( SubscriptionStatus::ACTIVE !== $subscription->get_status() ) {
+						continue;
+					}
+
+					// Do not expire membership because a newer completed payment activated the subscription.
+					$should_expire = false;
 				}
 
 				if ( $should_expire ) {
@@ -356,9 +355,15 @@ class Extension extends AbstractPluginIntegration {
 				if ( MembershipStatus::ACTIVE !== $rcp_membership->get_status() ) {
 					$expiration = '';
 
-					$end_date = $payment->get_end_date();
+					$periods = $payment->get_periods();
 
-					if ( null !== $end_date ) {
+					if ( null !== $periods ) {
+						$end_date = null;
+
+						foreach ( $periods as $period ) {
+							$end_date = \max( $end_date, $period->get_end_date() );
+						}
+
 						$expiration = $end_date->format( DateTime::MYSQL );
 					}
 
@@ -759,9 +764,15 @@ class Extension extends AbstractPluginIntegration {
 		// Renew membership.
 		$expiration = '';
 
-		$end_date = $payment->get_end_date();
+		$periods = $payment->get_periods();
 
-		if ( null !== $end_date ) {
+		if ( null !== $periods ) {
+			$end_date = null;
+
+			foreach ( $periods as $period ) {
+				$end_date = \max( $end_date, $period->get_end_date() );
+			}
+
 			$expiration = $end_date->format( DateTime::MYSQL );
 		}
 
@@ -899,11 +910,11 @@ class Extension extends AbstractPluginIntegration {
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/email-functions.php#L328-348
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/email-functions.php#L207-242
 	 *
-	 * @param \DateTime    $next_payment_delivery_date Next payment delivery date.
-	 * @param Subscription $subscription               Subscription.
-	 * @return \DateTime
+	 * @param DateTimeImmutable $next_payment_delivery_date Next payment delivery date.
+	 * @param Subscription      $subscription               Subscription.
+	 * @return DateTimeImmutable
 	 */
-	public function next_payment_delivery_date( \DateTime $next_payment_delivery_date, Subscription $subscription ) {
+	public function next_payment_delivery_date( DateTimeImmutable $next_payment_delivery_date, Subscription $subscription ) {
 		if ( 'rcp_membership' !== $subscription->source ) {
 			return $next_payment_delivery_date;
 		}

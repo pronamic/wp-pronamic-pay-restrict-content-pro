@@ -3,7 +3,7 @@
  * Util
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2021 Pronamic
+ * @copyright 2005-2022 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
  */
@@ -51,7 +51,7 @@ class Util {
 		);
 
 		// Description.
-		$payment->description = $gateway->subscription_name;
+		$payment->set_description( $gateway->subscription_name );
 
 		// Source.
 		$payment->source    = 'rcp_payment';
@@ -62,7 +62,7 @@ class Util {
 			$post_data = $gateway->subscription_data['post_data'];
 
 			if ( array_key_exists( 'pronamic_ideal_issuer_id', $post_data ) ) {
-				$payment->issuer = $post_data['pronamic_ideal_issuer_id'];
+				$payment->set_meta( 'issuer', $post_data['pronamic_ideal_issuer_id'] );
 			}
 		}
 
@@ -77,11 +77,7 @@ class Util {
 		// Subscription.
 		$subscription = self::new_subscription_from_rcp_gateway( $gateway );
 
-		$payment->subscription = $subscription;
-
 		if ( null !== $subscription ) {
-			$payment->subscription_id = $subscription->get_id();
-
 			$payment->add_period( $subscription->new_period() );
 		}
 
@@ -279,7 +275,7 @@ class Util {
 		$subscription->add_phase( $regular_phase );
 
 		// Other.
-		$subscription->description = $gateway->subscription_name;
+		$subscription->set_description( $gateway->subscription_name );
 
 		// Source.
 		$subscription->source    = 'rcp_membership';

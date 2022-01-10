@@ -1,6 +1,6 @@
 <?php
 /**
- * Credit Card gateway
+ * Apple Pay gateway
  *
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2022 Pronamic
@@ -14,29 +14,29 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 
 /**
- * Credit Card gateway
+ * Apple Pay gateway
  *
  * @author  Reüel van der Steege
- * @version 2.0.0
- * @since   1.0.0
+ * @version 3.1.0
+ * @since   3.1.0
  */
-class CreditCardGateway extends Gateway {
+class ApplePayGateway extends Gateway {
 	/**
 	 * Gateway id.
 	 *
 	 * @var string
 	 */
-	protected $id = 'pronamic_pay_credit_card';
+	protected $id = 'pronamic_pay_apple_pay';
 
 	/**
 	 * Payment method.
 	 *
 	 * @var string
 	 */
-	protected $payment_method = PaymentMethods::CREDIT_CARD;
+	protected $payment_method = PaymentMethods::APPLE_PAY;
 
 	/**
-	 * Construct and initialize Credit Card gateway.
+	 * Construct and initialize Apple Pay gateway.
 	 */
 	public function init() {
 		parent::init();
@@ -44,7 +44,7 @@ class CreditCardGateway extends Gateway {
 		// Support recurring subscription payments.
 		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
 
-		if ( null !== $gateway && $gateway->supports( 'recurring_credit_card' ) ) {
+		if ( null !== $gateway && $gateway->supports( 'recurring_apple_pay' ) ) {
 			$this->supports = array(
 				'recurring',
 				'trial',

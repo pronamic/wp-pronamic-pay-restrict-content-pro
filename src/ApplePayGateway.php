@@ -11,7 +11,6 @@
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Plugin;
 
 /**
  * Apple Pay gateway
@@ -34,21 +33,4 @@ class ApplePayGateway extends Gateway {
 	 * @var string
 	 */
 	protected $payment_method = PaymentMethods::APPLE_PAY;
-
-	/**
-	 * Construct and initialize Apple Pay gateway.
-	 */
-	public function init() {
-		parent::init();
-
-		// Support recurring subscription payments.
-		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
-
-		if ( null !== $gateway && $gateway->supports( 'recurring_apple_pay' ) ) {
-			$this->supports = array(
-				'recurring',
-				'trial',
-			);
-		}
-	}
 }

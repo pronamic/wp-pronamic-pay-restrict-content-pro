@@ -11,7 +11,6 @@
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
-use Pronamic\WordPress\Pay\Plugin;
 
 /**
  * Credit Card gateway
@@ -34,21 +33,4 @@ class CreditCardGateway extends Gateway {
 	 * @var string
 	 */
 	protected $payment_method = PaymentMethods::CREDIT_CARD;
-
-	/**
-	 * Construct and initialize Credit Card gateway.
-	 */
-	public function init() {
-		parent::init();
-
-		// Support recurring subscription payments.
-		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
-
-		if ( null !== $gateway && $gateway->supports( 'recurring_credit_card' ) ) {
-			$this->supports = array(
-				'recurring',
-				'trial',
-			);
-		}
-	}
 }

@@ -214,10 +214,10 @@ class Extension extends AbstractPluginIntegration {
 				'pronamic_pay_sofort'                  => SofortGateway::class,
 			);
 
-			foreach ( $gateways as $class ) {
+			foreach ( $gateways as $gateway_id => $class ) {
 				$gateway = new $class();
 
-				$this->gateways[] = array(
+				$this->gateways[ $gateway_id ] = array(
 					'label'       => $gateway->get_label(),
 					'admin_label' => $gateway->get_admin_label(),
 					'class'       => $class,

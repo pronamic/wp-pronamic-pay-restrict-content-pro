@@ -43,7 +43,20 @@ class Gateway extends RCP_Payment_Gateway {
 	 * Initialize.
 	 */
 	public function init() {
-		if ( PaymentMethods::is_direct_debit_method( $this->payment_method ) ) {
+		// Set supported features based on gateway.
+		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
+
+		if (
+			null !== $gateway
+				&&
+			$gateway->supports( 'recurring' )
+				&&
+			(
+				PaymentMethods::is_recurring_method( $this->payment_method )
+					||
+				\in_array( $this->payment_method, PaymentMethods::get_recurring_methods(), true )
+			)
+		) {
 			$this->supports = array(
 				'recurring',
 				'trial',

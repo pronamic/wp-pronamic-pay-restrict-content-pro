@@ -71,11 +71,7 @@ class MembershipStatus {
 			case self::ACTIVE:
 				return SubscriptionStatus::ACTIVE;
 			case self::EXPIRED:
-				/**
-				 * The expired subscription status will likely be removed
-				 * from the WordPress pay library in the future.
-				 */
-				return null;
+				return SubscriptionStatus::COMPLETED;
 			case self::CANCELLED:
 				return SubscriptionStatus::CANCELLED;
 			case self::PENDING:

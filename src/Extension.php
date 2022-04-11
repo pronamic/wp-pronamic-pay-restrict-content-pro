@@ -18,6 +18,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use RCP_Member;
+use RCP_Membership;
 use RCP_Payments;
 use WP_Query;
 
@@ -39,7 +40,8 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * Construct Restrict Content Pro plugin integration.
 	 *
-	 * @param array $args Arguments.
+	 * @param array<string, mixed> $args Arguments.
+	 * @return void
 	 */
 	public function __construct( $args = array() ) {
 		$args['name'] = __( 'Restrict Content Pro', 'pronamic_ideal' );
@@ -78,6 +80,8 @@ class Extension extends AbstractPluginIntegration {
 
 	/**
 	 * Plugins loaded.
+	 *
+	 * @return void
 	 */
 	public function plugins_loaded() {
 		// Check if dependencies are met and integration is active.
@@ -170,6 +174,8 @@ class Extension extends AbstractPluginIntegration {
 
 	/**
 	 * Upgrades are only executable when no Restrict Content Pro upgrade is needed.
+	 *
+	 * @return void
 	 */
 	public function admin_init_upgrades_executable() {
 		$this->get_upgrades()->set_executable( $this->are_upgrades_executable() );
@@ -178,51 +184,45 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * Register Pronamic gateways.
 	 *
-	 * @param array $gateways Gateways.
-	 * @return array
+	 * @param array<string, array<string, string>> $gateways Gateways.
+	 * @return array<string, array<string, string>>
 	 */
 	public function register_pronamic_gateways( $gateways ) {
 		return array_merge( $gateways, $this->get_gateways() );
 	}
 
 	/**
-	 * Get gateway data.
-	 *
-	 * @param string $class Class.
-	 * @return array
-	 */
-	private function get_gateway_data( $class ) {
-		$gateway = new $class();
-
-		return array(
-			'label'       => $gateway->get_label(),
-			'admin_label' => $gateway->get_admin_label(),
-			'class'       => $class,
-		);
-	}
-
-	/**
 	 * Get Pronamic gateways.
 	 *
-	 * @return array
+	 * @return array<string, array<string, string>>
 	 */
 	private function get_gateways() {
 		if ( null === $this->gateways ) {
-			$this->gateways = array(
-				'pronamic_pay'                         => $this->get_gateway_data( Gateway::class ),
-				'pronamic_pay_apple_pay'               => $this->get_gateway_data( ApplePayGateway::class ),
-				'pronamic_pay_bancontact'              => $this->get_gateway_data( BancontactGateway::class ),
-				'pronamic_pay_banktransfer'            => $this->get_gateway_data( BankTransferGateway::class ),
-				'pronamic_pay_bitcoin'                 => $this->get_gateway_data( BitcoinGateway::class ),
-				'pronamic_pay_credit_card'             => $this->get_gateway_data( CreditCardGateway::class ),
-				'pronamic_pay_direct_debit'            => $this->get_gateway_data( DirectDebitGateway::class ),
-				'pronamic_pay_direct_debit_bancontact' => $this->get_gateway_data( DirectDebitBancontactGateway::class ),
-				'pronamic_pay_direct_debit_ideal'      => $this->get_gateway_data( DirectDebitIDealGateway::class ),
-				'pronamic_pay_direct_debit_sofort'     => $this->get_gateway_data( DirectDebitSofortGateway::class ),
-				'pronamic_pay_ideal'                   => $this->get_gateway_data( IDealGateway::class ),
-				'pronamic_pay_paypal'                  => $this->get_gateway_data( PayPalGateway::class ),
-				'pronamic_pay_sofort'                  => $this->get_gateway_data( SofortGateway::class ),
+			$gateways = array(
+				'pronamic_pay'                         => Gateway::class,
+				'pronamic_pay_apple_pay'               => ApplePayGateway::class,
+				'pronamic_pay_bancontact'              => BancontactGateway::class,
+				'pronamic_pay_banktransfer'            => BankTransferGateway::class,
+				'pronamic_pay_bitcoin'                 => BitcoinGateway::class,
+				'pronamic_pay_credit_card'             => CreditCardGateway::class,
+				'pronamic_pay_direct_debit'            => DirectDebitGateway::class,
+				'pronamic_pay_direct_debit_bancontact' => DirectDebitBancontactGateway::class,
+				'pronamic_pay_direct_debit_ideal'      => DirectDebitIDealGateway::class,
+				'pronamic_pay_direct_debit_sofort'     => DirectDebitSofortGateway::class,
+				'pronamic_pay_ideal'                   => IDealGateway::class,
+				'pronamic_pay_paypal'                  => PayPalGateway::class,
+				'pronamic_pay_sofort'                  => SofortGateway::class,
 			);
+
+			foreach ( $gateways as $gateway_id => $class ) {
+				$gateway = new $class();
+
+				$this->gateways[ $gateway_id ] = array(
+					'label'       => $gateway->get_label(),
+					'admin_label' => $gateway->get_admin_label(),
+					'class'       => $class,
+				);
+			}
 		}
 
 		return $this->gateways;
@@ -231,7 +231,8 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * Payment settings.
 	 *
-	 * @param array $rcp_options Restrict Content Pro options.
+	 * @param array<string, mixed> $rcp_options Restrict Content Pro options.
+	 * @return void
 	 */
 	public function payments_settings( $rcp_options ) {
 		foreach ( $this->get_gateways() as $data ) {
@@ -259,13 +260,20 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		// Return success page URL.
-		return rcp_get_return_url( $payment->get_customer()->get_user_id() );
+		$customer = $payment->get_customer();
+
+		if ( null !== $customer ) {
+			$url = \rcp_get_return_url( $customer->get_user_id() );
+		}
+
+		return $url;
 	}
 
 	/**
 	 * Update the status of the specified payment.
 	 *
 	 * @param Payment $payment Payment.
+	 * @return void
 	 */
 	public function payment_status_update( Payment $payment ) {
 		/**
@@ -364,7 +372,9 @@ class Extension extends AbstractPluginIntegration {
 							$end_date = \max( $end_date, $period->get_end_date() );
 						}
 
-						$expiration = $end_date->format( DateTime::MYSQL );
+						if ( null !== $end_date ) {
+							$expiration = $end_date->format( DateTime::MYSQL );
+						}
 					}
 
 					$rcp_membership->renew( true, 'active', $expiration );
@@ -386,6 +396,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @param string $old_status    Old membership status.
 	 * @param string $new_status    New membership status.
 	 * @param int    $membership_id ID of the membership.
+	 * @return void
 	 */
 	public function rcp_transition_membership_status( $old_status, $new_status, $membership_id ) {
 		$query = new WP_Query(
@@ -434,6 +445,14 @@ class Extension extends AbstractPluginIntegration {
 				);
 
 				break;
+			case MembershipStatus::EXPIRED:
+				$note = sprintf(
+					/* translators: %s: Restrict Content Pro */
+					__( 'Subscription expired by %s.', 'pronamic_ideal' ),
+					__( 'Restrict Content Pro', 'pronamic_ideal' )
+				);
+
+				break;
 			case MembershipStatus::PENDING:
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
@@ -452,7 +471,13 @@ class Extension extends AbstractPluginIntegration {
 			$query->the_post();
 
 			// Get subscription.
-			$subscription = get_pronamic_subscription( get_the_ID() );
+			$post_id = get_the_ID();
+
+			if ( false === $post_id ) {
+				continue;
+			}
+
+			$subscription = get_pronamic_subscription( $post_id );
 
 			if ( null === $subscription ) {
 				continue;
@@ -462,7 +487,9 @@ class Extension extends AbstractPluginIntegration {
 			$subscription->set_status( $core_status );
 
 			// Add note.
-			$subscription->add_note( $note );
+			if ( null !== $note ) {
+				$subscription->add_note( $note );
+			}
 
 			$subscription->save();
 		}
@@ -478,7 +505,6 @@ class Extension extends AbstractPluginIntegration {
 	 * @param bool            $can_cancel    Whether or not this membership can be cancelled.
 	 * @param int             $membership_id ID of the membership.
 	 * @param \RCP_Membership $membership    Membership object.
-	 *
 	 * @return bool
 	 */
 	public function rcp_membership_can_cancel( $can_cancel, $membership_id, $membership ) {
@@ -512,11 +538,12 @@ class Extension extends AbstractPluginIntegration {
 	 *
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/class-rcp-membership.php#L2372-2385
 	 *
-	 * @param true|WP_Error  $success                 Whether or not the cancellation was successful.
+	 * @param true|\WP_Error $success                Whether or not the cancellation was successful.
 	 * @param string         $gateway                 Payment gateway for this membership.
 	 * @param string         $gateway_subscription_id Gateway subscription ID.
 	 * @param int            $membership_id           ID of the membership.
 	 * @param RCP_Membership $membership              Membership object.
+	 * @return true|\WP_Error
 	 */
 	public function rcp_membership_payment_profile_cancelled( $success, $gateway, $gateway_subscription_id, $membership_id, $membership ) {
 		$gateways = $this->get_gateways();
@@ -717,6 +744,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @link https://github.com/wp-pay/core/blob/2.1.6/src/Payments/PaymentsDataStoreCPT.php#L234
 	 *
 	 * @param Payment $payment Payment.
+	 * @return void
 	 * @throws \Exception When Restrict Content Pro returns unexpected value.
 	 */
 	public function new_payment( Payment $payment ) {
@@ -773,7 +801,9 @@ class Extension extends AbstractPluginIntegration {
 				$end_date = \max( $end_date, $period->get_end_date() );
 			}
 
-			$expiration = $end_date->format( DateTime::MYSQL );
+			if ( null !== $end_date ) {
+				$expiration = $end_date->format( DateTime::MYSQL );
+			}
 		}
 
 		$rcp_membership->renew( true, 'active', $expiration );
@@ -791,6 +821,7 @@ class Extension extends AbstractPluginIntegration {
 	 * Update payment.
 	 *
 	 * @param Payment $payment Payment.
+	 * @return void
 	 * @throws \Exception When Restrict Content Pro returns unexpected value.
 	 */
 	public function update_payment( Payment $payment ) {
@@ -833,6 +864,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/memberships/edit-membership.php#L285-294
 	 *
 	 * @param RCP_Membership $membership Restrict Content Pro membership.
+	 * @return void
 	 */
 	public function rcp_edit_membership_after( $membership ) {
 		$query = new \WP_Query(
@@ -867,6 +899,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/payments/edit-payment.php#L127
 	 *
 	 * @param object $payment Restrict Content Pro payment.
+	 * @return void
 	 */
 	public function rcp_edit_payment_after( $payment ) {
 		$query = new \WP_Query(

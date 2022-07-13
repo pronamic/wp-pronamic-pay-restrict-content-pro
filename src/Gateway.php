@@ -215,8 +215,6 @@ class Gateway extends RCP_Payment_Gateway {
 		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
 
 		if ( $gateway ) {
-			$gateway->set_payment_method( $this->payment_method );
-
 			$input = $gateway->get_input_html();
 
 			if ( $input ) {

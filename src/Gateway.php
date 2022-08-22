@@ -210,22 +210,33 @@ class Gateway extends RCP_Payment_Gateway {
 	 * @return string
 	 */
 	public function fields() {
-		ob_start();
-
 		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
 
-		if ( $gateway ) {
-			$input = $gateway->get_input_html();
-
-			if ( $input ) {
-				echo '<fieldset class="rcp_card_fieldset"><p>';
-				// phpcs:ignore WordPress.Security.EscapeOutput
-				echo $input;
-				echo '</p></fieldset>';
-			}
+		if ( null === $gateway ) {
+			return '';
 		}
 
-		return ob_get_clean();
+		$payment_method = $gateway->get_payment_method( $this->payment_method );
+
+		if ( null === $payment_method ) {
+			return '';
+		}
+
+		$fields = $payment_method->get_fields();
+
+		if ( empty( $fields ) ) {
+			return '';
+		}
+
+		$output = '<fieldset class="rcp_card_fieldset"><p>';
+
+		foreach ( $fields as $field ) {
+			$output .= $field->render();
+		}
+
+		$output .= '</p></fieldset>';
+
+		return $output;
 	}
 
 	/**

@@ -56,9 +56,9 @@ class Upgrade216 extends Upgrade {
 
 				$this->execute();
 			},
-			array(
+			[
 				'shortdesc' => 'Execute Restrict Content Pro upgrade 2.1.6.',
-			)
+			]
 		);
 
 		\WP_CLI::add_command(
@@ -68,11 +68,11 @@ class Upgrade216 extends Upgrade {
 
 				$posts = $this->get_subscription_posts();
 
-				\WP_CLI\Utils\format_items( 'table', $posts, array( 'ID', 'post_title', 'post_status' ) );
+				\WP_CLI\Utils\format_items( 'table', $posts, [ 'ID', 'post_title', 'post_status' ] );
 			},
-			array(
+			[
 				'shortdesc' => 'Execute Restrict Content Pro upgrade 2.1.6.',
-			)
+			]
 		);
 
 		\WP_CLI::add_command(
@@ -81,17 +81,17 @@ class Upgrade216 extends Upgrade {
 				\WP_CLI::log( 'Upgrade 2.1.6 - Subscriptions' );
 
 				$this->upgrade_subscriptions(
-					array(
+					[
 						'skip-no-match' => \WP_CLI\Utils\get_flag_value( $assoc_args, 'skip-no-match', true ),
 						'reactivate'    => \WP_CLI\Utils\get_flag_value( $assoc_args, 'reactivate', true ),
 						'dry-run'       => \WP_CLI\Utils\get_flag_value( $assoc_args, 'dry-run', true ),
 						'post__in'      => \WP_CLI\Utils\get_flag_value( $assoc_args, 'post__in', null ),
-					)
+					]
 				);
 			},
-			array(
+			[
 				'shortdesc' => 'Execute Restrict Content Pro upgrade 2.1.6.',
-			)
+			]
 		);
 
 		\WP_CLI::add_command(
@@ -101,11 +101,11 @@ class Upgrade216 extends Upgrade {
 
 				$posts = $this->get_payment_posts();
 
-				\WP_CLI\Utils\format_items( 'table', $posts, array( 'ID', 'post_title', 'post_status' ) );
+				\WP_CLI\Utils\format_items( 'table', $posts, [ 'ID', 'post_title', 'post_status' ] );
 			},
-			array(
+			[
 				'shortdesc' => 'Execute Restrict Content Pro upgrade 2.1.6.',
-			)
+			]
 		);
 	}
 
@@ -115,19 +115,19 @@ class Upgrade216 extends Upgrade {
 	 * @param array $args Query arguments.
 	 * @return array
 	 */
-	private function get_subscription_posts( $args = array() ) {
+	private function get_subscription_posts( $args = [] ) {
 		$args['post_type']     = 'pronamic_pay_subscr';
 		$args['post_status']   = 'any';
 		$args['nopaging']      = true;
 		$args['no_found_rows'] = true;
 		$args['order']         = 'DESC';
 		$args['orderby']       = 'ID';
-		$args['meta_query']    = array(
-			array(
+		$args['meta_query']    = [
+			[
 				'key'   => '_pronamic_subscription_source',
 				'value' => 'restrictcontentpro',
-			),
-		);
+			],
+		];
 
 		$query = new \WP_Query( $args );
 
@@ -141,20 +141,20 @@ class Upgrade216 extends Upgrade {
 	 */
 	private function get_payment_posts() {
 		$query = new \WP_Query(
-			array(
+			[
 				'post_type'     => 'pronamic_payment',
 				'post_status'   => 'any',
-				'meta_query'    => array(
-					array(
+				'meta_query'    => [
+					[
 						'key'   => '_pronamic_payment_source',
 						'value' => 'restrictcontentpro',
-					),
-				),
+					],
+				],
 				'nopaging'      => true,
 				'no_found_rows' => true,
 				'order'         => 'DESC',
 				'orderby'       => 'ID',
-			)
+			]
 		);
 
 		return $query->posts;
@@ -203,22 +203,22 @@ class Upgrade216 extends Upgrade {
 	 *
 	 * @param array $args Arguments.
 	 */
-	private function upgrade_subscriptions( $args = array() ) {
+	private function upgrade_subscriptions( $args = [] ) {
 		$args = \wp_parse_args(
 			$args,
-			array(
+			[
 				'skip-no-match' => false,
 				'reactivate'    => false,
 				'dry-run'       => false,
 				'post__in'      => null,
-			)
+			]
 		);
 
 		$skip_no_match = \filter_var( $args['skip-no-match'], FILTER_VALIDATE_BOOLEAN );
 		$reactivate    = \filter_var( $args['reactivate'], FILTER_VALIDATE_BOOLEAN );
 		$dry_run       = \filter_var( $args['dry-run'], FILTER_VALIDATE_BOOLEAN );
 
-		$query_args = array();
+		$query_args = [];
 
 		if ( null !== $args['post__in'] ) {
 			$query_args['post__in'] = \explode( ',', $args['post__in'] );

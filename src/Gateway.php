@@ -50,10 +50,10 @@ class Gateway extends RCP_Payment_Gateway {
 			$payment_method = $gateway->get_payment_method( $this->payment_method );
 
 			if ( null !== $payment_method && $payment_method->supports( 'recurring' ) ) {
-				$this->supports = array(
+				$this->supports = [
 					'recurring',
 					'trial',
-				);
+				];
 			}
 		}
 	}
@@ -176,11 +176,11 @@ class Gateway extends RCP_Payment_Gateway {
 					<?php
 
 					AdminModule::dropdown_configs(
-						array(
+						[
 							'name'           => 'rcp_settings[' . esc_attr( $config_option ) . ']',
 							'selected'       => $this->get_pronamic_config_id(),
 							'payment_method' => $this->payment_method,
-						)
+						]
 					);
 
 					?>
@@ -257,7 +257,7 @@ class Gateway extends RCP_Payment_Gateway {
 			wp_die(
 				esc_html( Plugin::get_default_error_message() ),
 				esc_html__( 'Payment Error', 'pronamic_ideal' ),
-				array( 'response' => '401' )
+				[ 'response' => '401' ]
 			);
 		}
 
@@ -281,7 +281,7 @@ class Gateway extends RCP_Payment_Gateway {
 					)
 				),
 				esc_html__( 'Payment Error', 'pronamic_ideal' ),
-				array( 'response' => '401' )
+				[ 'response' => '401' ]
 			);
 		}
 
@@ -291,9 +291,9 @@ class Gateway extends RCP_Payment_Gateway {
 		if ( null !== $transaction_id ) {
 			$rcp_payments_db->update(
 				$this->payment->id,
-				array(
+				[
 					'transaction_id' => $transaction_id,
-				)
+				]
 			);
 		}
 

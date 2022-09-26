@@ -7,6 +7,9 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.2.0] - 2022-09-26
+- Updated for new payment methods and fields registration.
+
 ## [4.1.0] - 2022-04-11
 - Transform expired Restrict Content Pro membership to Pronamic status `Completed`.
 - Fix missing gateway registration key.
@@ -101,7 +104,8 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## 1.0.0 - 2017-12-13
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/4.1.0...HEAD
+[unreleased]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/4.2.0...HEAD
+[4.2.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/4.1.0...4.2.0
 [4.1.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/4.0.0...4.1.0
 [4.0.0]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/3.0.0...4.0.0
 [3.0.0]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/2.3.2...3.0.0

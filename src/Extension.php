@@ -43,7 +43,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @param array<string, mixed> $args Arguments.
 	 * @return void
 	 */
-	public function __construct( $args = array() ) {
+	public function __construct( $args = [] ) {
 		$args['name'] = __( 'Restrict Content Pro', 'pronamic_ideal' );
 
 		parent::__construct( $args );
@@ -65,17 +65,17 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public function setup() {
-		add_filter( 'pronamic_payment_source_description', array( $this, 'payment_source_description' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_url', array( $this, 'payment_source_url' ), 10, 2 );
-		add_filter( 'pronamic_subscription_source_description', array( $this, 'subscription_source_description' ), 10, 2 );
-		add_filter( 'pronamic_subscription_source_url', array( $this, 'subscription_source_url' ), 10, 2 );
+		add_filter( 'pronamic_payment_source_description', [ $this, 'payment_source_description' ], 10, 2 );
+		add_filter( 'pronamic_payment_source_url', [ $this, 'payment_source_url' ], 10, 2 );
+		add_filter( 'pronamic_subscription_source_description', [ $this, 'subscription_source_description' ], 10, 2 );
+		add_filter( 'pronamic_subscription_source_url', [ $this, 'subscription_source_url' ], 10, 2 );
 
 		/*
 		 * The Restrict Content Pro plugin gets bootstrapped with priority `4`.
 		 *
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/restrict-content-pro.php#L119
 		 */
-		add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ), 5 );
+		add_action( 'plugins_loaded', [ $this, 'plugins_loaded' ], 5 );
 	}
 
 	/**
@@ -96,26 +96,26 @@ class Extension extends AbstractPluginIntegration {
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/class-restrict-content-pro.php#L199-215
 		 * @link https://github.com/wp-pay/core/blob/2.2.0/src/Admin/Install.php#L65
 		 */
-		add_action( 'admin_init', array( $this, 'admin_init_upgrades_executable' ), 4 );
+		add_action( 'admin_init', [ $this, 'admin_init_upgrades_executable' ], 4 );
 
-		add_filter( 'rcp_payment_gateways', array( $this, 'register_pronamic_gateways' ) );
-		add_action( 'rcp_payments_settings', array( $this, 'payments_settings' ) );
-		add_action( 'rcp_transition_membership_status', array( $this, 'rcp_transition_membership_status' ), 10, 3 );
+		add_filter( 'rcp_payment_gateways', [ $this, 'register_pronamic_gateways' ] );
+		add_action( 'rcp_payments_settings', [ $this, 'payments_settings' ] );
+		add_action( 'rcp_transition_membership_status', [ $this, 'rcp_transition_membership_status' ], 10, 3 );
 
-		add_filter( 'rcp_membership_can_cancel', array( $this, 'rcp_membership_can_cancel' ), 10, 3 );
-		add_filter( 'rcp_membership_payment_profile_cancelled', array( $this, 'rcp_membership_payment_profile_cancelled' ), 10, 5 );
+		add_filter( 'rcp_membership_can_cancel', [ $this, 'rcp_membership_can_cancel' ], 10, 3 );
+		add_filter( 'rcp_membership_payment_profile_cancelled', [ $this, 'rcp_membership_payment_profile_cancelled' ], 10, 5 );
 
-		add_action( 'pronamic_payment_status_update_rcp_payment', array( $this, 'payment_status_update' ), 10, 1 );
-		add_filter( 'pronamic_payment_redirect_url', array( $this, 'payment_redirect_url' ), 10, 2 );
-		add_filter( 'pronamic_payment_source_text_rcp_payment', array( $this, 'payment_source_text' ), 10, 2 );
+		add_action( 'pronamic_payment_status_update_rcp_payment', [ $this, 'payment_status_update' ], 10, 1 );
+		add_filter( 'pronamic_payment_redirect_url', [ $this, 'payment_redirect_url' ], 10, 2 );
+		add_filter( 'pronamic_payment_source_text_rcp_payment', [ $this, 'payment_source_text' ], 10, 2 );
 
-		add_filter( 'pronamic_subscription_source_text_rcp_membership', array( $this, 'subscription_source_text' ), 10, 2 );
+		add_filter( 'pronamic_subscription_source_text_rcp_membership', [ $this, 'subscription_source_text' ], 10, 2 );
 
-		add_action( 'pronamic_pay_new_payment', array( $this, 'new_payment' ) );
-		add_action( 'pronamic_pay_update_payment', array( $this, 'update_payment' ) );
+		add_action( 'pronamic_pay_new_payment', [ $this, 'new_payment' ] );
+		add_action( 'pronamic_pay_update_payment', [ $this, 'update_payment' ] );
 
-		add_action( 'rcp_edit_membership_after', array( $this, 'rcp_edit_membership_after' ) );
-		add_action( 'rcp_edit_payment_after', array( $this, 'rcp_edit_payment_after' ) );
+		add_action( 'rcp_edit_membership_after', [ $this, 'rcp_edit_membership_after' ] );
+		add_action( 'rcp_edit_payment_after', [ $this, 'rcp_edit_payment_after' ] );
 
 		/**
 		 * Filter the subscription next payment delivery date.
@@ -124,7 +124,7 @@ class Extension extends AbstractPluginIntegration {
 		 *
 		 * @link https://github.com/wp-pay-gateways/mollie/blob/2.1.4/src/Integration.php#L272-L344
 		 */
-		\add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', array( $this, 'next_payment_delivery_date' ), 9, 2 );
+		\add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', [ $this, 'next_payment_delivery_date' ], 9, 2 );
 	}
 
 	/**
@@ -160,9 +160,9 @@ class Extension extends AbstractPluginIntegration {
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/batch/batch-functions.php#L254-277
 		 */
 		$queue = \RCP\Utils\Batch\get_jobs(
-			array(
+			[
 				'status' => 'incomplete',
-			)
+			]
 		);
 
 		if ( ! empty( $queue ) ) {
@@ -198,7 +198,7 @@ class Extension extends AbstractPluginIntegration {
 	 */
 	private function get_gateways() {
 		if ( null === $this->gateways ) {
-			$gateways = array(
+			$gateways = [
 				'pronamic_pay'                         => Gateway::class,
 				'pronamic_pay_apple_pay'               => ApplePayGateway::class,
 				'pronamic_pay_bancontact'              => BancontactGateway::class,
@@ -212,16 +212,16 @@ class Extension extends AbstractPluginIntegration {
 				'pronamic_pay_ideal'                   => IDealGateway::class,
 				'pronamic_pay_paypal'                  => PayPalGateway::class,
 				'pronamic_pay_sofort'                  => SofortGateway::class,
-			);
+			];
 
 			foreach ( $gateways as $gateway_id => $class ) {
 				$gateway = new $class();
 
-				$this->gateways[ $gateway_id ] = array(
+				$this->gateways[ $gateway_id ] = [
 					'label'       => $gateway->get_label(),
 					'admin_label' => $gateway->get_admin_label(),
 					'class'       => $class,
-				);
+				];
 			}
 		}
 
@@ -298,9 +298,9 @@ class Extension extends AbstractPluginIntegration {
 
 		$core_status = $payment->get_status();
 
-		$rcp_payment_data = array(
+		$rcp_payment_data = [
 			'status' => PaymentStatus::from_core( $core_status ),
-		);
+		];
 
 		switch ( $core_status ) {
 			case Core_PaymentStatus::CANCELLED:
@@ -400,24 +400,24 @@ class Extension extends AbstractPluginIntegration {
 	 */
 	public function rcp_transition_membership_status( $old_status, $new_status, $membership_id ) {
 		$query = new WP_Query(
-			array(
+			[
 				'post_type'     => 'pronamic_pay_subscr',
 				'post_status'   => 'any',
-				'meta_query'    => array(
-					array(
+				'meta_query'    => [
+					[
 						'key'   => '_pronamic_subscription_source',
 						'value' => 'rcp_membership',
-					),
-					array(
+					],
+					[
 						'key'   => '_pronamic_subscription_source_id',
 						'value' => $membership_id,
-					),
-				),
+					],
+				],
 				'nopaging'      => true,
 				'no_found_rows' => true,
 				'order'         => 'DESC',
 				'orderby'       => 'ID',
-			)
+			]
 		);
 
 		if ( ! $query->have_posts() ) {
@@ -567,11 +567,11 @@ class Extension extends AbstractPluginIntegration {
 		$text = __( 'Restrict Content Pro', 'pronamic_ideal' ) . '<br />';
 
 		$source_url = add_query_arg(
-			array(
+			[
 				'page'       => 'rcp-payments',
 				'payment_id' => $payment->source_id,
 				'view'       => 'edit-payment',
-			),
+			],
 			admin_url( 'admin.php' )
 		);
 
@@ -616,11 +616,11 @@ class Extension extends AbstractPluginIntegration {
 		switch ( $payment->source ) {
 			case 'rcp_payment':
 				return add_query_arg(
-					array(
+					[
 						'page'       => 'rcp-payments',
 						'view'       => 'edit-payment',
 						'payment_id' => $payment->source_id,
-					),
+					],
 					admin_url( 'admin.php' )
 				);
 			default:
@@ -659,11 +659,11 @@ class Extension extends AbstractPluginIntegration {
 		$text = __( 'Restrict Content Pro', 'pronamic_ideal' ) . '<br />';
 
 		$source_url = add_query_arg(
-			array(
+			[
 				'page'          => 'rcp-members',
 				'membership_id' => $subscription->get_source_id(),
 				'view'          => 'edit',
-			),
+			],
 			admin_url( 'admin.php' )
 		);
 
@@ -689,11 +689,11 @@ class Extension extends AbstractPluginIntegration {
 		switch ( $subscription->get_source() ) {
 			case 'rcp_membership':
 				return add_query_arg(
-					array(
+					[
 						'page'          => 'rcp-members',
 						'view'          => 'edit',
 						'membership_id' => $subscription->get_source_id(),
-					),
+					],
 					admin_url( 'admin.php' )
 				);
 			default:
@@ -762,7 +762,7 @@ class Extension extends AbstractPluginIntegration {
 		$rcp_payments = new \RCP_Payments();
 
 		$result = $rcp_payments->insert(
-			array(
+			[
 				'date'             => $payment->get_date()->format( 'Y-m-d g:i:s' ),
 				'payment_type'     => '',
 				'transaction_type' => 'renewal',
@@ -777,7 +777,7 @@ class Extension extends AbstractPluginIntegration {
 				'object_type'      => 'subscription',
 				'object_id'        => $rcp_membership->get_object_id(),
 				'status'           => PaymentStatus::from_core( $payment->get_status() ),
-			)
+			]
 		);
 
 		if ( false === $result ) {
@@ -842,10 +842,10 @@ class Extension extends AbstractPluginIntegration {
 
 		$result = $rcp_payments->update(
 			$payment->source_id,
-			array(
+			[
 				'status'         => PaymentStatus::from_core( $payment->get_status() ),
 				'transaction_id' => \strval( $payment->get_transaction_id() ),
-			)
+			]
 		);
 
 		if ( false === $result ) {
@@ -868,24 +868,24 @@ class Extension extends AbstractPluginIntegration {
 	 */
 	public function rcp_edit_membership_after( $membership ) {
 		$query = new \WP_Query(
-			array(
+			[
 				'post_type'     => 'pronamic_pay_subscr',
 				'post_status'   => 'any',
-				'meta_query'    => array(
-					array(
+				'meta_query'    => [
+					[
 						'key'   => '_pronamic_subscription_source',
 						'value' => 'rcp_membership',
-					),
-					array(
+					],
+					[
 						'key'   => '_pronamic_subscription_source_id',
 						'value' => $membership->get_id(),
-					),
-				),
+					],
+				],
 				'nopaging'      => true,
 				'no_found_rows' => true,
 				'order'         => 'DESC',
 				'orderby'       => 'ID',
-			)
+			]
 		);
 
 		include __DIR__ . '/../views/edit-membership.php';
@@ -903,24 +903,24 @@ class Extension extends AbstractPluginIntegration {
 	 */
 	public function rcp_edit_payment_after( $payment ) {
 		$query = new \WP_Query(
-			array(
+			[
 				'post_type'     => 'pronamic_payment',
 				'post_status'   => 'any',
-				'meta_query'    => array(
-					array(
+				'meta_query'    => [
+					[
 						'key'   => '_pronamic_payment_source',
 						'value' => 'rcp_payment',
-					),
-					array(
+					],
+					[
 						'key'   => '_pronamic_payment_source_id',
 						'value' => $payment->id,
-					),
-				),
+					],
+				],
 				'nopaging'      => true,
 				'no_found_rows' => true,
 				'order'         => 'DESC',
 				'orderby'       => 'ID',
-			)
+			]
 		);
 
 		include __DIR__ . '/../views/edit-payment.php';

@@ -46,21 +46,15 @@ class Gateway extends RCP_Payment_Gateway {
 		// Set supported features based on gateway.
 		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
 
-		if (
-			null !== $gateway
-				&&
-			$gateway->supports( 'recurring' )
-				&&
-			(
-				PaymentMethods::is_recurring_method( $this->payment_method )
-					||
-				\in_array( $this->payment_method, PaymentMethods::get_recurring_methods(), true )
-			)
-		) {
-			$this->supports = array(
-				'recurring',
-				'trial',
-			);
+		if ( null !== $gateway ) {
+			$payment_method = $gateway->get_payment_method( $this->payment_method );
+
+			if ( null !== $payment_method && $payment_method->supports( 'recurring' ) ) {
+				$this->supports = [
+					'recurring',
+					'trial',
+				];
+			}
 		}
 	}
 
@@ -182,11 +176,11 @@ class Gateway extends RCP_Payment_Gateway {
 					<?php
 
 					AdminModule::dropdown_configs(
-						array(
+						[
 							'name'           => 'rcp_settings[' . esc_attr( $config_option ) . ']',
 							'selected'       => $this->get_pronamic_config_id(),
 							'payment_method' => $this->payment_method,
-						)
+						]
 					);
 
 					?>
@@ -216,24 +210,33 @@ class Gateway extends RCP_Payment_Gateway {
 	 * @return string
 	 */
 	public function fields() {
-		ob_start();
-
 		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
 
-		if ( $gateway ) {
-			$gateway->set_payment_method( $this->payment_method );
-
-			$input = $gateway->get_input_html();
-
-			if ( $input ) {
-				echo '<fieldset class="rcp_card_fieldset"><p>';
-				// phpcs:ignore WordPress.Security.EscapeOutput
-				echo $input;
-				echo '</p></fieldset>';
-			}
+		if ( null === $gateway ) {
+			return '';
 		}
 
-		return ob_get_clean();
+		$payment_method = $gateway->get_payment_method( $this->payment_method );
+
+		if ( null === $payment_method ) {
+			return '';
+		}
+
+		$fields = $payment_method->get_fields();
+
+		if ( empty( $fields ) ) {
+			return '';
+		}
+
+		$output = '<fieldset class="rcp_card_fieldset"><p>';
+
+		foreach ( $fields as $field ) {
+			$output .= $field->render();
+		}
+
+		$output .= '</p></fieldset>';
+
+		return $output;
 	}
 
 	/**
@@ -254,7 +257,7 @@ class Gateway extends RCP_Payment_Gateway {
 			wp_die(
 				esc_html( Plugin::get_default_error_message() ),
 				esc_html__( 'Payment Error', 'pronamic_ideal' ),
-				array( 'response' => '401' )
+				[ 'response' => '401' ]
 			);
 		}
 
@@ -278,7 +281,7 @@ class Gateway extends RCP_Payment_Gateway {
 					)
 				),
 				esc_html__( 'Payment Error', 'pronamic_ideal' ),
-				array( 'response' => '401' )
+				[ 'response' => '401' ]
 			);
 		}
 
@@ -288,9 +291,9 @@ class Gateway extends RCP_Payment_Gateway {
 		if ( null !== $transaction_id ) {
 			$rcp_payments_db->update(
 				$this->payment->id,
-				array(
+				[
 					'transaction_id' => $transaction_id,
-				)
+				]
 			);
 		}
 

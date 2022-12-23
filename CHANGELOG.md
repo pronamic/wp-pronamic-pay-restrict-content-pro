@@ -7,6 +7,23 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.3.0] - 2022-12-23
+
+### Commits
+
+- Added "Requires Plugins" plugin. ([9c44f8b](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/9c44f8ba54d46bbd32b42d4ff9ac54014f4247ab))
+
+### Composer
+
+- Changed `php` from `>=5.6.20` to `>=8.0`.
+- Changed `pronamic/wp-money` from `^2.0` to `v2.2.0`.
+	Release notes: https://github.com/pronamic/wp-money/releases/tag/v4.2.1
+- Changed `wp-pay/core` from `^4.4` to `v4.6.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.2.1
+Full set of changes: [`4.2.1...4.3.0`][4.3.0]
+
+[4.3.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.2.1...v4.3.0
+
 ## [4.2.1] - 2022-09-27
 - Update to `wp-pay/core` version `^4.4`.
 

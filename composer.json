@@ -61,7 +61,7 @@
 		}
 	],
 	"require": {
-		"php": ">=8.0",
+		"php": ">=7.4",
 		"pronamic/wp-money": "^2.2",
 		"wp-pay/core": "^4.6"
 	},

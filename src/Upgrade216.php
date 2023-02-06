@@ -27,6 +27,8 @@ class Upgrade216 extends Upgrade {
 	public function __construct() {
 		parent::__construct( '2.1.6' );
 
+		\add_action( 'pronamic_pay_restrictcontentpro_upgrade_2_1_6', [ $this, 'upgrade' ], 10, 1 );
+
 		if ( \defined( '\WP_CLI' ) && \WP_CLI ) {
 			$this->cli_init();
 		}
@@ -38,6 +40,15 @@ class Upgrade216 extends Upgrade {
 	 * @return void
 	 */
 	public function execute() {
+		\as_enqueue_async_action( 'pronamic_pay_restrictcontentpro_upgrade_2_1_6', [], 'pronamic-pay' );
+	}
+
+	/**
+	 * Upgrade.
+	 *
+	 * @return void
+	 */
+	public function upgrade() {
 		$this->upgrade_subscriptions();
 		$this->upgrade_payments();
 	}
@@ -54,7 +65,7 @@ class Upgrade216 extends Upgrade {
 			function( $args, $assoc_args ) {
 				\WP_CLI::log( 'Upgrade 2.1.6' );
 
-				$this->execute();
+				$this->upgrade();
 			},
 			[
 				'shortdesc' => 'Execute Restrict Content Pro upgrade 2.1.6.',

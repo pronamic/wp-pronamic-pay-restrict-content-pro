@@ -7,6 +7,14 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.3.2] - 2023-02-07
+### Changed
+
+- Upgrade `2.1.6` now runs asynchronously.
+Full set of changes: [`4.3.1...4.3.2`][4.3.2]
+
+[4.3.2]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.3.1...v4.3.2
+
 ## [4.3.1] - 2023-01-31
 ### Composer
 

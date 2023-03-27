@@ -7,6 +7,17 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.3.3] - 2023-03-27
+
+### Commits
+
+- Set Composer type to WordPress plugin. ([9c4f989](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/9c4f989d876fa1da672768374630131dfb331ff2))
+- Created .gitattributes ([ec810be](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/ec810beb8557e73173da914d8f3581850f86d51b))
+
+Full set of changes: [`4.3.2...4.3.3`][4.3.3]
+
+[4.3.3]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.3.2...v4.3.3
+
 ## [4.3.2] - 2023-02-07
 ### Changed
 

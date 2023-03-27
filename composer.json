@@ -4,6 +4,7 @@
 	"keywords": ["wordpress", "wp", "pay", "restrict", "content", "pro", "extension", "pronamic"],
 	"homepage": "http://www.wp-pay.org/extensions/restrict-content-pro/",
 	"license": "GPL-3.0-or-later",
+	"type": "wordpress-plugin",
 	"authors": [
 		{
 			"name": "Pronamic",

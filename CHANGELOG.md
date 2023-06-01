@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.3.4] - 2023-06-01
+
+### Commits
+
+- Switch from `pronamic/wp-deployer` to `pronamic/pronamic-cli`. ([b2b76b3](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/b2b76b3124961d78824b7713847b3214359db779))
+
+Full set of changes: [`4.3.3...4.3.4`][4.3.4]
+
+[4.3.4]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.3.3...v4.3.4
+
 ## [4.3.3] - 2023-03-27
 
 ### Commits

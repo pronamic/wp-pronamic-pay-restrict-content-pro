@@ -1,6 +1,6 @@
 {
   "name": "restrict-content-pro",
-  "version": "4.3.4",
+  "version": "4.3.5",
   "description": "Restrict Content Pro driver for the WordPress payment processing library.",
   "repository": {
     "type": "git",

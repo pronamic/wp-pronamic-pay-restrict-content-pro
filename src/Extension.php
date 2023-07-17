@@ -216,6 +216,7 @@ class Extension extends AbstractPluginIntegration {
 				'pronamic_pay_direct_debit_bancontact' => DirectDebitBancontactGateway::class,
 				'pronamic_pay_direct_debit_ideal'      => DirectDebitIDealGateway::class,
 				'pronamic_pay_direct_debit_sofort'     => DirectDebitSofortGateway::class,
+				'pronamic_pay_eps'                     => EpsGateway::class,
 				'pronamic_pay_ideal'                   => IDealGateway::class,
 				'pronamic_pay_giropay'                 => GiropayGateway::class,
 				'pronamic_pay_paypal'                  => PayPalGateway::class,

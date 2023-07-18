@@ -7,6 +7,17 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.3.6] - 2023-07-18
+
+### Commits
+
+- Updated version documentation in Giropay gateway. ([c6ce14d](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/c6ce14dc0777f80801ef24aeb0abad4f8896ad56))
+- Added EPS payment method. ([c6912de](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/c6912de7789d821c4a52a7d096d61b4ad6d36e5f))
+
+Full set of changes: [`4.3.5...4.3.6`][4.3.6]
+
+[4.3.6]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.3.5...v4.3.6
+
 ## [4.3.5] - 2023-07-12
 
 ### Commits

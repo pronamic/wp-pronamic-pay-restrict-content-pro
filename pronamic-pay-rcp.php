@@ -29,7 +29,7 @@
 
 add_filter(
 	'pronamic_pay_plugin_integrations',
-	function( $integrations ) {
+	function ( $integrations ) {
 		$integrations[] = new \Pronamic\WordPress\Pay\Extensions\RestrictContentPro\Extension();
 
 		return $integrations;

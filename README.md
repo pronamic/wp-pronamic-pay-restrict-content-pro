@@ -170,5 +170,5 @@ $ wp pronamic-pay restrict-content-pro upgrade-216 upgrade-subscriptions --skip-
 
 ## Links
 
-*	[Restrict Content Pro](https://restrictcontentpro.com/)
-*	[GitHub Restrict Content Pro](https://github.com/restrictcontentpro/restrict-content-pro)
+- [Restrict Content Pro](https://restrictcontentpro.com/)
+- [GitHub Restrict Content Pro](https://github.com/restrictcontentpro/restrict-content-pro)

@@ -736,7 +736,7 @@ class Extension extends AbstractPluginIntegration {
 			throw new \Exception(
 				\sprintf(
 					'Could not find Restrict Content Pro membership with ID: %s.',
-					$membership_id
+					\esc_html( (string) $membership_id )
 				)
 			);
 		}
@@ -793,7 +793,7 @@ class Extension extends AbstractPluginIntegration {
 			throw new \Exception(
 				\sprintf(
 					'Could not create Restrict Content Pro payment for payment %s.',
-					$payment->get_id()
+					\esc_html( (string) $payment->get_id() )
 				)
 			);
 		}
@@ -861,7 +861,7 @@ class Extension extends AbstractPluginIntegration {
 			throw new \Exception(
 				\sprintf(
 					'Could not update Restrict Content Pro payment for payment %s.',
-					$payment->get_id()
+					\esc_html( (string) $payment->get_id() )
 				)
 			);
 		}

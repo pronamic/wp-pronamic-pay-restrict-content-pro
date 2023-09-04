@@ -356,50 +356,26 @@ class Extension extends AbstractPluginIntegration {
 			case Core_PaymentStatus::FAILURE:
 				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
-				/**
-				 * Find and cancel the Restrict Content Pro membership.
-				 *
-				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/membership-functions.php#L15-29
-				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/class-rcp-payments.php#L75
-				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/class-rcp-membership.php#L1700-1808
-				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/gateways/class-rcp-payment-gateway-paypal.php#L466
-				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/gateways/class-rcp-payment-gateway-paypal.php#L570-571
-				 */
-				$rcp_membership = rcp_get_membership( $rcp_payment->membership_id );
+				$rcp_membership = \rcp_get_membership( $rcp_payment->membership_id );
 
-				$should_expire = false !== $rcp_membership;
-
-				// Do not expire membership if first payment expires and subscription is active,
-				// because a newer completed payment activated the subscription.
-				$subscriptions = $payment->get_subscriptions();
-
-				foreach ( $subscriptions as $subscription ) {
-					// Check expired payment status.
-					if ( Core_PaymentStatus::EXPIRED !== $core_status ) {
-						continue;
-					}
-
-					// Check if first payment for subscription.
-					if ( ! $subscription->is_first_payment( $payment ) ) {
-						continue;
-					}
-
-					// Check if subscription is active.
-					if ( SubscriptionStatus::ACTIVE !== $subscription->get_status() ) {
-						continue;
-					}
-
-					// Do not expire membership because a newer completed payment activated the subscription.
-					$should_expire = false;
+				if ( false === $rcp_membership ) {
+					return;
 				}
 
-				if ( $should_expire ) {
-					// Set expiration date to yesterday.
-					$rcp_membership->expire();
-
-					// Set status to `pending` to prevent access to restricted content.
-					$rcp_membership->set_status( 'pending' );
+				if ( ! $rcp_membership->is_active() ) {
+					return;
 				}
+
+				$this_pronamic_payment_id = (string) $payment->get_id();
+				$last_pronamic_payment_id = (string) \rcp_get_membership_meta( $rcp_membership->get_id(), '_pronamic_payment_id', true );
+
+				if ( $this_pronamic_payment_id !== $last_pronamic_payment_id ) {
+					return;
+				}
+
+				$rcp_membership->expire();
+
+				$rcp_membership->set_status( 'pending' );
 
 				break;
 			case Core_PaymentStatus::SUCCESS:

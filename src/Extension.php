@@ -779,8 +779,7 @@ class Extension extends AbstractPluginIntegration {
 				'customer_id'      => $rcp_membership->get_customer_id(),
 				'membership_id'    => $rcp_membership->get_id(),
 				'amount'           => $payment->get_total_amount()->get_value(),
-				// Transaction ID can not be null therefore we use `strval` to cast `null` to an empty string.
-				'transaction_id'   => \strval( $payment->get_transaction_id() ),
+				'transaction_id'   => '',
 				'subscription'     => \rcp_get_subscription_name( $rcp_membership->get_object_id() ),
 				'subscription_key' => $rcp_membership->get_subscription_key(),
 				'object_type'      => 'subscription',
@@ -853,7 +852,7 @@ class Extension extends AbstractPluginIntegration {
 			$payment->source_id,
 			[
 				'status'         => PaymentStatus::from_core( $payment->get_status() ),
-				'transaction_id' => \strval( $payment->get_transaction_id() ),
+				'transaction_id' => ( Core_PaymentStatus::SUCCESS === $payment->get_status() ) ? (string) $payment->get_transaction_id() : '',
 			]
 		);
 

@@ -285,18 +285,6 @@ class Gateway extends RCP_Payment_Gateway {
 			);
 		}
 
-		// Transaction ID.
-		$transaction_id = $payment->get_transaction_id();
-
-		if ( null !== $transaction_id ) {
-			$rcp_payments_db->update(
-				$this->payment->id,
-				[
-					'transaction_id' => $transaction_id,
-				]
-			);
-		}
-
 		$gateway->redirect( $payment );
 
 		exit;

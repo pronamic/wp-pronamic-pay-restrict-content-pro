@@ -252,6 +252,39 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
+	 * Get account page URL.
+	 * 
+	 * @return string|null
+	 */
+	private function get_account_page_url() {
+		global $rcp_options;
+
+		$url = null;
+
+		if ( ! \is_array( $rcp_options ) ) {
+			return $url;
+		}
+
+		if ( ! \array_key_exists( 'account_page', $rcp_options ) ) {
+			return $url;
+		}
+
+		$page_id = (int) $rcp_options['account_page'];
+
+		if ( 0 === $page_id ) {
+			return $url;
+		}
+
+		$permalink = \get_permalink( $page_id );
+
+		if ( false === $permalink ) {
+			return $url;
+		}
+
+		return $permalink;
+	}
+
+	/**
 	 * Payment redirect URL filter.
 	 *
 	 * @param string  $url     URL.
@@ -265,6 +298,12 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		if ( Core_PaymentStatus::SUCCESS !== $payment->get_status() ) {
+			$account_page_url = $this->get_account_page_url();
+
+			if ( null !== $account_page_url ) {
+				$url = $account_page_url;
+			}
+
 			return $url;
 		}
 

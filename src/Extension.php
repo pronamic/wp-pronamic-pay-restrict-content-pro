@@ -836,6 +836,11 @@ class Extension extends AbstractPluginIntegration {
 			);
 		}
 
+		$rcp_payment_id = $result;
+
+		Util::connect_pronamic_payment_id_to_rcp_membership( $rcp_membership->get_id(), $payment );
+		Util::connect_pronamic_payment_id_to_rcp_payment( $rcp_payment_id, $payment );
+
 		// Renew membership.
 		$expiration = '';
 
@@ -856,8 +861,6 @@ class Extension extends AbstractPluginIntegration {
 		$rcp_membership->renew( true, 'active', $expiration );
 
 		// Set source.
-		$rcp_payment_id = $result;
-
 		$payment->source    = 'rcp_payment';
 		$payment->source_id = $rcp_payment_id;
 

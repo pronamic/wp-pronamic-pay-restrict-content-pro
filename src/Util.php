@@ -290,7 +290,7 @@ class Util {
 	 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/8
 	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/blob/8d32295882ac2c4b0c3d3adc6c8355eb13916edb/src/Gateway.php#L446C29-L446C80
 	 * @param int     $rcp_membership_id Restrict Content Pro membership ID.
-	 * @param Payment $paymaent          Pronamic payment object.
+	 * @param Payment $payment           Pronamic payment object.
 	 * @return void
 	 */
 	public static function connect_pronamic_payment_id_to_rcp_payment( $rcp_membership_id, Payment $payment ) {
@@ -303,7 +303,7 @@ class Util {
 	 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/8
 	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/blob/8d32295882ac2c4b0c3d3adc6c8355eb13916edb/src/Gateway.php#L446C29-L446C80
 	 * @param int     $rcp_payment_id Restrict Content Pro payment ID.
-	 * @param Payment $paymaent       Pronamic payment object.
+	 * @param Payment $payment        Pronamic payment object.
 	 * @return void
 	 */
 	public static function connect_pronamic_payment_id_to_rcp_membership( $rcp_payment_id, Payment $payment ) {

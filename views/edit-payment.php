@@ -35,7 +35,7 @@ $pronamic_payment_id = (string) \rcp_get_payment_meta( $payment->id, '_pronamic_
 			</thead>
 
 			<tbody>
-		
+
 				<?php if ( $query->have_posts() ) : ?>
 
 					<?php while ( $query->have_posts() ) : ?>
@@ -57,7 +57,7 @@ $pronamic_payment_id = (string) \rcp_get_payment_meta( $payment->id, '_pronamic_
 							<td>
 								<?php
 
-								if ( $pronamic_payment_id === (string) \get_the_ID() ) {
+								if ( (string) \get_the_ID() === $pronamic_payment_id ) {
 									echo '✓';
 								}
 
@@ -74,7 +74,7 @@ $pronamic_payment_id = (string) \rcp_get_payment_meta( $payment->id, '_pronamic_
 							<?php esc_html_e( 'No payments found.', 'pronamic_ideal' ); ?>
 						</td>
 					</tr>
-				
+
 				<?php endif; ?>
 
 			</tbody>

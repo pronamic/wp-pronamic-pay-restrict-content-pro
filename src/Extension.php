@@ -357,7 +357,7 @@ class Extension extends AbstractPluginIntegration {
 				$this_pronamic_payment_id = (string) $payment->get_id();
 				$last_pronamic_payment_id = (string) \rcp_get_payment_meta( $rcp_payment_id, '_pronamic_payment_id', true );
 
-				if ( empty( $last_pronamic_payment_id ) || $this_pronamic_payment_id === $last_pronamic_payment_id ) {
+				if ( '' === $last_pronamic_payment_id || $this_pronamic_payment_id === $last_pronamic_payment_id ) {
 					$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 				}
 
@@ -373,7 +373,7 @@ class Extension extends AbstractPluginIntegration {
 
 				$last_pronamic_payment_id = (string) \rcp_get_membership_meta( $rcp_membership->get_id(), '_pronamic_payment_id', true );
 
-				if ( ! empty( $last_pronamic_payment_id ) && $this_pronamic_payment_id !== $last_pronamic_payment_id ) {
+				if ( '' !== $last_pronamic_payment_id && $this_pronamic_payment_id !== $last_pronamic_payment_id ) {
 					return;
 				}
 
@@ -866,7 +866,7 @@ class Extension extends AbstractPluginIntegration {
 		$this_pronamic_payment_id = (string) $payment->get_id();
 		$last_pronamic_payment_id = (string) \rcp_get_payment_meta( $payment->get_source_id(), '_pronamic_payment_id', true );
 
-		if ( ! empty( $last_pronamic_payment_id ) && $this_pronamic_payment_id !== $last_pronamic_payment_id ) {
+		if ( '' !== $last_pronamic_payment_id && $this_pronamic_payment_id !== $last_pronamic_payment_id ) {
 			return;
 		}
 

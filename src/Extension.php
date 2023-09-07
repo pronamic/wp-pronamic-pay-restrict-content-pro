@@ -369,7 +369,7 @@ class Extension extends AbstractPluginIntegration {
 				$this_pronamic_payment_id = (string) $payment->get_id();
 				$last_pronamic_payment_id = (string) \rcp_get_membership_meta( $rcp_membership->get_id(), '_pronamic_payment_id', true );
 
-				if ( $this_pronamic_payment_id !== $last_pronamic_payment_id ) {
+				if ( ! empty( $last_pronamic_payment_id ) && $this_pronamic_payment_id !== $last_pronamic_payment_id ) {
 					return;
 				}
 

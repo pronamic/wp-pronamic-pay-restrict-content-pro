@@ -253,7 +253,7 @@ class Extension extends AbstractPluginIntegration {
 
 	/**
 	 * Get account page URL.
-	 * 
+	 *
 	 * @return string|null
 	 */
 	private function get_account_page_url() {
@@ -354,7 +354,12 @@ class Extension extends AbstractPluginIntegration {
 			case Core_PaymentStatus::CANCELLED:
 			case Core_PaymentStatus::EXPIRED:
 			case Core_PaymentStatus::FAILURE:
-				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
+				$this_pronamic_payment_id = (string) $payment->get_id();
+				$last_pronamic_payment_id = (string) \rcp_get_payment_meta( $rcp_payment_id, '_pronamic_payment_id', true );
+
+				if ( empty( $last_pronamic_payment_id ) || $this_pronamic_payment_id === $last_pronamic_payment_id ) {
+					$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
+				}
 
 				$rcp_membership = \rcp_get_membership( $rcp_payment->membership_id );
 
@@ -366,7 +371,6 @@ class Extension extends AbstractPluginIntegration {
 					return;
 				}
 
-				$this_pronamic_payment_id = (string) $payment->get_id();
 				$last_pronamic_payment_id = (string) \rcp_get_membership_meta( $rcp_membership->get_id(), '_pronamic_payment_id', true );
 
 				if ( ! empty( $last_pronamic_payment_id ) && $this_pronamic_payment_id !== $last_pronamic_payment_id ) {
@@ -856,6 +860,13 @@ class Extension extends AbstractPluginIntegration {
 		 * payment.
 		 */
 		if ( 'rcp_payment' !== $payment->source ) {
+			return;
+		}
+
+		$this_pronamic_payment_id = (string) $payment->get_id();
+		$last_pronamic_payment_id = (string) \rcp_get_payment_meta( $payment->get_source_id(), '_pronamic_payment_id', true );
+
+		if ( ! empty( $last_pronamic_payment_id ) && $this_pronamic_payment_id !== $last_pronamic_payment_id ) {
 			return;
 		}
 

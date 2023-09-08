@@ -252,6 +252,39 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
+	 * Get account page URL.
+	 *
+	 * @return string|null
+	 */
+	private function get_account_page_url() {
+		global $rcp_options;
+
+		$url = null;
+
+		if ( ! \is_array( $rcp_options ) ) {
+			return $url;
+		}
+
+		if ( ! \array_key_exists( 'account_page', $rcp_options ) ) {
+			return $url;
+		}
+
+		$page_id = (int) $rcp_options['account_page'];
+
+		if ( 0 === $page_id ) {
+			return $url;
+		}
+
+		$permalink = \get_permalink( $page_id );
+
+		if ( false === $permalink ) {
+			return $url;
+		}
+
+		return $permalink;
+	}
+
+	/**
 	 * Payment redirect URL filter.
 	 *
 	 * @param string  $url     URL.
@@ -265,6 +298,12 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		if ( Core_PaymentStatus::SUCCESS !== $payment->get_status() ) {
+			$account_page_url = $this->get_account_page_url();
+
+			if ( null !== $account_page_url ) {
+				$url = $account_page_url;
+			}
+
 			return $url;
 		}
 
@@ -315,52 +354,32 @@ class Extension extends AbstractPluginIntegration {
 			case Core_PaymentStatus::CANCELLED:
 			case Core_PaymentStatus::EXPIRED:
 			case Core_PaymentStatus::FAILURE:
-				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
+				$this_pronamic_payment_id = (string) $payment->get_id();
+				$last_pronamic_payment_id = (string) \rcp_get_payment_meta( $rcp_payment_id, '_pronamic_payment_id', true );
 
-				/**
-				 * Find and cancel the Restrict Content Pro membership.
-				 *
-				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/membership-functions.php#L15-29
-				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/class-rcp-payments.php#L75
-				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/class-rcp-membership.php#L1700-1808
-				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/gateways/class-rcp-payment-gateway-paypal.php#L466
-				 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/gateways/class-rcp-payment-gateway-paypal.php#L570-571
-				 */
-				$rcp_membership = rcp_get_membership( $rcp_payment->membership_id );
-
-				$should_expire = false !== $rcp_membership;
-
-				// Do not expire membership if first payment expires and subscription is active,
-				// because a newer completed payment activated the subscription.
-				$subscriptions = $payment->get_subscriptions();
-
-				foreach ( $subscriptions as $subscription ) {
-					// Check expired payment status.
-					if ( Core_PaymentStatus::EXPIRED !== $core_status ) {
-						continue;
-					}
-
-					// Check if first payment for subscription.
-					if ( ! $subscription->is_first_payment( $payment ) ) {
-						continue;
-					}
-
-					// Check if subscription is active.
-					if ( SubscriptionStatus::ACTIVE !== $subscription->get_status() ) {
-						continue;
-					}
-
-					// Do not expire membership because a newer completed payment activated the subscription.
-					$should_expire = false;
+				if ( '' === $last_pronamic_payment_id || $this_pronamic_payment_id === $last_pronamic_payment_id ) {
+					$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 				}
 
-				if ( $should_expire ) {
-					// Set expiration date to yesterday.
-					$rcp_membership->expire();
+				$rcp_membership = \rcp_get_membership( $rcp_payment->membership_id );
 
-					// Set status to `pending` to prevent access to restricted content.
-					$rcp_membership->set_status( 'pending' );
+				if ( false === $rcp_membership ) {
+					return;
 				}
+
+				if ( ! $rcp_membership->is_active() ) {
+					return;
+				}
+
+				$last_pronamic_payment_id = (string) \rcp_get_membership_meta( $rcp_membership->get_id(), '_pronamic_payment_id', true );
+
+				if ( '' !== $last_pronamic_payment_id && $this_pronamic_payment_id !== $last_pronamic_payment_id ) {
+					return;
+				}
+
+				$rcp_membership->expire();
+
+				$rcp_membership->set_status( 'pending' );
 
 				break;
 			case Core_PaymentStatus::SUCCESS:
@@ -779,8 +798,7 @@ class Extension extends AbstractPluginIntegration {
 				'customer_id'      => $rcp_membership->get_customer_id(),
 				'membership_id'    => $rcp_membership->get_id(),
 				'amount'           => $payment->get_total_amount()->get_value(),
-				// Transaction ID can not be null therefore we use `strval` to cast `null` to an empty string.
-				'transaction_id'   => \strval( $payment->get_transaction_id() ),
+				'transaction_id'   => '',
 				'subscription'     => \rcp_get_subscription_name( $rcp_membership->get_object_id() ),
 				'subscription_key' => $rcp_membership->get_subscription_key(),
 				'object_type'      => 'subscription',
@@ -797,6 +815,11 @@ class Extension extends AbstractPluginIntegration {
 				)
 			);
 		}
+
+		$rcp_payment_id = $result;
+
+		Util::connect_pronamic_payment_id_to_rcp_membership( $rcp_membership->get_id(), $payment );
+		Util::connect_pronamic_payment_id_to_rcp_payment( $rcp_payment_id, $payment );
 
 		// Renew membership.
 		$expiration = '';
@@ -818,8 +841,6 @@ class Extension extends AbstractPluginIntegration {
 		$rcp_membership->renew( true, 'active', $expiration );
 
 		// Set source.
-		$rcp_payment_id = $result;
-
 		$payment->source    = 'rcp_payment';
 		$payment->source_id = $rcp_payment_id;
 
@@ -842,6 +863,13 @@ class Extension extends AbstractPluginIntegration {
 			return;
 		}
 
+		$this_pronamic_payment_id = (string) $payment->get_id();
+		$last_pronamic_payment_id = (string) \rcp_get_payment_meta( $payment->get_source_id(), '_pronamic_payment_id', true );
+
+		if ( '' !== $last_pronamic_payment_id && $this_pronamic_payment_id !== $last_pronamic_payment_id ) {
+			return;
+		}
+
 		/**
 		 * Update Restrict Content Pro payment.
 		 *
@@ -853,7 +881,7 @@ class Extension extends AbstractPluginIntegration {
 			$payment->source_id,
 			[
 				'status'         => PaymentStatus::from_core( $payment->get_status() ),
-				'transaction_id' => \strval( $payment->get_transaction_id() ),
+				'transaction_id' => ( Core_PaymentStatus::SUCCESS === $payment->get_status() ) ? (string) $payment->get_transaction_id() : '',
 			]
 		);
 

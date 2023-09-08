@@ -269,6 +269,9 @@ class Gateway extends RCP_Payment_Gateway {
 
 		try {
 			$payment = Plugin::start_payment( $payment, $gateway );
+
+			Util::connect_pronamic_payment_id_to_rcp_membership( $this->membership->get_id(), $payment );
+			Util::connect_pronamic_payment_id_to_rcp_payment( $this->payment->id, $payment );
 		} catch ( \Exception $e ) {
 			do_action( 'rcp_registration_failed', $this );
 
@@ -282,18 +285,6 @@ class Gateway extends RCP_Payment_Gateway {
 				),
 				esc_html__( 'Payment Error', 'pronamic_ideal' ),
 				[ 'response' => '401' ]
-			);
-		}
-
-		// Transaction ID.
-		$transaction_id = $payment->get_transaction_id();
-
-		if ( null !== $transaction_id ) {
-			$rcp_payments_db->update(
-				$this->payment->id,
-				[
-					'transaction_id' => $transaction_id,
-				]
 			);
 		}
 

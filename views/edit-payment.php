@@ -10,26 +10,74 @@
  * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/payments/edit-payment.php#L127
  */
 
+$pronamic_payment_id = (string) \rcp_get_payment_meta( $payment->id, '_pronamic_payment_id', true );
+
 ?>
+<style type="text/css">
+	.pronamic-pay-payments-table th {
+		line-height: 1.4em;
+
+		padding: 8px 10px;
+	}
+</style>
+
 <tr>
 	<th scope="row" class="row-title">
-		<?php esc_html_e( 'Pronamic Pay Payment', 'pronamic_ideal' ); ?>
+		<?php esc_html_e( 'Pronamic Pay Payments', 'pronamic_ideal' ); ?>
 	</th>
 	<td>
-		<?php
+		<table class="pronamic-pay-payments-table wp-list-table widefat striped table-view-list">
+			<thead>
+				<tr>
+					<th scope="col"><?php esc_html_e( 'ID', 'pronamic_ideal' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Last', 'pronamic_ideal' ); ?></th>
+				</tr>
+			</thead>
 
-		if ( $query->have_posts() ) {
-			while ( $query->have_posts() ) {
-				$query->the_post();
+			<tbody>
 
-				printf(
-					'<a href="%s">%s</a>',
-					esc_url( get_edit_post_link() ),
-					esc_html( get_the_ID() )
-				);
-			}
-		}
+				<?php if ( $query->have_posts() ) : ?>
 
-		?>
+					<?php while ( $query->have_posts() ) : ?>
+
+						<tr>
+							<?php $query->the_post(); ?>
+
+							<td>
+								<?php
+
+								printf(
+									'<a href="%s">%s</a>',
+									esc_url( get_edit_post_link() ),
+									esc_html( get_the_ID() )
+								);
+
+								?>
+							</td>
+							<td>
+								<?php
+
+								if ( (string) \get_the_ID() === $pronamic_payment_id ) {
+									echo '✓';
+								}
+
+								?>
+							</td>
+						</tr>
+
+					<?php endwhile; ?>
+
+				<?php else : ?>
+
+					<tr>
+						<td colspan="2">
+							<?php esc_html_e( 'No payments found.', 'pronamic_ideal' ); ?>
+						</td>
+					</tr>
+
+				<?php endif; ?>
+
+			</tbody>
+		</table>
 	</td>
 </tr>

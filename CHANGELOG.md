@@ -7,6 +7,30 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.4.0] - 2023-09-11
+
+### Commits
+
+- Merge pull request #9 from pronamic/8-restrict-content-pro-failed-payment-issues ([517714b](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/517714b9710730db22b2cc1f218cdfb86be1d75e))
+- Don't use `empty()`. ([f21433a](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/f21433ac79026935f375f8768f34de9b0c6f4767))
+- Only update RCP payment failed/abandoned status for last payment. ([fc9e0ac](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/fc9e0ac41240d7fbcfcaa3a7519c5558439b21b4))
+- Updated membership status for failed payment if last payment ID meta does not yet exist. ([10ec434](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/10ec434beb82a9e1b30ad098a47bef4ff03b61d8))
+- Fixed phpcs. ([9bbc53d](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/9bbc53d5b053fdad11d4b029b3633cb111a9f967))
+- Only update active Restrict Content Pro membership if it matches the last payment. ([bf0c215](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/bf0c215e83020173e9a92604ead7043b7fdcd1db))
+- Display Pronamic Pay payments in table view. ([32c54c4](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/32c54c4ce93bf5f6779442251c538379d8c3fc02))
+- Connect last Pronamic payment to RCP payment and membership. ([9ec7fbc](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/9ec7fbc0bd0027ea38411f3e84a66b089835aa24))
+- Redirect to account page if payment is not succesful. ([6d02863](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/6d028630a6107a650cbe260d21089a77c568ddda))
+- Only store transaction ID in RCP payment if successful. ([5348592](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/5348592373b0b03256673a9b9e10b2099a0d2049))
+- Added new StellarWP GitHub link. ([c3a1e40](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/c3a1e40e8026a85bc3b167af1d7aff6ba6bd93a9))
+- Change links list notation. ([034587e](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/034587e88eaa067a5648098b4570eba4eec01510))
+- Improve escaping in exception messages. ([d792791](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/d79279195ac8968833329055bf01311abfb6637f))
+- phpcbf ([eccb6a8](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/eccb6a8c748279518a447c54fdfda0ce68168b5e))
+- Updated package.json ([c012ee9](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/c012ee9ad77d6261d53f2e02d39a42e913f3897d))
+
+Full set of changes: [`4.3.6...4.4.0`][4.4.0]
+
+[4.4.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.3.6...v4.4.0
+
 ## [4.3.6] - 2023-07-18
 
 ### Commits

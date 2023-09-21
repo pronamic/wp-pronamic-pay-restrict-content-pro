@@ -119,7 +119,6 @@ class Extension extends AbstractPluginIntegration {
 		add_filter( 'pronamic_subscription_source_text_rcp_membership', [ $this, 'subscription_source_text' ], 10, 2 );
 
 		add_action( 'pronamic_pay_new_payment', [ $this, 'new_payment' ] );
-		add_action( 'pronamic_pay_update_payment', [ $this, 'update_payment' ] );
 
 		add_action( 'rcp_edit_membership_after', [ $this, 'rcp_edit_membership_after' ] );
 		add_action( 'rcp_edit_payment_after', [ $this, 'rcp_edit_payment_after' ] );
@@ -383,6 +382,8 @@ class Extension extends AbstractPluginIntegration {
 
 				break;
 			case Core_PaymentStatus::SUCCESS:
+				$rcp_payment_data['transaction_id'] = (string) $payment->get_transaction_id();
+
 				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
 				// Renew membership if not active.
@@ -845,54 +846,6 @@ class Extension extends AbstractPluginIntegration {
 		$payment->source_id = $rcp_payment_id;
 
 		$payment->save();
-	}
-
-	/**
-	 * Update payment.
-	 *
-	 * @param Payment $payment Payment.
-	 * @return void
-	 * @throws \Exception When Restrict Content Pro returns unexpected value.
-	 */
-	public function update_payment( Payment $payment ) {
-		/**
-		 * Check if the payment is connected to a Restrict Content Pro
-		 * payment.
-		 */
-		if ( 'rcp_payment' !== $payment->source ) {
-			return;
-		}
-
-		$this_pronamic_payment_id = (string) $payment->get_id();
-		$last_pronamic_payment_id = (string) \rcp_get_payment_meta( $payment->get_source_id(), '_pronamic_payment_id', true );
-
-		if ( '' !== $last_pronamic_payment_id && $this_pronamic_payment_id !== $last_pronamic_payment_id ) {
-			return;
-		}
-
-		/**
-		 * Update Restrict Content Pro payment.
-		 *
-		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/master/includes/class-rcp-payments.php#L219-284
-		 */
-		$rcp_payments = new \RCP_Payments();
-
-		$result = $rcp_payments->update(
-			$payment->source_id,
-			[
-				'status'         => PaymentStatus::from_core( $payment->get_status() ),
-				'transaction_id' => ( Core_PaymentStatus::SUCCESS === $payment->get_status() ) ? (string) $payment->get_transaction_id() : '',
-			]
-		);
-
-		if ( false === $result ) {
-			throw new \Exception(
-				\sprintf(
-					'Could not update Restrict Content Pro payment for payment %s.',
-					\esc_html( (string) $payment->get_id() )
-				)
-			);
-		}
 	}
 
 	/**

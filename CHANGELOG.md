@@ -7,6 +7,20 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.4.1] - 2023-09-29
+
+### Fixed
+
+- Fixed duplicate payment status email.
+
+### Commits
+
+- Don't hook `pronamic_pay_update_payment` action to fix duplicate payment status updates. ([8713ba4](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/8713ba4f7d2160b4f95f59f59f67cd1c00e0d581))
+
+Full set of changes: [`4.4.0...4.4.1`][4.4.1]
+
+[4.4.1]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.4.0...v4.4.1
+
 ## [4.4.0] - 2023-09-11
 
 ### Commits

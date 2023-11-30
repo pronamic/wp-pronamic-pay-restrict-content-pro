@@ -1,48 +1,48 @@
 {
-  "name": "restrict-content-pro",
-  "version": "4.4.1",
-  "description": "Restrict Content Pro driver for the WordPress payment processing library.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wp-pay-extensions/restrict-content-pro"
-  },
-  "keywords": [
-    "wordpress",
-    "wp",
-    "pay",
-    "restrict",
-    "content",
-    "pro",
-    "extension",
-    "pronamic"
-  ],
-  "author": {
-    "name": "Pronamic",
-    "email": "info@pronamic.nl",
-    "url": "http://www.pronamic.nl/"
-  },
-  "contributors": [
-    {
-      "name": "Remco Tolsma",
-      "email": "info@remcotolsma.nl",
-      "url": "http://www.remcotolsma.nl/"
-    }
-  ],
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/wp-pay-extensions/restrict-content-pro/issues"
-  },
-  "homepage": "http://www.wp-pay.org/extensions/restrict-content-pro/",
-  "devDependencies": {
-    "@wordpress/env": "^8.6.0",
-    "npm-run-all": "^4.1.5"
-  },
-  "scripts": {
-    "start": "wp-env start && npm run setup && npm run login",
-    "setup": "npm-run-all setup-*",
-    "setup-mollie": "wp-env run cli wp config set MOLLIE_API_KEY $MOLLIE_API_KEY",
-    "setup-buckaroo-website-key": "wp-env run cli wp config set BUCKAROO_WEBSITE_KEY $BUCKAROO_WEBSITE_KEY",
-    "setup-buckaroo-secret-key": "wp-env run cli wp config set BUCKAROO_SECRET_KEY $BUCKAROO_SECRET_KEY",
-    "login": "wp-env run cli wp user one-time-login admin"
-  }
+	"name": "restrict-content-pro",
+	"version": "4.4.1",
+	"description": "Restrict Content Pro driver for the WordPress payment processing library.",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/wp-pay-extensions/restrict-content-pro"
+	},
+	"keywords": [
+		"wordpress",
+		"wp",
+		"pay",
+		"restrict",
+		"content",
+		"pro",
+		"extension",
+		"pronamic"
+	],
+	"author": {
+		"name": "Pronamic",
+		"email": "info@pronamic.nl",
+		"url": "http://www.pronamic.nl/"
+	},
+	"contributors": [
+		{
+			"name": "Remco Tolsma",
+			"email": "info@remcotolsma.nl",
+			"url": "http://www.remcotolsma.nl/"
+		}
+	],
+	"license": "GPL-3.0",
+	"bugs": {
+		"url": "https://github.com/wp-pay-extensions/restrict-content-pro/issues"
+	},
+	"homepage": "http://www.wp-pay.org/extensions/restrict-content-pro/",
+	"devDependencies": {
+		"@wordpress/env": "^8.13.0",
+		"npm-run-all": "^4.1.5"
+	},
+	"scripts": {
+		"start": "wp-env start && npm run setup && npm run login",
+		"setup": "npm-run-all setup-*",
+		"setup-mollie": "wp-env run cli wp config set MOLLIE_API_KEY $MOLLIE_API_KEY",
+		"setup-buckaroo-website-key": "wp-env run cli wp config set BUCKAROO_WEBSITE_KEY $BUCKAROO_WEBSITE_KEY",
+		"setup-buckaroo-secret-key": "wp-env run cli wp config set BUCKAROO_SECRET_KEY $BUCKAROO_SECRET_KEY",
+		"login": "wp-env run cli wp user one-time-login admin"
+	}
 }

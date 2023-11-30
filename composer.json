@@ -1,7 +1,16 @@
 {
 	"name": "wp-pay-extensions/restrict-content-pro",
 	"description": "Restrict Content Pro driver for the WordPress payment processing library.",
-	"keywords": ["wordpress", "wp", "pay", "restrict", "content", "pro", "extension", "pronamic"],
+	"keywords": [
+		"wordpress",
+		"wp",
+		"pay",
+		"restrict",
+		"content",
+		"pro",
+		"extension",
+		"pronamic"
+	],
 	"homepage": "http://www.wp-pay.org/extensions/restrict-content-pro/",
 	"license": "GPL-3.0-or-later",
 	"type": "wordpress-plugin",

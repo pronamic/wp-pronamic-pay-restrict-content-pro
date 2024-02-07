@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.4.2] - 2024-02-07
+
+### Changed
+
+- The code further complies with (WordPress) coding standards.
+
+Full set of changes: [`4.4.1...4.4.2`][4.4.2]
+
+[4.4.2]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.4.1...v4.4.2
+
 ## [4.4.1] - 2023-09-29
 
 ### Fixed

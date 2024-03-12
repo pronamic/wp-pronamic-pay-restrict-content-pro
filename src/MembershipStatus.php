@@ -80,4 +80,33 @@ class MembershipStatus {
 				return null;
 		}
 	}
+
+	/**
+	 * Transform a Restrict Content Pro subscription status to a WordPress Pay subscription status.
+	 *
+	 * @link https://github.com/wp-premium/memberpress-basic/blob/master/app/models/MeprSubscription.php#L5-L9
+	 *
+	 * @param string $status WordPress Pay status value.
+	 * @return string|null
+	 */
+	public static function transform_from_pronamic( $status ) {
+		switch ( $status ) {
+			case SubscriptionStatus::ACTIVE:
+				return self::ACTIVE;
+			case SubscriptionStatus::CANCELLED:
+				return self::CANCELLED;
+			case SubscriptionStatus::EXPIRED:
+				return self::EXPIRED;
+			case SubscriptionStatus::FAILURE:
+			case SubscriptionStatus::ON_HOLD:
+			case SubscriptionStatus::OPEN:
+				return self::PENDING;
+			case SubscriptionStatus::COMPLETED:
+				return null;
+			default:
+				return null;
+		}
+
+		return null;
+	}
 }

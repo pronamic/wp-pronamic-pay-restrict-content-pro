@@ -16,6 +16,7 @@ use Pronamic\WordPress\Pay\AbstractPluginIntegration;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use RCP_Membership;
 use RCP_Payments;
 use WP_Query;
@@ -70,17 +71,17 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public function setup() {
-		add_filter( 'pronamic_payment_source_description', [ $this, 'payment_source_description' ], 10, 2 );
-		add_filter( 'pronamic_payment_source_url', [ $this, 'payment_source_url' ], 10, 2 );
-		add_filter( 'pronamic_subscription_source_description', [ $this, 'subscription_source_description' ], 10, 2 );
-		add_filter( 'pronamic_subscription_source_url', [ $this, 'subscription_source_url' ], 10, 2 );
+		\add_filter( 'pronamic_payment_source_description', [ $this, 'payment_source_description' ], 10, 2 );
+		\add_filter( 'pronamic_payment_source_url', [ $this, 'payment_source_url' ], 10, 2 );
+		\add_filter( 'pronamic_subscription_source_description', [ $this, 'subscription_source_description' ], 10, 2 );
+		\add_filter( 'pronamic_subscription_source_url', [ $this, 'subscription_source_url' ], 10, 2 );
 
 		/*
 		 * The Restrict Content Pro plugin gets bootstrapped with priority `4`.
 		 *
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/restrict-content-pro.php#L119
 		 */
-		add_action( 'plugins_loaded', [ $this, 'plugins_loaded' ], 5 );
+		\add_action( 'plugins_loaded', [ $this, 'plugins_loaded' ], 5 );
 	}
 
 	/**
@@ -101,25 +102,26 @@ class Extension extends AbstractPluginIntegration {
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/class-restrict-content-pro.php#L199-215
 		 * @link https://github.com/wp-pay/core/blob/2.2.0/src/Admin/Install.php#L65
 		 */
-		add_action( 'admin_init', [ $this, 'admin_init_upgrades_executable' ], 4 );
+		\add_action( 'admin_init', [ $this, 'admin_init_upgrades_executable' ], 4 );
 
-		add_filter( 'rcp_payment_gateways', [ $this, 'register_pronamic_gateways' ] );
-		add_action( 'rcp_payments_settings', [ $this, 'payments_settings' ] );
-		add_action( 'rcp_transition_membership_status', [ $this, 'rcp_transition_membership_status' ], 10, 3 );
+		\add_filter( 'rcp_payment_gateways', [ $this, 'register_pronamic_gateways' ] );
+		\add_action( 'rcp_payments_settings', [ $this, 'payments_settings' ] );
+		\add_action( 'rcp_transition_membership_status', [ $this, 'rcp_transition_membership_status' ], 10, 3 );
 
-		add_filter( 'rcp_membership_can_cancel', [ $this, 'rcp_membership_can_cancel' ], 10, 3 );
-		add_filter( 'rcp_membership_payment_profile_cancelled', [ $this, 'rcp_membership_payment_profile_cancelled' ], 10, 5 );
+		\add_filter( 'rcp_membership_can_cancel', [ $this, 'rcp_membership_can_cancel' ], 10, 3 );
+		\add_filter( 'rcp_membership_payment_profile_cancelled', [ $this, 'rcp_membership_payment_profile_cancelled' ], 10, 5 );
 
-		add_action( 'pronamic_payment_status_update_rcp_payment', [ $this, 'payment_status_update' ], 10, 1 );
-		add_filter( 'pronamic_payment_redirect_url', [ $this, 'payment_redirect_url' ], 10, 2 );
-		add_filter( 'pronamic_payment_source_text_rcp_payment', [ $this, 'payment_source_text' ], 10, 2 );
+		\add_action( 'pronamic_payment_status_update_rcp_payment', [ $this, 'payment_status_update' ], 10, 1 );
+		\add_filter( 'pronamic_payment_redirect_url', [ $this, 'payment_redirect_url' ], 10, 2 );
+		\add_filter( 'pronamic_payment_source_text_rcp_payment', [ $this, 'payment_source_text' ], 10, 2 );
 
-		add_filter( 'pronamic_subscription_source_text_rcp_membership', [ $this, 'subscription_source_text' ], 10, 2 );
+		\add_action( 'pronamic_subscription_status_update_rcp_membership', [ $this, 'subscription_status_update' ], 10, 1 );
+		\add_filter( 'pronamic_subscription_source_text_rcp_membership', [ $this, 'subscription_source_text' ], 10, 2 );
 
-		add_action( 'pronamic_pay_new_payment', [ $this, 'new_payment' ] );
+		\add_action( 'pronamic_pay_new_payment', [ $this, 'new_payment' ] );
 
-		add_action( 'rcp_edit_membership_after', [ $this, 'rcp_edit_membership_after' ] );
-		add_action( 'rcp_edit_payment_after', [ $this, 'rcp_edit_payment_after' ] );
+		\add_action( 'rcp_edit_membership_after', [ $this, 'rcp_edit_membership_after' ] );
+		\add_action( 'rcp_edit_payment_after', [ $this, 'rcp_edit_payment_after' ] );
 
 		/**
 		 * Filter the subscription next payment delivery date.
@@ -143,7 +145,7 @@ class Extension extends AbstractPluginIntegration {
 		 *
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.2.3/includes/class-restrict-content-pro.php#L199-215
 		 */
-		if ( ! is_admin() ) {
+		if ( ! \is_admin() ) {
 			throw new \Exception( 'Can not run `are_upgrades_executable` function outside the WordPress admin environment.' );
 		}
 
@@ -385,7 +387,7 @@ class Extension extends AbstractPluginIntegration {
 				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
 				// Renew membership if not active.
-				$rcp_membership = rcp_get_membership( $rcp_payment->membership_id );
+				$rcp_membership = \rcp_get_membership( $rcp_payment->membership_id );
 
 				if ( MembershipStatus::ACTIVE !== $rcp_membership->get_status() ) {
 					$expiration = '';
@@ -412,6 +414,37 @@ class Extension extends AbstractPluginIntegration {
 				// Nothing to do?
 				break;
 		}
+	}
+
+	/**
+	 * Update RCP membership status on subscription status update.
+	 *
+	 * @param Subscription $pronamic_subscription Subscription.
+	 * @return void
+	 */
+	public function subscription_status_update( Subscription $pronamic_subscription ) {
+		// Check status.
+		if ( SubscriptionStatus::COMPLETED === $pronamic_subscription->get_status() ) {
+			return;
+		}
+
+		// Get Restrict Content Pro membership.
+		$membership_id = $pronamic_subscription->get_source_id();
+
+		$rcp_membership = \rcp_get_membership( $membership_id );
+
+		if ( false === $rcp_membership ) {
+			return;
+		}
+
+		// Set status.
+		$status = MembershipStatus::transform_from_pronamic( $pronamic_subscription->get_status() );
+
+		if ( null === $status ) {
+			return;
+		}
+
+		$rcp_membership->set_status( $status );
 	}
 
 	/**

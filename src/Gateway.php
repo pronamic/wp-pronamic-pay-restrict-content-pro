@@ -13,7 +13,6 @@ namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 use Pronamic\WordPress\Pay\Admin\AdminModule;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
-use RCP_Member;
 use RCP_Payment_Gateway;
 use RCP_Payments;
 

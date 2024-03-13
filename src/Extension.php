@@ -423,12 +423,10 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public function subscription_status_update( Subscription $pronamic_subscription ) {
-		// Check status.
 		if ( SubscriptionStatus::COMPLETED === $pronamic_subscription->get_status() ) {
 			return;
 		}
 
-		// Get Restrict Content Pro membership.
 		$membership_id = $pronamic_subscription->get_source_id();
 
 		$rcp_membership = \rcp_get_membership( $membership_id );
@@ -437,7 +435,6 @@ class Extension extends AbstractPluginIntegration {
 			return;
 		}
 
-		// Set status.
 		$status = MembershipStatus::transform_from_pronamic( $pronamic_subscription->get_status() );
 
 		if ( null === $status ) {
@@ -530,7 +527,6 @@ class Extension extends AbstractPluginIntegration {
 		while ( $query->have_posts() ) {
 			$query->the_post();
 
-			// Get subscription.
 			$post_id = get_the_ID();
 
 			if ( false === $post_id ) {
@@ -543,10 +539,8 @@ class Extension extends AbstractPluginIntegration {
 				continue;
 			}
 
-			// Set subscription status.
 			$subscription->set_status( $core_status );
 
-			// Add note.
 			if ( null !== $note ) {
 				$subscription->add_note( $note );
 			}
@@ -872,7 +866,6 @@ class Extension extends AbstractPluginIntegration {
 
 		$rcp_membership->renew( true, 'active', $expiration );
 
-		// Set source.
 		$payment->source    = 'rcp_payment';
 		$payment->source_id = $rcp_payment_id;
 

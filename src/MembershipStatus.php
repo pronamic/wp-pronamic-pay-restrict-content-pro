@@ -102,6 +102,7 @@ class MembershipStatus {
 			case SubscriptionStatus::OPEN:
 				return self::PENDING;
 			case SubscriptionStatus::COMPLETED:
+				// Restrict Content Pro does not have a corresponding status.
 				return null;
 			default:
 				return null;

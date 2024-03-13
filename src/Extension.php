@@ -423,10 +423,6 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public function subscription_status_update( Subscription $pronamic_subscription ) {
-		if ( SubscriptionStatus::COMPLETED === $pronamic_subscription->get_status() ) {
-			return;
-		}
-
 		$membership_id = $pronamic_subscription->get_source_id();
 
 		$rcp_membership = \rcp_get_membership( $membership_id );

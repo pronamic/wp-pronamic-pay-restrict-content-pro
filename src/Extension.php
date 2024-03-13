@@ -119,6 +119,7 @@ class Extension extends AbstractPluginIntegration {
 		\add_filter( 'pronamic_subscription_source_text_rcp_membership', [ $this, 'subscription_source_text' ], 10, 2 );
 
 		\add_action( 'pronamic_pay_new_payment', [ $this, 'new_payment' ] );
+		\add_action( 'pronamic_pay_update_payment', [ $this, 'maybe_record_restrictcontentpro_payment_refund' ], 10, 1 );
 
 		\add_action( 'rcp_edit_membership_after', [ $this, 'rcp_edit_membership_after' ] );
 		\add_action( 'rcp_edit_payment_after', [ $this, 'rcp_edit_payment_after' ] );
@@ -866,6 +867,52 @@ class Extension extends AbstractPluginIntegration {
 		$payment->source_id = $rcp_payment_id;
 
 		$payment->save();
+	}
+
+	/**
+	 * Maybe record refund for Restrict Content Pro payment.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return void
+	 */
+	public function maybe_record_restrictcontentpro_payment_refund( Payment $payment ) {
+		if ( 'rcp_payment' !== $payment->get_source() ) {
+			return;
+		}
+
+		$amount_refunded = $payment->get_refunded_amount();
+
+		$amount_charged_back = $payment->get_charged_back_amount();
+
+		if ( $amount_refunded->get_value() <= 0 && null === $amount_charged_back ) {
+			return;
+		}
+
+		/**
+		 * Find the related Restrict Content Pro payment.
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.4.4/includes/class-rcp-payments.php#L312-337
+		 */
+		$rcp_payments = new RCP_Payments();
+
+		$rcp_payment_id = $payment->get_source_id();
+
+		$rcp_payment = $rcp_payments->get_payment( $rcp_payment_id );
+
+		if ( null === $rcp_payment ) {
+			return;
+		}
+
+		if ( PaymentStatus::REFUNDED === $rcp_payment->status ) {
+			return;
+		}
+
+		$rcp_payments->update(
+			$rcp_payment_id,
+			[
+				'status' => PaymentStatus::REFUNDED,
+			]
+		);
 	}
 
 	/**

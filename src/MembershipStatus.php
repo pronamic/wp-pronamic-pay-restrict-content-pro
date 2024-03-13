@@ -84,7 +84,7 @@ class MembershipStatus {
 	/**
 	 * Transform a Restrict Content Pro subscription status to a WordPress Pay subscription status.
 	 *
-	 * @link https://github.com/wp-premium/memberpress-basic/blob/master/app/models/MeprSubscription.php#L5-L9
+	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.4.4/includes/admin/memberships/edit-membership.php?ref_type=tags#L110-117
 	 *
 	 * @param string $status WordPress Pay status value.
 	 * @return string|null

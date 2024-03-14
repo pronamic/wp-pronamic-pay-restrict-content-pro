@@ -78,7 +78,11 @@ class Util {
 		$subscription = self::new_subscription_from_rcp_gateway( $gateway );
 
 		if ( null !== $subscription ) {
-			$payment->add_period( $subscription->new_period() );
+			$new_period = $subscription->new_period();
+
+			if ( null !== $new_period ) {
+				$payment->add_period( $new_period );
+			}
 		}
 
 		/**
@@ -106,7 +110,7 @@ class Util {
 	 * @link https://github.com/wp-pay-extensions/woocommerce/blob/develop/src/Gateway.php
 	 *
 	 * @param RCP_Payment_Gateway $gateway Restrict Content Pro gateway object.
-	 * @return Payment
+	 * @return Customer
 	 */
 	public static function new_customer_from_rcp_gateway( $gateway ) {
 		// Contact name.
@@ -286,7 +290,7 @@ class Util {
 
 	/**
 	 * Store payment ID in Restrict Content Pro membership meta.
-	 * 
+	 *
 	 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/8
 	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/blob/8d32295882ac2c4b0c3d3adc6c8355eb13916edb/src/Gateway.php#L446C29-L446C80
 	 * @param int     $rcp_membership_id Restrict Content Pro membership ID.
@@ -299,7 +303,7 @@ class Util {
 
 	/**
 	 * Store payment ID in Restrict Content Pro payment meta.
-	 * 
+	 *
 	 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/8
 	 * @link https://github.com/pronamic/wp-pronamic-pay-woocommerce/blob/8d32295882ac2c4b0c3d3adc6c8355eb13916edb/src/Gateway.php#L446C29-L446C80
 	 * @param int     $rcp_payment_id Restrict Content Pro payment ID.

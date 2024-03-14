@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.4.4] - 2024-03-14
+
+### Commits
+
+- Added `wp-slug` to Composer config. ([1100c10](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/1100c10e163ee5edd8ba947ca1f949c5f4fc46f4))
+
+Full set of changes: [`4.4.3...4.4.4`][4.4.4]
+
+[4.4.4]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.4.3...v4.4.4
+
 ## [4.4.3] - 2024-03-14
 
 ### Fixed

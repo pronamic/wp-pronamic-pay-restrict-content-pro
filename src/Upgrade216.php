@@ -62,6 +62,7 @@ class Upgrade216 extends Upgrade {
 	public function cli_init() {
 		\WP_CLI::add_command(
 			'pronamic-pay restrict-content-pro upgrade-216 execute',
+			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 			function ( $args, $assoc_args ) {
 				\WP_CLI::log( 'Upgrade 2.1.6' );
 
@@ -74,6 +75,7 @@ class Upgrade216 extends Upgrade {
 
 		\WP_CLI::add_command(
 			'pronamic-pay restrict-content-pro upgrade-216 list-subscriptions',
+			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 			function ( $args, $assoc_args ) {
 				\WP_CLI::log( 'Upgrade 2.1.6 - Subscriptions List' );
 
@@ -88,6 +90,7 @@ class Upgrade216 extends Upgrade {
 
 		\WP_CLI::add_command(
 			'pronamic-pay restrict-content-pro upgrade-216 upgrade-subscriptions',
+			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 			function ( $args, $assoc_args ) {
 				\WP_CLI::log( 'Upgrade 2.1.6 - Subscriptions' );
 
@@ -107,6 +110,7 @@ class Upgrade216 extends Upgrade {
 
 		\WP_CLI::add_command(
 			'pronamic-pay restrict-content-pro upgrade-216 list-payments',
+			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 			function ( $args, $assoc_args ) {
 				\WP_CLI::log( 'Upgrade 2.1.6 - Payments List' );
 

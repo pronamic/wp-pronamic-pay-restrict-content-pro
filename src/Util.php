@@ -275,6 +275,8 @@ class Util {
 		}
 
 		// Add phases to subscription.
+		$subscription->set_phases( [] );
+
 		$subscription->add_phase( $initial_phase );
 		$subscription->add_phase( $regular_phase );
 

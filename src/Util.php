@@ -265,9 +265,15 @@ class Util {
 
 		$initial_phase->set_total_periods( 1 );
 
+		$initial_phase_end_date = $initial_phase->get_end_date();
+
+		if ( null === $initial_phase_end_date ) {
+			throw new \Exception( 'The initial subscription phase has no end date, this should not happen.' );
+		}
+
 		$regular_phase = new SubscriptionPhase(
 			$subscription,
-			$initial_phase->get_end_date(),
+			$initial_phase_end_date,
 			new SubscriptionInterval( 'P' . \intval( $gateway->length ) . LengthUnit::to_core( $gateway->length_unit ) ),
 			new Money( $gateway->amount, $gateway->currency )
 		);

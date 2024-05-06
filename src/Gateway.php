@@ -268,12 +268,12 @@ class Gateway extends RCP_Payment_Gateway {
 		$gateway = $this->get_pronamic_gateway();
 
 		if ( empty( $gateway ) ) {
-			do_action( 'rcp_registration_failed', $this );
+			\do_action( 'rcp_registration_failed', $this );
 
-			wp_die(
-				esc_html( Plugin::get_default_error_message() ),
-				esc_html__( 'Payment Error', 'pronamic_ideal' ),
-				[ 'response' => '401' ]
+			\wp_die(
+				\esc_html( Plugin::get_default_error_message() ),
+				\esc_html__( 'Payment Error', 'pronamic_ideal' ),
+				[ 'response' => 401 ]
 			);
 		}
 
@@ -289,18 +289,18 @@ class Gateway extends RCP_Payment_Gateway {
 			Util::connect_pronamic_payment_id_to_rcp_membership( $this->membership->get_id(), $payment );
 			Util::connect_pronamic_payment_id_to_rcp_payment( $this->payment->id, $payment );
 		} catch ( \Exception $e ) {
-			do_action( 'rcp_registration_failed', $this );
+			\do_action( 'rcp_registration_failed', $this );
 
-			wp_die(
-				esc_html(
-					sprintf(
+			\wp_die(
+				\esc_html(
+					\sprintf(
 						/* translators: %s: JSON encoded payment data */
 						__( 'Payment creation failed before sending buyer to the payment provider. Error: %s', 'pronamic_ideal' ),
 						$e->getMessage()
 					)
 				),
-				esc_html__( 'Payment Error', 'pronamic_ideal' ),
-				[ 'response' => '401' ]
+				\esc_html__( 'Payment Error', 'pronamic_ideal' ),
+				[ 'response' => 401 ]
 			);
 		}
 

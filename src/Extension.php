@@ -25,6 +25,7 @@ use WP_Query;
  * 
  * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/gateways/class-rcp-payment-gateways.php#L47
  * @phpstan-type RestrictContentProGatewayRegistration array{label: string, admin_label: string, class: class-string}
+ * @phpstan-type RestrictContentProPaymentObject object{id: int, membership_id: int, status: string}
  */
 class Extension extends AbstractPluginIntegration {
 	/**
@@ -333,13 +334,14 @@ class Extension extends AbstractPluginIntegration {
 
 		$rcp_payment_id = (int) $payment->get_source_id();
 
+		/**
+		 * The RCP Payments class will return a `object`.
+		 *
+		 * @var null|RestrictContentProPaymentObject $rcp_payment Restrict Content Pro payment object.
+		 */
 		$rcp_payment = $rcp_payments->get_payment( $rcp_payment_id );
 
-		if ( is_null( $rcp_payment ) ) {
-			return;
-		}
-
-		if ( ! \property_exists( $rcp_payment, 'status' ) ) {
+		if ( null === $rcp_payment ) {
 			return;
 		}
 
@@ -358,10 +360,10 @@ class Extension extends AbstractPluginIntegration {
 			case Core_PaymentStatus::CANCELLED:
 			case Core_PaymentStatus::EXPIRED:
 			case Core_PaymentStatus::FAILURE:
-				$this_pronamic_payment_id = (string) $payment->get_id();
-				$last_pronamic_payment_id = (string) \rcp_get_payment_meta( $rcp_payment_id, '_pronamic_payment_id', true );
+				$this_pronamic_payment_id = $payment->get_id();
+				$last_pronamic_payment_id = \rcp_get_payment_meta( $rcp_payment_id, '_pronamic_payment_id', true );
 
-				if ( '' === $last_pronamic_payment_id || $this_pronamic_payment_id === $last_pronamic_payment_id ) {
+				if ( '' == $last_pronamic_payment_id || $this_pronamic_payment_id == $last_pronamic_payment_id ) {
 					$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 				}
 
@@ -375,9 +377,9 @@ class Extension extends AbstractPluginIntegration {
 					return;
 				}
 
-				$last_pronamic_payment_id = (string) \rcp_get_membership_meta( $rcp_membership->get_id(), '_pronamic_payment_id', true );
+				$last_pronamic_payment_id = \rcp_get_membership_meta( $rcp_membership->get_id(), '_pronamic_payment_id', true );
 
-				if ( '' !== $last_pronamic_payment_id && $this_pronamic_payment_id !== $last_pronamic_payment_id ) {
+				if ( '' != $last_pronamic_payment_id && $this_pronamic_payment_id != $last_pronamic_payment_id ) {
 					return;
 				}
 
@@ -391,7 +393,6 @@ class Extension extends AbstractPluginIntegration {
 
 				$rcp_payments->update( $rcp_payment_id, $rcp_payment_data );
 
-				// Renew membership if not active.
 				$rcp_membership = \rcp_get_membership( $rcp_payment->membership_id );
 
 				if ( false === $rcp_membership ) {
@@ -432,7 +433,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public function subscription_status_update( Subscription $pronamic_subscription ) {
-		$membership_id = $pronamic_subscription->get_source_id();
+		$membership_id = (int) $pronamic_subscription->get_source_id();
 
 		$rcp_membership = \rcp_get_membership( $membership_id );
 
@@ -525,7 +526,7 @@ class Extension extends AbstractPluginIntegration {
 				break;
 		}
 
-		if ( is_null( $core_status ) ) {
+		if ( null === $core_status ) {
 			return;
 		}
 
@@ -905,13 +906,14 @@ class Extension extends AbstractPluginIntegration {
 
 		$rcp_payment_id = (int) $payment->get_source_id();
 
+		/**
+		 * The RCP Payments class will return a `object`.
+		 *
+		 * @var null|RestrictContentProPaymentObject $rcp_payment Restrict Content Pro payment object.
+		 */
 		$rcp_payment = $rcp_payments->get_payment( $rcp_payment_id );
 
 		if ( null === $rcp_payment ) {
-			return;
-		}
-
-		if ( ! \property_exists( $rcp_payment, 'status' ) ) {
 			return;
 		}
 
@@ -966,15 +968,10 @@ class Extension extends AbstractPluginIntegration {
 	 * Restrict Content Pro edit payment after.
 	 *
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/payments/edit-payment.php#L127
-	 *
-	 * @param object $payment Restrict Content Pro payment.
+	 * @param RestrictContentProPaymentObject $payment Restrict Content Pro payment.
 	 * @return void
 	 */
 	public function rcp_edit_payment_after( $payment ) {
-		if ( ! \property_exists( $payment, 'id' ) ) {
-			return;
-		}
-
 		$query = new \WP_Query(
 			[
 				'post_type'     => 'pronamic_payment',

@@ -27,12 +27,12 @@ class RestrictContentProDependency extends \Pronamic\WordPress\Pay\Dependencies\
 	 * @return bool True if dependency is met, false otherwise.
 	 */
 	public function is_met() {
-		if ( ! \defined( '\RCP_PLUGIN_VERSION' ) ) {
+		if ( ! \defined( 'RCP_PLUGIN_VERSION' ) ) {
 			return false;
 		}
 
 		return \version_compare(
-			\RCP_PLUGIN_VERSION,
+			RCP_PLUGIN_VERSION,
 			'3.0.0',
 			'>='
 		);

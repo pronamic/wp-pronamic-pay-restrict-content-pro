@@ -40,24 +40,19 @@ class Util {
 	 * @return Payment
 	 */
 	public static function new_payment_from_rcp_gateway( $gateway ) {
-		// Payment.
 		$payment = new Payment();
 
-		// Title.
 		$payment->title = sprintf(
 			/* translators: %s: Restrict Content Pro payment ID */
 			__( 'Restrict Content Pro payment %s', 'pronamic_ideal' ),
 			\property_exists( $gateway->payment, 'id' ) ? $gateway->payment->id : '?'
 		);
 
-		// Description.
 		$payment->set_description( $gateway->subscription_name );
 
-		// Source.
 		$payment->source    = 'rcp_payment';
 		$payment->source_id = \property_exists( $gateway->payment, 'id' ) ? $gateway->payment->id : ''
 
-		// Issuer.
 		if ( array_key_exists( 'post_data', $gateway->subscription_data ) ) {
 			$post_data = $gateway->subscription_data['post_data'];
 
@@ -66,15 +61,12 @@ class Util {
 			}
 		}
 
-		// Customer.
 		$customer = self::new_customer_from_rcp_gateway( $gateway );
 
 		$payment->set_customer( $customer );
 
-		// Payment lines.
 		$payment->lines = self::new_payment_lines_from_rcp_gateway( $gateway );
 
-		// Subscription.
 		$subscription = self::new_subscription_from_rcp_gateway( $gateway );
 
 		if ( null !== $subscription ) {
@@ -104,7 +96,6 @@ class Util {
 
 		$payment->set_total_amount( $amount );
 
-		// Result.
 		return $payment;
 	}
 

@@ -230,7 +230,7 @@ class Util {
 		}
 
 		// Get existing subscription for membership.
-		$subscriptions = \get_pronamic_subscriptions_by_source( 'rcp_membership', $gateway->membership->get_id() );
+		$subscriptions = \get_pronamic_subscriptions_by_source( 'rcp_membership', (string) $gateway->membership->get_id() );
 
 		$subscription = array_shift( $subscriptions );
 

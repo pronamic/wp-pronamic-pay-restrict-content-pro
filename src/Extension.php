@@ -963,6 +963,10 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public function rcp_edit_payment_after( $payment ) {
+		if ( ! \property_exists( $payment, 'id' ) ) {
+			return;
+		}
+
 		$query = new \WP_Query(
 			[
 				'post_type'     => 'pronamic_payment',

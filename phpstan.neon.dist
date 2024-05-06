@@ -4,4 +4,6 @@ parameters:
 	paths:
 		- src/
 	scanDirectories:
+		- vendor/wp-cli/wp-cli/php/
+		- wp-content/plugins/action-scheduler/
 		- wp-content/plugins/restrict-content/

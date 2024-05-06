@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\Pay\Admin\AdminModule;
+use Pronamic\WordPress\Pay\Core\Gateway as PronamicGateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Plugin;
 use RCP_Payment_Gateway;
@@ -43,7 +44,7 @@ class Gateway extends RCP_Payment_Gateway {
 	 */
 	public function init() {
 		// Set supported features based on gateway.
-		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
+		$gateway = $this->get_pronamic_gateway();
 
 		if ( null !== $gateway ) {
 			$payment_method = $gateway->get_payment_method( $this->payment_method );
@@ -86,14 +87,33 @@ class Gateway extends RCP_Payment_Gateway {
 	}
 
 	/**
+	 * Get the Pronamic gateway.
+	 * 
+	 * @return PronamicGateway|null
+	 */
+	private function get_pronamic_gateway() {
+		$config_id = $this->get_pronamic_config_id();
+
+		if ( null === $config_id ) {
+			return null;
+		}
+		
+		if ( '' === $config_id ) {
+			return null;
+		}
+
+		return Plugin::get_gateway( (int) $config_id );
+	}
+
+	/**
 	 * Get label from settings, fallback to core payment method name.
 	 *
-	 * @return string|null
+	 * @return string
 	 */
 	public function get_label() {
 		global $rcp_options;
 
-		$label = PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
+		$label = (string) PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
 
 		// Check options.
 		if ( ! \is_array( $rcp_options ) ) {
@@ -127,8 +147,8 @@ class Gateway extends RCP_Payment_Gateway {
 	 * Add the iDEAL configuration settings to the Restrict Content Pro payment gateways settings page.
 	 *
 	 * @link https://github.com/restrictcontentpro/restrict-content-pro/blob/2.2.8/includes/admin/settings/register-settings.php#L126
-	 *
-	 * @param array $rcp_options Restrict Content Pro options.
+	 * @param array<string, mixed> $rcp_options Restrict Content Pro options.
+	 * @return void
 	 */
 	public function payments_settings( $rcp_options ) {
 		$config_option = $this->id . '_config_id';
@@ -196,7 +216,8 @@ class Gateway extends RCP_Payment_Gateway {
 	 * Payment fields for this gateway
 	 *
 	 * @version 1.0.0
-	 * @see     https://github.com/restrictcontentpro/restrict-content-pro/blob/1.9.4/includes/checkout/template.php#L167
+	 * @link https://github.com/restrictcontentpro/restrict-content-pro/blob/1.9.4/includes/checkout/template.php#L167
+	 * @return void
 	 */
 	public function payment_fields() {
 		// phpcs:ignore WordPress.Security.EscapeOutput
@@ -209,7 +230,7 @@ class Gateway extends RCP_Payment_Gateway {
 	 * @return string
 	 */
 	public function fields() {
-		$gateway = Plugin::get_gateway( $this->get_pronamic_config_id() );
+		$gateway = $this->get_pronamic_gateway();
 
 		if ( null === $gateway ) {
 			return '';
@@ -240,15 +261,11 @@ class Gateway extends RCP_Payment_Gateway {
 
 	/**
 	 * Process signup.
-	 *
-	 * @global RCP_Payments $rcp_payments_db Restrict Content Pro payments object.
+	 * 
+	 * @return void
 	 */
 	public function process_signup() {
-		global $rcp_payments_db;
-
-		$config_id = $this->get_pronamic_config_id();
-
-		$gateway = Plugin::get_gateway( $config_id );
+		$gateway = $this->get_pronamic_gateway();
 
 		if ( empty( $gateway ) ) {
 			do_action( 'rcp_registration_failed', $this );
@@ -262,12 +279,12 @@ class Gateway extends RCP_Payment_Gateway {
 
 		$payment = Util::new_payment_from_rcp_gateway( $this );
 
-		$payment->config_id = $config_id;
+		$payment->config_id = (int) $this->get_pronamic_config_id();
 
 		$payment->set_payment_method( $this->payment_method );
 
 		try {
-			$payment = Plugin::start_payment( $payment, $gateway );
+			$payment = Plugin::start_payment( $payment );
 
 			Util::connect_pronamic_payment_id_to_rcp_membership( $this->membership->get_id(), $payment );
 			Util::connect_pronamic_payment_id_to_rcp_payment( $this->payment->id, $payment );

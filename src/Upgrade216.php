@@ -12,6 +12,7 @@ namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use Pronamic\WordPress\Pay\Upgrades\Upgrade;
+use WP_Post;
 
 /**
  * Upgrade 2.1.6
@@ -128,7 +129,7 @@ class Upgrade216 extends Upgrade {
 	 * Get subscription posts to upgrade.
 	 *
 	 * @param array $args Query arguments.
-	 * @return array
+	 * @return WP_Post[]
 	 */
 	private function get_subscription_posts( $args = [] ) {
 		$args['post_type']     = 'pronamic_pay_subscr';
@@ -381,6 +382,8 @@ class Upgrade216 extends Upgrade {
 
 	/**
 	 * Upgrade payments.
+	 * 
+	 * @return void
 	 */
 	private function upgrade_payments() {
 		$payment_posts = $this->get_payment_posts();

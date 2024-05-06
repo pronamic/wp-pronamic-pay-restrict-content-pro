@@ -22,12 +22,15 @@ use WP_Query;
 
 /**
  * Extension class
+ * 
+ * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/gateways/class-rcp-payment-gateways.php#L47
+ * @phpstan-type RestrictContentProGatewayRegistration array{label: string, admin_label: string, class: class-string}
  */
 class Extension extends AbstractPluginIntegration {
 	/**
 	 * Registered gateways.
 	 *
-	 * @var array<string, array<string, string>>
+	 * @var array<string, RestrictContentProGatewayRegistration>
 	 */
 	private $gateways;
 
@@ -186,8 +189,8 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * Register Pronamic gateways.
 	 *
-	 * @param array<string, array<string, string>> $gateways Gateways.
-	 * @return array<string, array<string, string>>
+	 * @param array<string, RestrictContentProGatewayRegistration> $gateways Gateways.
+	 * @return array<string, RestrictContentProGatewayRegistration>
 	 */
 	public function register_pronamic_gateways( $gateways ) {
 		return array_merge( $gateways, $this->get_gateways() );
@@ -196,7 +199,7 @@ class Extension extends AbstractPluginIntegration {
 	/**
 	 * Get Pronamic gateways.
 	 *
-	 * @return array<string, array<string, string>>
+	 * @return array<string, RestrictContentProGatewayRegistration>
 	 */
 	private function get_gateways() {
 		if ( null === $this->gateways ) {
@@ -242,7 +245,9 @@ class Extension extends AbstractPluginIntegration {
 		foreach ( $this->get_gateways() as $data ) {
 			$gateway = new $data['class']();
 
-			$gateway->payments_settings( $rcp_options );
+			if ( $gateway instanceof Gateway ) {
+				$gateway->payments_settings( $rcp_options );
+			}
 		}
 	}
 
@@ -326,11 +331,15 @@ class Extension extends AbstractPluginIntegration {
 		 */
 		$rcp_payments = new RCP_Payments();
 
-		$rcp_payment_id = $payment->get_source_id();
+		$rcp_payment_id = (int) $payment->get_source_id();
 
 		$rcp_payment = $rcp_payments->get_payment( $rcp_payment_id );
 
 		if ( is_null( $rcp_payment ) ) {
+			return;
+		}
+
+		if ( ! \property_exists( $rcp_payment, 'status' ) ) {
 			return;
 		}
 

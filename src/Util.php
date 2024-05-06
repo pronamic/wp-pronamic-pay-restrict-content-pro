@@ -225,9 +225,9 @@ class Util {
 	 * @link https://restrictcontentpro.com/tour/payment-gateways/add-your-own/
 	 * @link http://docs.pippinsplugins.com/article/812-payment-gateway-api
 	 * @link https://github.com/wp-pay-extensions/woocommerce/blob/develop/src/Gateway.php
-	 *
 	 * @param RCP_Payment_Gateway $gateway Restrict Content Pro gateway object.
 	 * @return Subscription|null
+	 * @throws \Exception Throws an exception if the initial subscription phase has no end date.
 	 */
 	public static function new_subscription_from_rcp_gateway( $gateway ) {
 		if ( ! $gateway->auto_renew ) {

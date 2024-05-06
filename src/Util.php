@@ -150,14 +150,19 @@ class Util {
 	 *
 	 * @param RCP_Payment_Gateway $gateway Restrict Content Pro gateway object.
 	 * @return PaymentLines
+	 * @throws \Exception Throws an exception if the Restrict Content data does not meet expectations.
 	 */
 	public static function new_payment_lines_from_rcp_gateway( $gateway ) {
+		if ( ! \property_exists( $gateway->payment, 'subtotal' ) ) {
+			throw new \Exception( 'Payment object from Restrict Content gateway object does not contain a subtotal.' );
+		}
+
 		$lines = new PaymentLines();
 
 		// Membership.
 		$line = $lines->new_line();
 
-		$line->set_id( $gateway->subscription_id );
+		$line->set_id( (string) $gateway->subscription_id );
 		$line->set_sku( null );
 		$line->set_type( PaymentLineType::DIGITAL );
 		$line->set_name( $gateway->subscription_name );
@@ -172,16 +177,20 @@ class Util {
 		if ( $gateway->discount ) {
 			$line = $lines->new_line();
 
-			$line->set_id( null );
-			$line->set_sku( null );
-			$line->set_type( PaymentLineType::DISCOUNT );
-			$line->set_name(
-				sprintf(
+			$name = \__( 'Discount', 'pronamic_ideal' );
+
+			if ( \property_exists( $gateway, 'discount_code' ) ) {
+				$name = \sprintf(
 					/* translators: %s: Restrict Content Pro discount code */
 					__( 'Discount code `%s`', 'pronamic_ideal' ),
 					$gateway->discount_code
-				)
-			);
+				);
+			}
+
+			$line->set_id( null );
+			$line->set_sku( null );
+			$line->set_type( PaymentLineType::DISCOUNT );
+			$line->set_name( $name );
 			$line->set_quantity( 1 );
 			$line->set_unit_price( new Money( -$gateway->discount, $gateway->currency ) );
 			$line->set_total_amount( new Money( -$gateway->discount, $gateway->currency ) );
@@ -191,7 +200,7 @@ class Util {
 		}
 
 		// Fees.
-		if ( $gateway->payment->fees ) {
+		if ( \property_exists( $gateway->payment, 'fees' ) ) {
 			$line = $lines->new_line();
 
 			$line->set_id( null );

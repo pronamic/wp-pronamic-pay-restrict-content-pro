@@ -38,20 +38,25 @@ class Util {
 	 *
 	 * @param RCP_Payment_Gateway $gateway Restrict Content Pro gateway object.
 	 * @return Payment
+	 * @throws \Exception Throws an exception if the Restrict Content data does not meet expectations.
 	 */
 	public static function new_payment_from_rcp_gateway( $gateway ) {
 		$payment = new Payment();
 
+		if ( ! \property_exists( $gateway->payment, 'id' ) ) {
+			throw new \Exception( 'Payment object from Restrict Content gateway object does not contain an ID.' );
+		}
+
 		$payment->title = sprintf(
 			/* translators: %s: Restrict Content Pro payment ID */
 			__( 'Restrict Content Pro payment %s', 'pronamic_ideal' ),
-			\property_exists( $gateway->payment, 'id' ) ? $gateway->payment->id : '?'
+			$gateway->payment->id
 		);
 
 		$payment->set_description( $gateway->subscription_name );
 
 		$payment->source    = 'rcp_payment';
-		$payment->source_id = \property_exists( $gateway->payment, 'id' ) ? $gateway->payment->id : '';
+		$payment->source_id = $gateway->payment->id;
 
 		if ( array_key_exists( 'post_data', $gateway->subscription_data ) ) {
 			$post_data = $gateway->subscription_data['post_data'];

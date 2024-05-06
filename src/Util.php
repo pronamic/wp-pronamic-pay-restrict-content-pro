@@ -51,7 +51,7 @@ class Util {
 		$payment->set_description( $gateway->subscription_name );
 
 		$payment->source    = 'rcp_payment';
-		$payment->source_id = \property_exists( $gateway->payment, 'id' ) ? $gateway->payment->id : ''
+		$payment->source_id = \property_exists( $gateway->payment, 'id' ) ? $gateway->payment->id : '';
 
 		if ( array_key_exists( 'post_data', $gateway->subscription_data ) ) {
 			$post_data = $gateway->subscription_data['post_data'];

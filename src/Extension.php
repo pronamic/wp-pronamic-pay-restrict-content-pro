@@ -22,7 +22,7 @@ use RCP_Payments;
 use WP_Query;
 
 /**
- * Extension
+ * Extension class
  *
  * @author  Reüel van der Steege
  * @version 2.2.2

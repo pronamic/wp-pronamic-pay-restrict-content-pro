@@ -47,7 +47,7 @@ class Util {
 		$payment->title = sprintf(
 			/* translators: %s: Restrict Content Pro payment ID */
 			__( 'Restrict Content Pro payment %s', 'pronamic_ideal' ),
-			$gateway->payment->id
+			\property_exists( $gateway->payment, 'id' ) ? $gateway->payment->id : '?'
 		);
 
 		// Description.
@@ -55,7 +55,7 @@ class Util {
 
 		// Source.
 		$payment->source    = 'rcp_payment';
-		$payment->source_id = $gateway->payment->id;
+		$payment->source_id = \property_exists( $gateway->payment, 'id' ) ? $gateway->payment->id : ''
 
 		// Issuer.
 		if ( array_key_exists( 'post_data', $gateway->subscription_data ) ) {

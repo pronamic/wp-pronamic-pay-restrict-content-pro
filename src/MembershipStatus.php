@@ -107,7 +107,5 @@ class MembershipStatus {
 			default:
 				return null;
 		}
-
-		return null;
 	}
 }

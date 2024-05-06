@@ -1,5 +1,7 @@
 parameters:
 	customRulesetUsed: false
+	dynamicConstantNames:
+		- RCP_PLUGIN_VERSION
 	level: max
 	paths:
 		- src/

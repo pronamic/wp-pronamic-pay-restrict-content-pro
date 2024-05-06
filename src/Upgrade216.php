@@ -12,6 +12,8 @@ namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
 
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use Pronamic\WordPress\Pay\Upgrades\Upgrade;
+use RCP_Customer;
+use RCP_Membership;
 use WP_Post;
 
 /**
@@ -129,7 +131,7 @@ class Upgrade216 extends Upgrade {
 	 * Get subscription posts to upgrade.
 	 *
 	 * @param array<string, mixed> $args Query arguments.
-	 * @return array<int|WP_Post>
+	 * @return WP_Post[]
 	 */
 	private function get_subscription_posts( $args = [] ) {
 		$args['post_type']     = 'pronamic_pay_subscr';
@@ -147,13 +149,20 @@ class Upgrade216 extends Upgrade {
 
 		$query = new \WP_Query( $args );
 
-		return $query->posts;
+		$subscription_posts = \array_filter(
+			$query->posts,
+			function ( $subscription_post ) {
+				return ( $subscription_post instanceof WP_Post );
+			}
+		);
+
+		return $subscription_posts;
 	}
 
 	/**
 	 * Get payment posts to upgrade.
 	 *
-	 * @return array<int|WP_Post>
+	 * @return WP_Post[]
 	 */
 	private function get_payment_posts() {
 		$query = new \WP_Query(
@@ -173,7 +182,14 @@ class Upgrade216 extends Upgrade {
 			]
 		);
 
-		return $query->posts;
+		$payment_posts = \array_filter(
+			$query->posts,
+			function ( $payment_post ) {
+				return ( $payment_post instanceof WP_Post );
+			}
+		);
+
+		return $payment_posts;
 	}
 
 	/**
@@ -194,20 +210,16 @@ class Upgrade216 extends Upgrade {
 	 *
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/memberships/class-rcp-membership.php#L376-391
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.1/includes/customers/class-rcp-customer.php#L198-207
-	 * @param \RCP_Membership|null $rcp_membership Restrict Content Pro membership.
-	 * @param int                  $wp_user_id     WordPress user ID.
-	 * @return boolean True if Restrict Content Pro membership is for the specified WordPress user ID, false otherwise.
+	 * @param RCP_Membership $rcp_membership Restrict Content Pro membership.
+	 * @param int            $wp_user_id     WordPress user ID.
+	 * @return bool True if Restrict Content Pro membership is for the specified WordPress user ID, false otherwise.
 	 */
 	private function is_rcp_membership_for_wp_user_id( $rcp_membership, $wp_user_id ) {
-		if ( null === $rcp_membership ) {
-			return false;
-		}
-
 		$rcp_customer = $rcp_membership->get_customer();
 
 		$rcp_customer_user_id = null;
 
-		if ( $rcp_customer instanceof \RCP_Customer ) {
+		if ( $rcp_customer instanceof RCP_Customer ) {
 			$rcp_customer_user_id = \intval( $rcp_customer->get_user_id() );
 		}
 
@@ -241,12 +253,7 @@ class Upgrade216 extends Upgrade {
 			$query_args['post__in'] = \explode( ',', $args['post__in'] );
 		}
 
-		$subscription_posts = \array_filter(
-			$this->get_subscription_posts( $query_args ),
-			function ( $subscription_post ) {
-				return ( $subscription_post instanceof WP_Post );
-			}
-		);
+		$subscription_posts = $this->get_subscription_posts( $query_args );
 
 		$this->log(
 			\sprintf(
@@ -284,6 +291,14 @@ class Upgrade216 extends Upgrade {
 			$subscription_source    = \get_post_meta( $subscription_post_id, '_pronamic_subscription_source', true );
 			$subscription_source_id = \get_post_meta( $subscription_post_id, '_pronamic_subscription_source_id', true );
 
+			if ( ! \is_scalar( $subscription_source ) ) {
+				continue;
+			}
+
+			if ( ! \is_scalar( $subscription_source_id ) ) {
+				continue;
+			}
+
 			\update_post_meta( $subscription_post_id, '_pronamic_subscription_rcp_update_source', $subscription_source );
 			\update_post_meta( $subscription_post_id, '_pronamic_subscription_rcp_update_source_id', $subscription_source_id );
 
@@ -296,11 +311,11 @@ class Upgrade216 extends Upgrade {
 			 * In Restrict Content Pro versions before 3.0 we may have saved the Restrict Content Pro payment ID as source ID.
 			 */
 			if ( null === $rcp_membership ) {
-				$potential_rcp_payment_id = $subscription_source_id;
+				$potential_rcp_payment_id = (int) $subscription_source_id;
 
 				$potential_rcp_membership = $this->get_rcp_membership_by_rcp_payment_id( $potential_rcp_payment_id );
 
-				if ( $this->is_rcp_membership_for_wp_user_id( $potential_rcp_membership, $pronamic_subscription_post_author_id ) ) {
+				if ( null !== $potential_rcp_membership && $this->is_rcp_membership_for_wp_user_id( $potential_rcp_membership, $pronamic_subscription_post_author_id ) ) {
 					$rcp_membership = $potential_rcp_membership;
 
 					$this->log(
@@ -317,11 +332,11 @@ class Upgrade216 extends Upgrade {
 			 * In Restrict Content Pro versions before 3.0 we may have saved the WordPress user ID as source ID.
 			 */
 			if ( null === $rcp_membership ) {
-				$potential_wp_user_id = $subscription_source_id;
+				$potential_wp_user_id = (int) $subscription_source_id;
 
 				$potential_rcp_membership = $this->get_rcp_membership_by_wp_user_id( $potential_wp_user_id );
 
-				if ( $this->is_rcp_membership_for_wp_user_id( $potential_rcp_membership, $pronamic_subscription_post_author_id ) ) {
+				if ( null !== $potential_rcp_membership && $this->is_rcp_membership_for_wp_user_id( $potential_rcp_membership, $pronamic_subscription_post_author_id ) ) {
 					$rcp_membership = $potential_rcp_membership;
 
 					$this->log(
@@ -414,6 +429,14 @@ class Upgrade216 extends Upgrade {
 			$payment_source    = \get_post_meta( $payment_post_id, '_pronamic_payment_source', true );
 			$payment_source_id = \get_post_meta( $payment_post_id, '_pronamic_payment_source_id', true );
 
+			if ( ! \is_scalar( $payment_source ) ) {
+				continue;
+			}
+
+			if ( ! \is_scalar( $payment_source_id ) ) {
+				continue;
+			}
+
 			\update_post_meta( $payment_post_id, '_pronamic_payment_rcp_update_source', $payment_source );
 			\update_post_meta( $payment_post_id, '_pronamic_payment_rcp_update_source_id', $payment_source_id );
 
@@ -428,13 +451,27 @@ class Upgrade216 extends Upgrade {
 			if ( null === $rcp_payment ) {
 				$potential_rcp_payment_id = $payment_source_id;
 
-				$rcp_payment = $this->get_rcp_payment_by_rcp_payment_id( $potential_rcp_payment_id );
+				$rcp_payment = $this->get_rcp_payment_by_rcp_payment_id( (int) $potential_rcp_payment_id );
 			}
 
 			/**
 			 * No match, no problem.
 			 */
 			if ( null === $rcp_payment ) {
+				continue;
+			}
+
+			/**
+			 * No payment ID, no problem.
+			 */
+			if ( ! \property_exists( $rcp_payment, 'id' ) ) {
+				continue;
+			}
+
+			/**
+			 * No payment user ID, no problem.
+			 */
+			if ( ! \property_exists( $rcp_payment, 'user_id' ) ) {
 				continue;
 			}
 
@@ -503,6 +540,10 @@ class Upgrade216 extends Upgrade {
 			return null;
 		}
 
+		if ( ! \property_exists( $rcp_payment, 'membership_id' ) ) {
+			return null;
+		}
+
 		$rcp_membership_id = \intval( $rcp_payment->membership_id );
 
 		if ( 0 !== $rcp_membership_id ) {
@@ -511,6 +552,10 @@ class Upgrade216 extends Upgrade {
 			if ( false !== $rcp_membership ) {
 				return $rcp_membership;
 			}
+		}
+
+		if ( ! \property_exists( $rcp_payment, 'customer_id' ) ) {
+			return null;
 		}
 
 		$rcp_customer_id = \intval( $rcp_payment->customer_id );

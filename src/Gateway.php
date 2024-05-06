@@ -263,8 +263,13 @@ class Gateway extends RCP_Payment_Gateway {
 	 * Process signup.
 	 * 
 	 * @return void
+	 * @throws \Exception Throws an exception if the Restrict Content data does not meet expectations.
 	 */
 	public function process_signup() {
+		if ( ! \property_exists( $this->payment, 'id' ) ) {
+			throw new \Exception( 'Payment object from Restrict Content gateway object does not contain an ID.' );
+		}
+
 		$gateway = $this->get_pronamic_gateway();
 
 		if ( empty( $gateway ) ) {

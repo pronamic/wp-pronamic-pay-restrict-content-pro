@@ -394,6 +394,10 @@ class Extension extends AbstractPluginIntegration {
 				// Renew membership if not active.
 				$rcp_membership = \rcp_get_membership( $rcp_payment->membership_id );
 
+				if ( false === $rcp_membership ) {
+					return;
+				}
+
 				if ( MembershipStatus::ACTIVE !== $rcp_membership->get_status() ) {
 					$expiration = '';
 
@@ -557,9 +561,9 @@ class Extension extends AbstractPluginIntegration {
 	 *
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/memberships/class-rcp-membership.php#L2239-2248
 	 *
-	 * @param bool            $can_cancel    Whether or not this membership can be cancelled.
-	 * @param int             $membership_id ID of the membership.
-	 * @param \RCP_Membership $membership    Membership object.
+	 * @param bool           $can_cancel    Whether or not this membership can be cancelled.
+	 * @param int            $membership_id ID of the membership.
+	 * @param RCP_Membership $membership    Membership object.
 	 * @return bool
 	 */
 	public function rcp_membership_can_cancel( $can_cancel, $membership_id, $membership ) {
@@ -768,7 +772,7 @@ class Extension extends AbstractPluginIntegration {
 			return null;
 		}
 
-		$membership_id = $payment->source_id;
+		$membership_id = (int) $payment->source_id;
 
 		/**
 		 * Try to find the Restrict Content Pro membership from the
@@ -826,7 +830,7 @@ class Extension extends AbstractPluginIntegration {
 				'membership_id'    => $rcp_membership->get_id(),
 				'amount'           => $payment->get_total_amount()->get_value(),
 				'transaction_id'   => '',
-				'subscription'     => \rcp_get_subscription_name( $rcp_membership->get_object_id() ),
+				'subscription'     => $rcp_membership->get_membership_level_name(),
 				'subscription_key' => $rcp_membership->get_subscription_key(),
 				'object_type'      => 'subscription',
 				'object_id'        => $rcp_membership->get_object_id(),
@@ -899,11 +903,15 @@ class Extension extends AbstractPluginIntegration {
 		 */
 		$rcp_payments = new RCP_Payments();
 
-		$rcp_payment_id = $payment->get_source_id();
+		$rcp_payment_id = (int) $payment->get_source_id();
 
 		$rcp_payment = $rcp_payments->get_payment( $rcp_payment_id );
 
 		if ( null === $rcp_payment ) {
+			return;
+		}
+
+		if ( ! \property_exists( $rcp_payment, 'status' ) ) {
 			return;
 		}
 

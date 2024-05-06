@@ -128,8 +128,8 @@ class Upgrade216 extends Upgrade {
 	/**
 	 * Get subscription posts to upgrade.
 	 *
-	 * @param array $args Query arguments.
-	 * @return WP_Post[]
+	 * @param array<string, mixed> $args Query arguments.
+	 * @return array<int|WP_Post>
 	 */
 	private function get_subscription_posts( $args = [] ) {
 		$args['post_type']     = 'pronamic_pay_subscr';
@@ -153,7 +153,7 @@ class Upgrade216 extends Upgrade {
 	/**
 	 * Get payment posts to upgrade.
 	 *
-	 * @return array
+	 * @return array<int|WP_Post>
 	 */
 	private function get_payment_posts() {
 		$query = new \WP_Query(
@@ -217,7 +217,8 @@ class Upgrade216 extends Upgrade {
 	/**
 	 * Upgrade subscriptions.
 	 *
-	 * @param array $args Arguments.
+	 * @param array<string, mixed> $args Arguments.
+	 * @return void
 	 */
 	private function upgrade_subscriptions( $args = [] ) {
 		$args = \wp_parse_args(
@@ -240,7 +241,12 @@ class Upgrade216 extends Upgrade {
 			$query_args['post__in'] = \explode( ',', $args['post__in'] );
 		}
 
-		$subscription_posts = $this->get_subscription_posts( $query_args );
+		$subscription_posts = \array_filter(
+			$this->get_subscription_posts( $query_args ),
+			function ( $subscription_post ) {
+				return ( $subscription_post instanceof WP_Post );
+			}
+		);
 
 		$this->log(
 			\sprintf(

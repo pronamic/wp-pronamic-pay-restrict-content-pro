@@ -78,6 +78,7 @@
 		"automattic/jetpack-autoloader": "^3.0",
 		"pronamic/wp-money": "^2.2",
 		"woocommerce/action-scheduler": "^3.7",
+		"wp-pay-gateways/mollie": "^4.10",
 		"wp-pay/core": "^4.6"
 	},
 	"require-dev": {

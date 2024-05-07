@@ -56,7 +56,7 @@ class SubscriptionUpdater {
 		$rcp_membership        = $this->rcp_membership;
 		$pronamic_subscription = $this->pronamic_subscription;
 
-		$rcp_membership_level = \rcp_get_membership_level( $rcp_membership->get_object_id() );
+		$rcp_membership_level = \rcp_get_membership_level( (int) $rcp_membership->get_object_id() );
 
 		if ( false === $rcp_membership_level ) {
 			throw new \Exception( 'Cannot find the Restrict Content membership level for the Restrict Content membership to be updated.' );
@@ -84,10 +84,16 @@ class SubscriptionUpdater {
 		);
 	
 		$initial_phase->set_total_periods( 1 );
+
+		$initial_phase_end_date = $initial_phase->get_end_date();
+
+		if ( null === $initial_phase_end_date ) {
+			throw new \Exception( 'The initial subscription phase has no end date, this should not happen.' );
+		}
 	
 		$regular_phase = new SubscriptionPhase(
 			$pronamic_subscription,
-			$initial_phase->get_end_date(),
+			$initial_phase_end_date,
 			new SubscriptionInterval( 'P' . $rcp_membership_level->get_duration() . LengthUnit::to_core( $rcp_membership_level->get_duration_unit() ) ),
 			new Money( $rcp_membership->get_recurring_amount(), $rcp_membership->get_currency() )
 		);

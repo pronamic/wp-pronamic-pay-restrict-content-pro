@@ -1065,7 +1065,7 @@ class Extension extends AbstractPluginIntegration {
 			return;
 		}
 
-		$subscription = \get_pronamic_subscription( $subscription_id );
+		$subscription = \get_pronamic_subscription( (int) $subscription_id );
 
 		if ( null === $subscription ) {
 			return;
@@ -1079,7 +1079,7 @@ class Extension extends AbstractPluginIntegration {
 
 		$source_id = $subscription->get_source_id();
 
-		$rcp_membership = \rcp_get_membership( $source_id );
+		$rcp_membership = \rcp_get_membership( (int) $source_id );
 
 		if ( false === $rcp_membership ) {
 			return;

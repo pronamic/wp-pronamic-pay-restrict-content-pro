@@ -81,6 +81,8 @@ class Extension extends AbstractPluginIntegration {
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/restrict-content-pro.php#L119
 		 */
 		\add_action( 'plugins_loaded', [ $this, 'plugins_loaded' ], 5 );
+
+		\add_action( 'admin_init', [ $this, 'admin_init' ] );
 	}
 
 	/**
@@ -1027,5 +1029,66 @@ class Extension extends AbstractPluginIntegration {
 		$date = $date->modify( '-1 day' );
 
 		return $date;
+	}
+
+	/**
+	 * Admin init.
+	 *
+	 * @return void
+	 */
+	public function admin_init() {
+		$this->maybe_update_pronamic_subscription();
+	}
+
+	/**
+	 * Maybe update Pronamic subscription.
+	 * 
+	 * @return void
+	 */
+	private function maybe_update_pronamic_subscription() {
+		if ( ! \array_key_exists( 'subscription_id', $_GET ) ) {
+			return;
+		}
+
+		if ( ! \array_key_exists( 'action', $_GET ) ) {
+			return;
+		}
+
+		$subscription_id = \sanitize_text_field( \wp_unslash( $_GET['subscription_id'] ) );
+		$action          = \sanitize_text_field( \wp_unslash( $_GET['action'] ) );
+
+		if ( 'pronamic_pay_rcp_update_subscription' !== $action ) {
+			return;
+		}
+
+		if ( false === \check_admin_referer( 'pronamic_pay_rcp_update_subscription_' . $subscription_id ) ) {
+			return;
+		}
+
+		$subscription = \get_pronamic_subscription( $subscription_id );
+
+		if ( null === $subscription ) {
+			return;
+		}
+
+		$source = $subscription->get_source();
+
+		if ( 'rcp_membership' !== $source ) {
+			return;
+		}
+
+		$source_id = $subscription->get_source_id();
+
+		$rcp_membership = \rcp_get_membership( $source_id );
+
+		if ( false === $rcp_membership ) {
+			return;
+		}
+
+		$subscription_updater = new SubscriptionUpdater( $rcp_membership, $subscription );
+
+		$subscription_updater->update_pronamic_subscription();
+
+		$subscription->save();
 	}
 }

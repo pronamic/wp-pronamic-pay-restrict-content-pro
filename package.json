@@ -34,7 +34,7 @@
 	},
 	"homepage": "http://www.wp-pay.org/extensions/restrict-content-pro/",
 	"devDependencies": {
-		"@wordpress/env": "^8.13.0",
+		"@wordpress/env": "^9.9.0",
 		"npm-run-all": "^4.1.5"
 	},
 	"scripts": {

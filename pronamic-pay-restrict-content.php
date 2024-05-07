@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Pronamic Pay Restrict Content Pro Add-On
+ * Plugin Name: Pronamic Pay Restrict Content (Pro) Add-On
  * Plugin URI: https://www.pronamic.eu/plugins/pronamic-pay-restrict-content-pro/
- * Description: Extend the Pronamic Pay plugin with Restrict Content Pro support to receive payments through a variety of payment providers.
+ * Description: Extend the Pronamic Pay plugin with Restrict Content (Pro) support to receive payments through a variety of payment providers.
  *
  * Version: 4.4.4
  * Requires at least: 4.7
@@ -11,12 +11,11 @@
  * Author: Pronamic
  * Author URI: https://www.pronamic.eu/
  *
- * Text Domain: pronamic-pay-rcp
+ * Text Domain: pronamic-pay-restrict-content
  * Domain Path: /languages/
  *
  * License: GPL-3.0-or-later
  *
- * Requires Plugins: pronamic-ideal
  * Depends: wp-pay/core
  *
  * GitHub URI: https://github.com/wp-pay-extensions/restrict-content-pro
@@ -26,6 +25,25 @@
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Autoload.
+ */
+require_once __DIR__ . '/vendor/autoload_packages.php';
+
+/**
+ * Bootstrap.
+ */
+\Pronamic\WordPress\Pay\Plugin::instance(
+	[
+		'file'             => __FILE__,
+		'action_scheduler' => __DIR__ . '/packages/woocommerce/action-scheduler/action-scheduler.php',
+	]
+);
 
 add_filter(
 	'pronamic_pay_plugin_integrations',

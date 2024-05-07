@@ -1,6 +1,6 @@
 {
 	"name": "wp-pay-extensions/restrict-content-pro",
-	"description": "Restrict Content Pro driver for the WordPress payment processing library.",
+	"description": "Restrict Content (Pro) driver for the WordPress payment processing library.",
 	"keywords": [
 		"wordpress",
 		"wp",
@@ -43,13 +43,25 @@
 			"composer/installers": true,
 			"dealerdirect/phpcodesniffer-composer-installer": true,
 			"roots/wordpress-core-installer": true,
-			"phpstan/extension-installer": true
+			"phpstan/extension-installer": true,
+			"automattic/jetpack-autoloader": true
 		},
 		"platform": {
 			"php": "8.0"
 		},
 		"sort-packages": true,
-		"wp-slug": "pronamic-pay-restrict-content-pro"
+		"wp-slug": "pronamic-pay-restrict-content"
+	},
+	"extra": {
+		"installer-paths": {
+			"packages/{$vendor}/{$name}": [
+				"vendor:pronamic",
+				"vendor:wp-pay",
+				"vendor:wp-pay-extensions",
+				"vendor:wp-pay-gateways",
+				"woocommerce/action-scheduler"
+			]
+		}
 	},
 	"repositories": [
 		{
@@ -63,7 +75,9 @@
 	],
 	"require": {
 		"php": ">=8.0",
+		"automattic/jetpack-autoloader": "^3.0",
 		"pronamic/wp-money": "^2.2",
+		"woocommerce/action-scheduler": "^3.7",
 		"wp-pay/core": "^4.6"
 	},
 	"require-dev": {
@@ -73,7 +87,6 @@
 		"phpstan/phpstan": "^1.10",
 		"pronamic/pronamic-cli": "^1.0",
 		"pronamic/wp-coding-standards": "^2.1",
-		"restrictcontentpro/restrict-content": "2.2.3",
 		"roots/wordpress": "^6.0",
 		"szepeviktor/phpstan-wordpress": "^1.3",
 		"vimeo/psalm": "^5.24",

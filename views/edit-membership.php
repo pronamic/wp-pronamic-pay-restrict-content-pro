@@ -45,7 +45,14 @@
 				printf(
 					'<a class="button" href="%s">%s</a>',
 					esc_url( $action_url ),
-					'Bijwerken'
+					esc_html__( 'Update details to Pronamic Pay subscription', 'pronamic_ideal' )
+				);
+
+				echo  ' ';
+
+				printf(
+					'<span class="rcp-help-tip dashicons dashicons-editor-help" title="%s"></span>',
+					esc_attr__( 'Updating ensures that date changes in the Restrict Content membership are updated in the Pronamic Pay subscription.', 'pronamic_ideal' )
 				);
 
 				echo '</div>';

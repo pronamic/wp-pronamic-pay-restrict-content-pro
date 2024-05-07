@@ -5,14 +5,15 @@
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2023 Pronamic
  * @license   GPL-3.0-or-later
- * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
+ * @package   Pronamic\WordPress\Pay\Extensions\RestrictContent
  */
 
-namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
+namespace Pronamic\WordPress\Pay\Extensions\RestrictContent\Gateways;
 
 use Pronamic\WordPress\Pay\Admin\AdminModule;
 use Pronamic\WordPress\Pay\Core\Gateway as PronamicGateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Pay\Extensions\RestrictContent\Util;
 use Pronamic\WordPress\Pay\Plugin;
 use RCP_Payment_Gateway;
 use RCP_Payments;

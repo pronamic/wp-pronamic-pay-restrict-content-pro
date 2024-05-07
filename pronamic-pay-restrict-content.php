@@ -48,7 +48,7 @@ require_once __DIR__ . '/vendor/autoload_packages.php';
 add_filter(
 	'pronamic_pay_plugin_integrations',
 	function ( $integrations ) {
-		$integrations[] = new \Pronamic\WordPress\Pay\Extensions\RestrictContentPro\Extension();
+		$integrations[] = new \Pronamic\WordPress\Pay\Extensions\RestrictContent\Extension();
 
 		return $integrations;
 	}

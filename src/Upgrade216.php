@@ -8,7 +8,7 @@
  * @package   Pronamic\WordPress\Pay\Upgrades
  */
 
-namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
+namespace Pronamic\WordPress\Pay\Extensions\RestrictContent;
 
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use Pronamic\WordPress\Pay\Upgrades\Upgrade;

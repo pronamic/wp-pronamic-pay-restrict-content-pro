@@ -5,10 +5,10 @@
  * @author    Pronamic <info@pronamic.eu>
  * @copyright 2005-2023 Pronamic
  * @license   GPL-3.0-or-later
- * @package   Pronamic\WordPress\Pay\Extensions\RestrictContentPro
+ * @package   Pronamic\WordPress\Pay\Extensions\RestrictContent
  */
 
-namespace Pronamic\WordPress\Pay\Extensions\RestrictContentPro;
+namespace Pronamic\WordPress\Pay\Extensions\RestrictContent;
 
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\DateTime\DateTimeImmutable;
@@ -205,21 +205,21 @@ class Extension extends AbstractPluginIntegration {
 	private function get_gateways() {
 		if ( null === $this->gateways ) {
 			$gateways = [
-				'pronamic_pay'                         => Gateway::class,
-				'pronamic_pay_apple_pay'               => ApplePayGateway::class,
-				'pronamic_pay_bancontact'              => BancontactGateway::class,
-				'pronamic_pay_banktransfer'            => BankTransferGateway::class,
-				'pronamic_pay_bitcoin'                 => BitcoinGateway::class,
-				'pronamic_pay_credit_card'             => CreditCardGateway::class,
-				'pronamic_pay_direct_debit'            => DirectDebitGateway::class,
-				'pronamic_pay_direct_debit_bancontact' => DirectDebitBancontactGateway::class,
-				'pronamic_pay_direct_debit_ideal'      => DirectDebitIDealGateway::class,
-				'pronamic_pay_direct_debit_sofort'     => DirectDebitSofortGateway::class,
-				'pronamic_pay_eps'                     => EpsGateway::class,
-				'pronamic_pay_ideal'                   => IDealGateway::class,
-				'pronamic_pay_giropay'                 => GiropayGateway::class,
-				'pronamic_pay_paypal'                  => PayPalGateway::class,
-				'pronamic_pay_sofort'                  => SofortGateway::class,
+				'pronamic_pay'                         => Gateways\Gateway::class,
+				'pronamic_pay_apple_pay'               => Gateways\ApplePayGateway::class,
+				'pronamic_pay_bancontact'              => Gateways\BancontactGateway::class,
+				'pronamic_pay_banktransfer'            => Gateways\BankTransferGateway::class,
+				'pronamic_pay_bitcoin'                 => Gateways\BitcoinGateway::class,
+				'pronamic_pay_credit_card'             => Gateways\CreditCardGateway::class,
+				'pronamic_pay_direct_debit'            => Gateways\DirectDebitGateway::class,
+				'pronamic_pay_direct_debit_bancontact' => Gateways\DirectDebitBancontactGateway::class,
+				'pronamic_pay_direct_debit_ideal'      => Gateways\DirectDebitIDealGateway::class,
+				'pronamic_pay_direct_debit_sofort'     => Gateways\DirectDebitSofortGateway::class,
+				'pronamic_pay_eps'                     => Gateways\EpsGateway::class,
+				'pronamic_pay_ideal'                   => Gateways\IDealGateway::class,
+				'pronamic_pay_giropay'                 => Gateways\GiropayGateway::class,
+				'pronamic_pay_paypal'                  => Gateways\PayPalGateway::class,
+				'pronamic_pay_sofort'                  => Gateways\SofortGateway::class,
 			];
 
 			foreach ( $gateways as $gateway_id => $class ) {
@@ -246,7 +246,7 @@ class Extension extends AbstractPluginIntegration {
 		foreach ( $this->get_gateways() as $data ) {
 			$gateway = new $data['class']();
 
-			if ( $gateway instanceof Gateway ) {
+			if ( $gateway instanceof Gateways\Gateway ) {
 				$gateway->payments_settings( $rcp_options );
 			}
 		}

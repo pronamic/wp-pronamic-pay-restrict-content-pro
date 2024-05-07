@@ -35,7 +35,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"Pronamic\\WordPress\\Pay\\Extensions\\RestrictContentPro\\": "src/"
+			"Pronamic\\WordPress\\Pay\\Extensions\\RestrictContent\\": "src/"
 		}
 	},
 	"config": {

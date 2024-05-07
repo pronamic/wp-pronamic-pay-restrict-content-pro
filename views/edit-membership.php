@@ -48,7 +48,7 @@
 					esc_html__( 'Update details to Pronamic Pay subscription', 'pronamic_ideal' )
 				);
 
-				echo  ' ';
+				echo ' ';
 
 				printf(
 					'<span class="rcp-help-tip dashicons dashicons-editor-help" title="%s"></span>',

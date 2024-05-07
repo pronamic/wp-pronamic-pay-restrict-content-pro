@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContent;
 
+use DateTimeImmutable;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Pay\Extensions\RestrictContent\LengthUnit;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
@@ -78,7 +79,7 @@ class SubscriptionUpdater {
 	
 		$initial_phase = new SubscriptionPhase(
 			$pronamic_subscription,
-			new \DateTimeImmutable( $rcp_membership->get_created_date( false ) ),
+			new DateTimeImmutable( $rcp_membership->get_created_date( false ) ),
 			new SubscriptionInterval( $interval_spec ),
 			new Money( $rcp_membership->get_initial_amount(), $rcp_membership->get_currency() )
 		);
@@ -106,5 +107,10 @@ class SubscriptionUpdater {
 	
 		$pronamic_subscription->add_phase( $initial_phase );
 		$pronamic_subscription->add_phase( $regular_phase );
+
+		$next_payment_date = new DateTimeImmutable( $rcp_membership->get_expiration_date( false ) );
+		$next_payment_date = $next_payment_date->setTime( 0, 0, 0 );
+
+		$pronamic_subscription->set_next_payment_date( $next_payment_date );
 	}
 }

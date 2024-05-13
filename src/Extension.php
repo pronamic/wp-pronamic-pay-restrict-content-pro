@@ -82,7 +82,7 @@ class Extension extends AbstractPluginIntegration {
 		 */
 		\add_action( 'plugins_loaded', [ $this, 'plugins_loaded' ], 5 );
 
-		\add_action( 'admin_init', [ $this, 'admin_init' ] );
+		\add_action( 'rcp_after_membership_admin_update', [ $this, 'rcp_after_membership_admin_update' ] );
 	}
 
 	/**
@@ -445,11 +445,15 @@ class Extension extends AbstractPluginIntegration {
 
 		$status = MembershipStatus::transform_from_pronamic( $pronamic_subscription->get_status() );
 
-		if ( null === $status ) {
-			return;
+		if ( null !== $status ) {
+			$rcp_membership->set_status( $status );
 		}
 
-		$rcp_membership->set_status( $status );
+		$id = $pronamic_subscription->get_id();
+
+		if ( null !== $id ) {
+			$rcp_membership->set_gateway_subscription_id( (string) $id );
+		}
 	}
 
 	/**
@@ -1032,63 +1036,21 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
-	 * Admin init.
-	 *
-	 * @return void
-	 */
-	public function admin_init() {
-		$this->maybe_update_pronamic_subscription();
-	}
-
-	/**
-	 * Maybe update Pronamic subscription.
+	 * Restrict Content Pro after membership admin update.
 	 * 
+	 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/admin/memberships/membership-actions.php#L371
+	 * @param RCP_Membership $rcp_membership Restrict Content Pro membership object.
 	 * @return void
 	 */
-	private function maybe_update_pronamic_subscription() {
-		if ( ! \array_key_exists( 'subscription_id', $_GET ) ) {
-			return;
+	public function rcp_after_membership_admin_update( RCP_Membership $rcp_membership ) {
+		$subscriptions = \get_pronamic_subscriptions_by_source( 'rcp_membership', (string) $rcp_membership->get_id() );
+
+		foreach ( $subscriptions as $subscription ) {
+			$subscription_updater = new SubscriptionUpdater( $rcp_membership, $subscription );
+
+			$subscription_updater->update_pronamic_subscription();
+
+			$subscription->save();
 		}
-
-		if ( ! \array_key_exists( 'action', $_GET ) ) {
-			return;
-		}
-
-		$subscription_id = \sanitize_text_field( \wp_unslash( $_GET['subscription_id'] ) );
-		$action          = \sanitize_text_field( \wp_unslash( $_GET['action'] ) );
-
-		if ( 'pronamic_pay_rcp_update_subscription' !== $action ) {
-			return;
-		}
-
-		if ( false === \check_admin_referer( 'pronamic_pay_rcp_update_subscription_' . $subscription_id ) ) {
-			return;
-		}
-
-		$subscription = \get_pronamic_subscription( (int) $subscription_id );
-
-		if ( null === $subscription ) {
-			return;
-		}
-
-		$source = $subscription->get_source();
-
-		if ( 'rcp_membership' !== $source ) {
-			return;
-		}
-
-		$source_id = $subscription->get_source_id();
-
-		$rcp_membership = \rcp_get_membership( (int) $source_id );
-
-		if ( false === $rcp_membership ) {
-			return;
-		}
-
-		$subscription_updater = new SubscriptionUpdater( $rcp_membership, $subscription );
-
-		$subscription_updater->update_pronamic_subscription();
-
-		$subscription->save();
 	}
 }

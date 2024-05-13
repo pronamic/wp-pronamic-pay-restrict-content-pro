@@ -108,8 +108,14 @@ class SubscriptionUpdater {
 		$pronamic_subscription->add_phase( $initial_phase );
 		$pronamic_subscription->add_phase( $regular_phase );
 
-		$next_payment_date = new DateTimeImmutable( $rcp_membership->get_expiration_date( false ) );
-		$next_payment_date = $next_payment_date->setTime( 0, 0, 0 );
+		$next_payment_date = null;
+		
+		$expiration_timestamp = $rcp_membership->get_expiration_time();
+
+		if ( false !== $expiration_timestamp ) {
+			$next_payment_date = new DateTimeImmutable( '@' . $expiration_timestamp );
+			$next_payment_date = $next_payment_date->setTime( 0, 0, 0 );
+		}
 
 		$pronamic_subscription->set_next_payment_date( $next_payment_date );
 	}

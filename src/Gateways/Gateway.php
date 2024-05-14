@@ -53,6 +53,14 @@ class Gateway extends RCP_Payment_Gateway {
 			if ( null !== $payment_method && $payment_method->supports( 'recurring' ) ) {
 				$this->supports = [
 					'recurring',
+					/**
+					 * Renewal date changes.
+					 * 
+					 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/17
+					 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/pull/18#issuecomment-2107023059
+					 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/memberships/class-rcp-membership.php#L3454
+					 */
+					'renewal-date-changes',
 					'trial',
 				];
 			}

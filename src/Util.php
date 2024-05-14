@@ -247,55 +247,9 @@ class Util {
 			$subscription = new Subscription();
 		}
 
-		/**
-		 * Maximum number of times to renew this membership. Default is `0` for unlimited.
-		 *
-		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/memberships/class-rcp-membership.php#L138-143
-		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/memberships/class-rcp-membership.php#L1169-1178
-		 */
-		$maximum_renewals = $gateway->membership->get_maximum_renewals();
-		$maximum_renewals = \intval( $maximum_renewals );
+		$subscription_updater = new SubscriptionUpdater( $gateway->membership, $subscription );
 
-		// Initial phase.
-		$interval_spec = 'P' . \intval( $gateway->length ) . LengthUnit::to_core( $gateway->length_unit );
-
-		$trial_duration = $gateway->subscription_data['trial_duration'];
-
-		if ( 0 !== \intval( $trial_duration ) ) {
-			$interval_spec = 'P' . $trial_duration . LengthUnit::to_core( $gateway->subscription_data['trial_duration_unit'] );
-		}
-
-		$initial_phase = new SubscriptionPhase(
-			$subscription,
-			new \DateTimeImmutable(),
-			new SubscriptionInterval( $interval_spec ),
-			new Money( $gateway->initial_amount, $gateway->currency )
-		);
-
-		$initial_phase->set_total_periods( 1 );
-
-		$initial_phase_end_date = $initial_phase->get_end_date();
-
-		if ( null === $initial_phase_end_date ) {
-			throw new \Exception( 'The initial subscription phase has no end date, this should not happen.' );
-		}
-
-		$regular_phase = new SubscriptionPhase(
-			$subscription,
-			$initial_phase_end_date,
-			new SubscriptionInterval( 'P' . \intval( $gateway->length ) . LengthUnit::to_core( $gateway->length_unit ) ),
-			new Money( $gateway->amount, $gateway->currency )
-		);
-
-		if ( 0 !== $maximum_renewals ) {
-			$regular_phase->set_total_periods( $maximum_renewals );
-		}
-
-		// Add phases to subscription.
-		$subscription->set_phases( [] );
-
-		$subscription->add_phase( $initial_phase );
-		$subscription->add_phase( $regular_phase );
+		$subscription_updater->update_pronamic_subscription();
 
 		// Other.
 		$subscription->set_description( $gateway->subscription_name );

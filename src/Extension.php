@@ -81,6 +81,8 @@ class Extension extends AbstractPluginIntegration {
 		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/restrict-content-pro.php#L119
 		 */
 		\add_action( 'plugins_loaded', [ $this, 'plugins_loaded' ], 5 );
+
+		\add_action( 'rcp_after_membership_admin_update', [ $this, 'rcp_after_membership_admin_update' ] );
 	}
 
 	/**
@@ -443,11 +445,15 @@ class Extension extends AbstractPluginIntegration {
 
 		$status = MembershipStatus::transform_from_pronamic( $pronamic_subscription->get_status() );
 
-		if ( null === $status ) {
-			return;
+		if ( null !== $status ) {
+			$rcp_membership->set_status( $status );
 		}
 
-		$rcp_membership->set_status( $status );
+		$id = $pronamic_subscription->get_id();
+
+		if ( null !== $id ) {
+			$rcp_membership->set_gateway_subscription_id( (string) $id );
+		}
 	}
 
 	/**
@@ -1027,5 +1033,24 @@ class Extension extends AbstractPluginIntegration {
 		$date = $date->modify( '-1 day' );
 
 		return $date;
+	}
+
+	/**
+	 * Restrict Content Pro after membership admin update.
+	 * 
+	 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/admin/memberships/membership-actions.php#L371
+	 * @param RCP_Membership $rcp_membership Restrict Content Pro membership object.
+	 * @return void
+	 */
+	public function rcp_after_membership_admin_update( RCP_Membership $rcp_membership ) {
+		$subscriptions = \get_pronamic_subscriptions_by_source( 'rcp_membership', (string) $rcp_membership->get_id() );
+
+		foreach ( $subscriptions as $subscription ) {
+			$subscription_updater = new SubscriptionUpdater( $rcp_membership, $subscription );
+
+			$subscription_updater->update_pronamic_subscription();
+
+			$subscription->save();
+		}
 	}
 }

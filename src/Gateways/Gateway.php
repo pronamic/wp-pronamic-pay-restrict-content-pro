@@ -52,6 +52,12 @@ class Gateway extends RCP_Payment_Gateway {
 
 			if ( null !== $payment_method && $payment_method->supports( 'recurring' ) ) {
 				$this->supports = [
+					/**
+					 * Price changes.
+					 * 
+					 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/19
+					 */
+					'price-changes',
 					'recurring',
 					/**
 					 * Renewal date changes.

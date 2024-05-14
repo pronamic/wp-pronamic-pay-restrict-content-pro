@@ -47,6 +47,7 @@ class Extension extends AbstractPluginIntegration {
 			[
 				'name'                => \__( 'Restrict Content Pro', 'pronamic_ideal' ),
 				'slug'                => 'restrict-content-pro',
+				'version'             => '4.5.0',
 				'version_option_name' => 'pronamic_pay_restrictcontentpro_version',
 			]
 		);
@@ -62,6 +63,7 @@ class Extension extends AbstractPluginIntegration {
 		$upgrades = $this->get_upgrades();
 
 		$upgrades->add( new Upgrade216() );
+		$upgrades->add( new Upgrade450() );
 	}
 
 	/**
@@ -122,8 +124,9 @@ class Extension extends AbstractPluginIntegration {
 		\add_action( 'pronamic_pay_new_payment', [ $this, 'new_payment' ] );
 		\add_action( 'pronamic_pay_update_payment', [ $this, 'maybe_record_restrictcontentpro_payment_refund' ], 10, 1 );
 
-		\add_action( 'rcp_edit_membership_after', [ $this, 'rcp_edit_membership_after' ] );
 		\add_action( 'rcp_edit_payment_after', [ $this, 'rcp_edit_payment_after' ] );
+
+		\add_filter( 'rcp_gateway_subscription_id_url', [ $this, 'rcp_gateway_subscription_id_url' ], 10, 3 );
 
 		/**
 		 * Filter the subscription next payment delivery date.
@@ -468,28 +471,21 @@ class Extension extends AbstractPluginIntegration {
 	 * @return void
 	 */
 	public function rcp_transition_membership_status( $old_status, $new_status, $membership_id ) {
-		$query = new WP_Query(
-			[
-				'post_type'     => 'pronamic_pay_subscr',
-				'post_status'   => 'any',
-				'meta_query'    => [
-					[
-						'key'   => '_pronamic_subscription_source',
-						'value' => 'rcp_membership',
-					],
-					[
-						'key'   => '_pronamic_subscription_source_id',
-						'value' => $membership_id,
-					],
-				],
-				'nopaging'      => true,
-				'no_found_rows' => true,
-				'order'         => 'DESC',
-				'orderby'       => 'ID',
-			]
-		);
+		$rcp_membership = \rcp_get_membership( (int) $membership_id );
 
-		if ( ! $query->have_posts() ) {
+		if ( false === $rcp_membership ) {
+			return;
+		}
+
+		$gateway_subscription_id = $rcp_membership->get_gateway_subscription_id();
+
+		if ( '' === $gateway_subscription_id ) {
+			return;
+		}
+
+		$pronamic_subscription = \get_pronamic_subscription( (int) $gateway_subscription_id );
+
+		if ( null === $pronamic_subscription ) {
 			return;
 		}
 
@@ -536,31 +532,13 @@ class Extension extends AbstractPluginIntegration {
 			return;
 		}
 
-		while ( $query->have_posts() ) {
-			$query->the_post();
+		$pronamic_subscription->set_status( $core_status );
 
-			$post_id = get_the_ID();
-
-			if ( false === $post_id ) {
-				continue;
-			}
-
-			$subscription = get_pronamic_subscription( $post_id );
-
-			if ( null === $subscription ) {
-				continue;
-			}
-
-			$subscription->set_status( $core_status );
-
-			if ( null !== $note ) {
-				$subscription->add_note( $note );
-			}
-
-			$subscription->save();
+		if ( null !== $note ) {
+			$pronamic_subscription->add_note( $note );
 		}
 
-		wp_reset_postdata();
+		$pronamic_subscription->save();
 	}
 
 	/**
@@ -936,41 +914,6 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
-	 * Restrict Content Pro edit membership after.
-	 *
-	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/memberships/edit-membership.php#L285-294
-	 *
-	 * @param RCP_Membership $membership Restrict Content Pro membership.
-	 * @return void
-	 */
-	public function rcp_edit_membership_after( $membership ) {
-		$query = new \WP_Query(
-			[
-				'post_type'     => 'pronamic_pay_subscr',
-				'post_status'   => 'any',
-				'meta_query'    => [
-					[
-						'key'   => '_pronamic_subscription_source',
-						'value' => 'rcp_membership',
-					],
-					[
-						'key'   => '_pronamic_subscription_source_id',
-						'value' => $membership->get_id(),
-					],
-				],
-				'nopaging'      => true,
-				'no_found_rows' => true,
-				'order'         => 'DESC',
-				'orderby'       => 'ID',
-			]
-		);
-
-		include __DIR__ . '/../views/edit-membership.php';
-
-		\wp_reset_postdata();
-	}
-
-	/**
 	 * Restrict Content Pro edit payment after.
 	 *
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/payments/edit-payment.php#L127
@@ -1052,5 +995,31 @@ class Extension extends AbstractPluginIntegration {
 
 			$subscription->save();
 		}
+	}
+
+	/**
+	 * Restrict Content Pro gateway subscription ID URL.
+	 * 
+	 * @param string $url             URL.
+	 * @param string $gateway         Payment gateway slug.
+	 * @param string $subscription_id ID of the subscription in the gateway.
+	 * @return string
+	 */
+	public function rcp_gateway_subscription_id_url( $url, $gateway, $subscription_id ) {
+		$gateways = $this->get_gateways();
+
+		if ( ! \array_key_exists( $gateway, $gateways ) ) {
+			return $url;
+		}
+
+		$edit_post_link = \get_edit_post_link( (int) $subscription_id );
+
+		if ( null === $edit_post_link ) {
+			return $url;
+		}
+
+		$url = $edit_post_link;
+
+		return $url;
 	}
 }

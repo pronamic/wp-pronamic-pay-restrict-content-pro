@@ -7,6 +7,37 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.5.0] - 2024-05-15
+
+### Changed
+
+- Restrict Content (Pro) memberships updates are now processed to the connected Pronamic Pay subscriptions.
+- A failed first payment will no longer result in an accumulation of the Pronamic Pay subscription phases.
+- The Pronamic Pay subscription ID is now processed in the Restrict Content (Pro) "Gateway Subscription ID" field for memberships.
+
+### Commits
+
+- Added `rcp_gateway_subscription_id_url` and upgrade old memberships with gateway subscription ID. ([144ed86](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/144ed865a591dc9e81b02d534742af847456582b))
+- Enable support for price changes, fixes #19. ([39c7cd0](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/39c7cd043987b3f3c05a954b0e1a9ff3e374391e))
+- Reuse subscription updater class in gateway, more DRY. ([80a8f5d](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/80a8f5d87ef86ede3b0d2174898ae29988a656f6))
+- Change PHP namespace `RestrictContentPro` to `RestrictContent` and group gateways in `Gateways` namespace. ([991ce74](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/991ce7455aacbcc05b5ff5f746b6240d3bc6c065))
+- Make library more type safe. ([9ce8236](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/9ce823602afad3e6060830e8cd2c53e91ae40e3c))
+- Throw an exception if the Restrict Content data does not meet expectations. ([b2516ff](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/b2516ffb4e9e40fc4183fda04cfc0918fc7cdb9e))
+- Reset the phases so they don't pile up. ([b15a942](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/b15a9425def6b2c7a8886719e5cf968eaa14c5c7))
+
+### Composer
+
+- Added `automattic/jetpack-autoloader` `^3.0`.
+- Added `woocommerce/action-scheduler` `^3.7`.
+- Added `wp-pay-gateways/mollie` `^4.10`.
+- Changed `php` from `>=7.4` to `>=8.0`.
+- Changed `wp-pay/core` from `^4.6` to `v4.17.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.17.0
+
+Full set of changes: [`4.4.4...4.5.0`][4.5.0]
+
+[4.5.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.4.4...v4.5.0
+
 ## [4.4.4] - 2024-03-14
 
 ### Commits

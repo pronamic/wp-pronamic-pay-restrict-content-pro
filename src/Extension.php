@@ -13,11 +13,13 @@ namespace Pronamic\WordPress\Pay\Extensions\RestrictContent;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\DateTime\DateTimeImmutable;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use RCP_Membership;
 use RCP_Payments;
+use WP_HTML_Tag_Processor;
 use WP_Query;
 
 /**
@@ -85,6 +87,20 @@ class Extension extends AbstractPluginIntegration {
 		\add_action( 'plugins_loaded', [ $this, 'plugins_loaded' ], 5 );
 
 		\add_action( 'rcp_after_membership_admin_update', [ $this, 'rcp_after_membership_admin_update' ] );
+
+		/*
+		 * Filter if billing can be updated for membership.
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.4.4/includes/memberships/class-rcp-membership.php#L3231-3240
+		 */
+		\add_filter( 'rcp_membership_can_update_billing_card', [ $this, 'rcp_membership_can_update_billing' ], 10, 2 );
+
+		/*
+		 * Filter subscription details actions HTML.
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.4.4/templates/subscription.php#L156-164
+		 */
+		\add_filter( 'rcp_subscription_details_actions', [ $this, 'rcp_subscription_details_actions' ], 10, 4 );
 	}
 
 	/**
@@ -127,6 +143,8 @@ class Extension extends AbstractPluginIntegration {
 		\add_action( 'rcp_edit_payment_after', [ $this, 'rcp_edit_payment_after' ] );
 
 		\add_filter( 'rcp_gateway_subscription_id_url', [ $this, 'rcp_gateway_subscription_id_url' ], 10, 3 );
+
+		\add_action( 'save_post_pronamic_pay_subscr', [ $this, 'maybe_update_membership_gateway' ] );
 
 		/**
 		 * Filter the subscription next payment delivery date.
@@ -597,6 +615,125 @@ class Extension extends AbstractPluginIntegration {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Can update membership billing.
+	 *
+	 * @param bool $can_update        Whether or not billing can be updated.
+	 * @param int  $rcp_membership_id ID of the membership.
+	 * @return bool
+	 */
+	public function rcp_membership_can_update_billing( $can_update, $rcp_membership_id ) {
+		$subscriptions = \get_pronamic_subscriptions_by_source( 'rcp_membership', $rcp_membership_id );
+
+		if ( 0 !== count( $subscriptions ) ) {
+			$can_update = true;
+		}
+
+		return $can_update;
+	}
+
+	/**
+	 * Subscription action links HTML.
+	 *
+	 * @param string         $actions        Formatted HTML links.
+	 * @param array          $links          Links.
+	 * @param int            $user_id        Current user ID.
+	 * @param RCP_Membership $rcp_membership Membership object.
+	 * @return string
+	 */
+	public function rcp_subscription_details_actions( $actions, $links, $user_id, $rcp_membership ) {
+		$subscriptions = \get_pronamic_subscriptions_by_source( 'rcp_membership', $rcp_membership->get_id() );
+
+		if ( 0 === count( $subscriptions ) ) {
+			return $actions;
+		}
+
+		$subscription = reset( $subscriptions );
+
+		foreach ( $links as $link ) {
+			if ( ! \str_contains( $link, 'rcp_sub_details_update_card' ) ) {
+				continue;
+			}
+
+			$new_link = new WP_HTML_Tag_Processor( $link );
+
+			if ( $new_link->next_tag( 'a' ) ) {
+				$new_link->set_attribute( 'href', $subscription->get_mandate_selection_url() );
+			}
+
+			$actions = \str_replace( $link, $new_link, $actions );
+		}
+
+		return $actions;
+	}
+
+	/**
+	 * Maybe update membership gateway on subscription updates.
+	 *
+	 * @param int $post_id Subscription post ID.
+	 * @return void
+	 */
+	public function maybe_update_membership_gateway( $post_id ) {
+		$subscription = \get_pronamic_subscription( $post_id );
+
+		if ( null === $subscription ) {
+			return;
+		}
+
+		if ( 'rcp_membership' !== $subscription->get_source() ) {
+			return;
+		}
+
+		$rcp_membership = \rcp_get_membership( $subscription->get_source_id() );
+
+		if ( false === $rcp_membership ) {
+			return;
+		}
+
+		$payment_methods = [
+			$subscription->get_payment_method(),
+		];
+
+		$payments = $subscription->get_payments();
+
+		foreach ( $payments as $payment ) {
+			if ( 'subscription_payment_method_change' !== $payment->get_source() ) {
+				continue;
+			}
+
+			$payment_methods[] = $payment->get_payment_method();
+
+			break;
+		}
+
+		/*
+		 * If the payment method has changed we have to update the Restrict Content Pro membership.
+		 */
+		foreach ( $payment_methods as $payment_method ) {
+			if ( PaymentMethods::CARD === $payment_method ) {
+				$payment_method = PaymentMethods::CREDIT_CARD;
+			}
+
+			$gateway_id = 'pronamic_pay_' . $payment_method;
+
+			if ( ! \rcp_is_gateway_enabled( $gateway_id ) ) {
+				continue;
+			}
+
+			if ( $rcp_membership->get_gateway() === $gateway_id ) {
+				break;
+			}
+
+			$rcp_membership->update(
+				[
+					'gateway' => $gateway_id,
+				]
+			);
+
+			break;
+		}
 	}
 
 	/**

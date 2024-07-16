@@ -672,16 +672,23 @@ class Extension extends AbstractPluginIntegration {
 			$subscription->get_payment_method(),
 		];
 
-		$payments = $subscription->get_payments();
+		$args = [
+			'meta_query' => [
+				[
+					'key'   => '_pronamic_payment_source',
+					'value' => 'subscription_payment_method_change',
+				],
+				[
+					'key'   => '_pronamic_payment_subscription_id',
+					'value' => $subscription->get_id(),
+				],
+			],
+		];
 
-		foreach ( $payments as $payment ) {
-			if ( 'subscription_payment_method_change' !== $payment->get_source() ) {
-				continue;
-			}
+		$payment = \get_pronamic_payment_by_meta( '', '', $args );
 
+		if ( null !== $payment ) {
 			$payment_methods[] = $payment->get_payment_method();
-
-			break;
 		}
 
 		/*

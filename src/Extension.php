@@ -17,9 +17,9 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus as Core_SubscriptionStatus;
 use RCP_Membership;
 use RCP_Payments;
-use WP_HTML_Tag_Processor;
 use WP_Query;
 
 /**
@@ -87,13 +87,6 @@ class Extension extends AbstractPluginIntegration {
 		\add_action( 'plugins_loaded', [ $this, 'plugins_loaded' ], 5 );
 
 		\add_action( 'rcp_after_membership_admin_update', [ $this, 'rcp_after_membership_admin_update' ] );
-
-		/*
-		 * Filter if billing can be updated for membership.
-		 *
-		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.4.4/includes/memberships/class-rcp-membership.php#L3231-3240
-		 */
-		\add_filter( 'rcp_membership_can_update_billing_card', [ $this, 'rcp_membership_can_update_billing' ], 10, 2 );
 
 		/*
 		 * Filter subscription details actions HTML.
@@ -618,23 +611,6 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
-	 * Can update membership billing.
-	 *
-	 * @param bool $can_update        Whether or not billing can be updated.
-	 * @param int  $rcp_membership_id ID of the membership.
-	 * @return bool
-	 */
-	public function rcp_membership_can_update_billing( $can_update, $rcp_membership_id ) {
-		$subscriptions = \get_pronamic_subscriptions_by_source( 'rcp_membership', $rcp_membership_id );
-
-		if ( 0 !== count( $subscriptions ) ) {
-			$can_update = true;
-		}
-
-		return $can_update;
-	}
-
-	/**
 	 * Subscription action links HTML.
 	 *
 	 * @param string         $actions        Formatted HTML links.
@@ -652,19 +628,19 @@ class Extension extends AbstractPluginIntegration {
 
 		$subscription = reset( $subscriptions );
 
-		foreach ( $links as $link ) {
-			if ( ! \str_contains( $link, 'rcp_sub_details_update_card' ) ) {
-				continue;
-			}
-
-			$new_link = new WP_HTML_Tag_Processor( $link );
-
-			if ( $new_link->next_tag( 'a' ) ) {
-				$new_link->set_attribute( 'href', $subscription->get_mandate_selection_url() );
-			}
-
-			$actions = \str_replace( $link, $new_link, $actions );
+		// Payment method can only be updated for active subscription.
+		if ( Core_SubscriptionStatus::ACTIVE !== $subscription->get_status() ) {
+			return $actions;
 		}
+
+		$action = \sprintf(
+			'<a href="%1$s" title="%2$s"><button type="button">%3$s</button></a>',
+			\esc_url( $subscription->get_mandate_selection_url() ),
+			\esc_attr( \__( 'Update payment method', 'pronamic_ideal' ) ),
+			\esc_html( \__( 'Update payment method', 'pronamic_ideal' ) )
+		);
+
+		$actions = \sprintf( '%s<br/>%s', $action, $actions );
 
 		return $actions;
 	}

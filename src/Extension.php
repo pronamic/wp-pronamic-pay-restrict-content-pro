@@ -226,6 +226,7 @@ class Extension extends AbstractPluginIntegration {
 				'pronamic_pay_bancontact'              => Gateways\BancontactGateway::class,
 				'pronamic_pay_banktransfer'            => Gateways\BankTransferGateway::class,
 				'pronamic_pay_bitcoin'                 => Gateways\BitcoinGateway::class,
+				'pronamic_pay_card'                    => Gateways\CardGateway::class,
 				'pronamic_pay_credit_card'             => Gateways\CreditCardGateway::class,
 				'pronamic_pay_direct_debit'            => Gateways\DirectDebitGateway::class,
 				'pronamic_pay_direct_debit_bancontact' => Gateways\DirectDebitBancontactGateway::class,

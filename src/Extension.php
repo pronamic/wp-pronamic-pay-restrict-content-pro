@@ -19,6 +19,7 @@ use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
 use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus as Core_SubscriptionStatus;
 use RCP_Membership;
+use RCP_Payment_Gateways;
 use RCP_Payments;
 use WP_Query;
 
@@ -669,40 +670,23 @@ class Extension extends AbstractPluginIntegration {
 			return;
 		}
 
-		$payment_methods = [
-			$subscription->get_payment_method(),
-		];
-
-		$args = [
-			'meta_query' => [
-				[
-					'key'   => '_pronamic_payment_source',
-					'value' => 'subscription_payment_method_change',
-				],
-				[
-					'key'   => '_pronamic_payment_subscription_id',
-					'value' => $subscription->get_id(),
-				],
-			],
-		];
-
-		$payment = \get_pronamic_payment_by_meta( '', '', $args );
-
-		if ( null !== $payment ) {
-			$payment_methods[] = $payment->get_payment_method();
-		}
-
-		/*
-		 * If the payment method has changed we have to update the Restrict Content Pro membership.
+		/**
+		 * Update membership gateway.
 		 */
-		foreach ( $payment_methods as $payment_method ) {
-			if ( PaymentMethods::CARD === $payment_method ) {
-				$payment_method = PaymentMethods::CREDIT_CARD;
+		$rcp_gateways = new RCP_Payment_Gateways();
+
+		foreach ( $rcp_gateways->available_gateways as $gateway_id => $gateway ) {
+			if ( ! \array_key_exists( 'class', $gateway ) ) {
+				continue;
 			}
 
-			$gateway_id = 'pronamic_pay_' . $payment_method;
+			$rcp_gateway = new $gateway['class']();
 
-			if ( ! \rcp_is_gateway_enabled( $gateway_id ) ) {
+			if ( ! \method_exists( $rcp_gateway, 'get_pronamic_payment_method' ) ) {
+				continue;
+			}
+
+			if ( $rcp_gateway->get_pronamic_payment_method() !== $subscription->get_payment_method() ) {
 				continue;
 			}
 

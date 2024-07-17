@@ -36,7 +36,7 @@ class Gateway extends RCP_Payment_Gateway {
 	/**
 	 * Payment method
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	protected $payment_method;
 
@@ -71,6 +71,15 @@ class Gateway extends RCP_Payment_Gateway {
 				];
 			}
 		}
+	}
+
+	/**
+	 * Get payment method.
+	 *
+	 * @return string|null
+	 */
+	public function get_pronamic_payment_method() {
+		return $this->payment_method;
 	}
 
 	/**

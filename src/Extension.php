@@ -616,7 +616,7 @@ class Extension extends AbstractPluginIntegration {
 	 * Subscription action links HTML.
 	 *
 	 * @param string         $actions        Formatted HTML links.
-	 * @param array          $links          Links.
+	 * @param array<string>  $links          Links.
 	 * @param int            $user_id        Current user ID.
 	 * @param RCP_Membership $rcp_membership Membership object.
 	 * @return string
@@ -664,7 +664,7 @@ class Extension extends AbstractPluginIntegration {
 			return;
 		}
 
-		$rcp_membership = \rcp_get_membership( $subscription->get_source_id() );
+		$rcp_membership = \rcp_get_membership( (int) $subscription->get_source_id() );
 
 		if ( false === $rcp_membership ) {
 			return;

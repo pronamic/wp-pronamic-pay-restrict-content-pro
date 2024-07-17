@@ -47,7 +47,7 @@ class Gateway extends RCP_Payment_Gateway {
 		// Set supported features based on gateway.
 		$gateway = $this->get_pronamic_gateway();
 
-		if ( null !== $gateway ) {
+		if ( null !== $gateway && null !== $this->payment_method ) {
 			$payment_method = $gateway->get_payment_method( $this->payment_method );
 
 			if ( null !== $payment_method && $payment_method->supports( 'recurring' ) ) {
@@ -257,6 +257,10 @@ class Gateway extends RCP_Payment_Gateway {
 		$gateway = $this->get_pronamic_gateway();
 
 		if ( null === $gateway ) {
+			return '';
+		}
+
+		if ( null === $this->payment_method ) {
 			return '';
 		}
 

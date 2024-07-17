@@ -24,7 +24,7 @@ use WP_Query;
 
 /**
  * Extension class
- * 
+ *
  * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/gateways/class-rcp-payment-gateways.php#L47
  * @phpstan-type RestrictContentProGatewayRegistration array{label: string, admin_label: string, class: class-string}
  * @phpstan-type RestrictContentProPaymentObject object{id: int, membership_id: int, status: string}
@@ -1100,7 +1100,7 @@ class Extension extends AbstractPluginIntegration {
 
 	/**
 	 * Restrict Content Pro after membership admin update.
-	 * 
+	 *
 	 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/admin/memberships/membership-actions.php#L371
 	 * @param RCP_Membership $rcp_membership Restrict Content Pro membership object.
 	 * @return void
@@ -1119,7 +1119,7 @@ class Extension extends AbstractPluginIntegration {
 
 	/**
 	 * Restrict Content Pro gateway subscription ID URL.
-	 * 
+	 *
 	 * @param string $url             URL.
 	 * @param string $gateway         Payment gateway slug.
 	 * @param string $subscription_id ID of the subscription in the gateway.

@@ -54,14 +54,14 @@ class Gateway extends RCP_Payment_Gateway {
 				$this->supports = [
 					/**
 					 * Price changes.
-					 * 
+					 *
 					 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/19
 					 */
 					'price-changes',
 					'recurring',
 					/**
 					 * Renewal date changes.
-					 * 
+					 *
 					 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/17
 					 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/pull/18#issuecomment-2107023059
 					 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/memberships/class-rcp-membership.php#L3454
@@ -103,7 +103,7 @@ class Gateway extends RCP_Payment_Gateway {
 
 	/**
 	 * Get the Pronamic gateway.
-	 * 
+	 *
 	 * @return PronamicGateway|null
 	 */
 	private function get_pronamic_gateway() {
@@ -112,7 +112,7 @@ class Gateway extends RCP_Payment_Gateway {
 		if ( null === $config_id ) {
 			return null;
 		}
-		
+
 		if ( '' === $config_id ) {
 			return null;
 		}
@@ -276,7 +276,7 @@ class Gateway extends RCP_Payment_Gateway {
 
 	/**
 	 * Process signup.
-	 * 
+	 *
 	 * @return void
 	 * @throws \Exception Throws an exception if the Restrict Content data does not meet expectations.
 	 */

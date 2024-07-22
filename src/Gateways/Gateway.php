@@ -36,7 +36,7 @@ class Gateway extends RCP_Payment_Gateway {
 	/**
 	 * Payment method
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	protected $payment_method;
 
@@ -47,21 +47,21 @@ class Gateway extends RCP_Payment_Gateway {
 		// Set supported features based on gateway.
 		$gateway = $this->get_pronamic_gateway();
 
-		if ( null !== $gateway ) {
+		if ( null !== $gateway && null !== $this->payment_method ) {
 			$payment_method = $gateway->get_payment_method( $this->payment_method );
 
 			if ( null !== $payment_method && $payment_method->supports( 'recurring' ) ) {
 				$this->supports = [
 					/**
 					 * Price changes.
-					 * 
+					 *
 					 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/19
 					 */
 					'price-changes',
 					'recurring',
 					/**
 					 * Renewal date changes.
-					 * 
+					 *
 					 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/17
 					 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/pull/18#issuecomment-2107023059
 					 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/memberships/class-rcp-membership.php#L3454
@@ -71,6 +71,15 @@ class Gateway extends RCP_Payment_Gateway {
 				];
 			}
 		}
+	}
+
+	/**
+	 * Get payment method.
+	 *
+	 * @return string|null
+	 */
+	public function get_pronamic_payment_method() {
+		return $this->payment_method;
 	}
 
 	/**
@@ -103,7 +112,7 @@ class Gateway extends RCP_Payment_Gateway {
 
 	/**
 	 * Get the Pronamic gateway.
-	 * 
+	 *
 	 * @return PronamicGateway|null
 	 */
 	private function get_pronamic_gateway() {
@@ -112,7 +121,7 @@ class Gateway extends RCP_Payment_Gateway {
 		if ( null === $config_id ) {
 			return null;
 		}
-		
+
 		if ( '' === $config_id ) {
 			return null;
 		}
@@ -251,6 +260,10 @@ class Gateway extends RCP_Payment_Gateway {
 			return '';
 		}
 
+		if ( null === $this->payment_method ) {
+			return '';
+		}
+
 		$payment_method = $gateway->get_payment_method( $this->payment_method );
 
 		if ( null === $payment_method ) {
@@ -276,7 +289,7 @@ class Gateway extends RCP_Payment_Gateway {
 
 	/**
 	 * Process signup.
-	 * 
+	 *
 	 * @return void
 	 * @throws \Exception Throws an exception if the Restrict Content data does not meet expectations.
 	 */

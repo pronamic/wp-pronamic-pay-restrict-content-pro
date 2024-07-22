@@ -13,16 +13,19 @@ namespace Pronamic\WordPress\Pay\Extensions\RestrictContent;
 use Pronamic\WordPress\DateTime\DateTime;
 use Pronamic\WordPress\DateTime\DateTimeImmutable;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
+use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus as Core_SubscriptionStatus;
 use RCP_Membership;
+use RCP_Payment_Gateways;
 use RCP_Payments;
 use WP_Query;
 
 /**
  * Extension class
- * 
+ *
  * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/gateways/class-rcp-payment-gateways.php#L47
  * @phpstan-type RestrictContentProGatewayRegistration array{label: string, admin_label: string, class: class-string}
  * @phpstan-type RestrictContentProPaymentObject object{id: int, membership_id: int, status: string}
@@ -85,6 +88,13 @@ class Extension extends AbstractPluginIntegration {
 		\add_action( 'plugins_loaded', [ $this, 'plugins_loaded' ], 5 );
 
 		\add_action( 'rcp_after_membership_admin_update', [ $this, 'rcp_after_membership_admin_update' ] );
+
+		/*
+		 * Filter subscription details actions HTML.
+		 *
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.4.4/templates/subscription.php#L156-164
+		 */
+		\add_filter( 'rcp_subscription_details_actions', [ $this, 'rcp_subscription_details_actions' ], 10, 4 );
 	}
 
 	/**
@@ -127,6 +137,8 @@ class Extension extends AbstractPluginIntegration {
 		\add_action( 'rcp_edit_payment_after', [ $this, 'rcp_edit_payment_after' ] );
 
 		\add_filter( 'rcp_gateway_subscription_id_url', [ $this, 'rcp_gateway_subscription_id_url' ], 10, 3 );
+
+		\add_action( 'save_post_pronamic_pay_subscr', [ $this, 'maybe_update_membership_gateway' ] );
 
 		/**
 		 * Filter the subscription next payment delivery date.
@@ -215,6 +227,7 @@ class Extension extends AbstractPluginIntegration {
 				'pronamic_pay_bancontact'              => Gateways\BancontactGateway::class,
 				'pronamic_pay_banktransfer'            => Gateways\BankTransferGateway::class,
 				'pronamic_pay_bitcoin'                 => Gateways\BitcoinGateway::class,
+				'pronamic_pay_card'                    => Gateways\CardGateway::class,
 				'pronamic_pay_credit_card'             => Gateways\CreditCardGateway::class,
 				'pronamic_pay_direct_debit'            => Gateways\DirectDebitGateway::class,
 				'pronamic_pay_direct_debit_bancontact' => Gateways\DirectDebitBancontactGateway::class,
@@ -600,6 +613,98 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
+	 * Subscription action links HTML.
+	 *
+	 * @param string         $actions        Formatted HTML links.
+	 * @param array<string>  $links          Links.
+	 * @param int            $user_id        Current user ID.
+	 * @param RCP_Membership $rcp_membership Membership object.
+	 * @return string
+	 */
+	public function rcp_subscription_details_actions( $actions, $links, $user_id, $rcp_membership ) {
+		$subscriptions = \get_pronamic_subscriptions_by_source( 'rcp_membership', $rcp_membership->get_id() );
+
+		if ( 0 === count( $subscriptions ) ) {
+			return $actions;
+		}
+
+		$subscription = reset( $subscriptions );
+
+		// Payment method can only be updated for active subscription.
+		if ( Core_SubscriptionStatus::ACTIVE !== $subscription->get_status() ) {
+			return $actions;
+		}
+
+		$action = \sprintf(
+			'<a href="%1$s" title="%2$s"><button type="button">%3$s</button></a>',
+			\esc_url( $subscription->get_mandate_selection_url() ),
+			\esc_attr( \__( 'Update payment method', 'pronamic_ideal' ) ),
+			\esc_html( \__( 'Update payment method', 'pronamic_ideal' ) )
+		);
+
+		$actions = \sprintf( '%s<br/>%s', $action, $actions );
+
+		return $actions;
+	}
+
+	/**
+	 * Maybe update membership gateway on subscription updates.
+	 *
+	 * @param int $post_id Subscription post ID.
+	 * @return void
+	 */
+	public function maybe_update_membership_gateway( $post_id ) {
+		$subscription = \get_pronamic_subscription( $post_id );
+
+		if ( null === $subscription ) {
+			return;
+		}
+
+		if ( 'rcp_membership' !== $subscription->get_source() ) {
+			return;
+		}
+
+		$rcp_membership = \rcp_get_membership( (int) $subscription->get_source_id() );
+
+		if ( false === $rcp_membership ) {
+			return;
+		}
+
+		/**
+		 * Update membership gateway.
+		 */
+		$rcp_gateways = new RCP_Payment_Gateways();
+
+		foreach ( $rcp_gateways->available_gateways as $gateway_id => $gateway ) {
+			if ( ! \array_key_exists( 'class', $gateway ) ) {
+				continue;
+			}
+
+			$rcp_gateway = new $gateway['class']();
+
+			if ( ! \method_exists( $rcp_gateway, 'get_pronamic_payment_method' ) ) {
+				continue;
+			}
+
+			if ( $rcp_gateway->get_pronamic_payment_method() !== $subscription->get_payment_method() ) {
+				continue;
+			}
+
+			if ( $rcp_membership->get_gateway() === $gateway_id ) {
+				break;
+			}
+
+			$rcp_membership->update(
+				[
+					'gateway' => $gateway_id,
+				]
+			);
+
+			break;
+		}
+	}
+
+	/**
 	 * Source column
 	 *
 	 * @param string  $text    Text.
@@ -980,7 +1085,7 @@ class Extension extends AbstractPluginIntegration {
 
 	/**
 	 * Restrict Content Pro after membership admin update.
-	 * 
+	 *
 	 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/admin/memberships/membership-actions.php#L371
 	 * @param RCP_Membership $rcp_membership Restrict Content Pro membership object.
 	 * @return void
@@ -999,7 +1104,7 @@ class Extension extends AbstractPluginIntegration {
 
 	/**
 	 * Restrict Content Pro gateway subscription ID URL.
-	 * 
+	 *
 	 * @param string $url             URL.
 	 * @param string $gateway         Payment gateway slug.
 	 * @param string $subscription_id ID of the subscription in the gateway.

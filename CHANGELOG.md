@@ -7,6 +7,24 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.6.0] - 2024-07-24
+
+### Changed
+
+- Requires PHP 8.1. ([4a09f5f](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/4a09f5f2daa08fc27fd4eee3d64ca8435ac8a6b3))
+
+### Commits
+
+- Added support for payment method updates. ([c056a4d](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/c056a4deef669cc4c21ed9191ca8dc62a9786ae2))
+
+### Composer
+
+- Changed `php` from `>=8.0` to `>=8.1`.
+
+Full set of changes: [`4.5.0...4.6.0`][4.6.0]
+
+[4.6.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.5.0...v4.6.0
+
 ## [4.5.0] - 2024-05-15
 
 ### Changed

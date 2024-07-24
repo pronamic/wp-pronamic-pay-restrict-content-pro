@@ -3,7 +3,7 @@
  * Subscription updater
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2023 Pronamic
+ * @copyright 2005-2024 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Extensions\RestrictContent
  */
@@ -72,18 +72,18 @@ class SubscriptionUpdater {
 		$maximum_renewals = (int) $rcp_membership->get_maximum_renewals();
 
 		$interval_spec = 'P' . $rcp_membership_level->get_duration() . LengthUnit::to_core( $rcp_membership_level->get_duration_unit() );
-	
+
 		if ( $rcp_membership_level->has_trial() ) {
 			$interval_spec = 'P' . $rcp_membership_level->get_trial_duration() . LengthUnit::to_core( $rcp_membership_level->get_trial_duration_unit() );
 		}
-	
+
 		$initial_phase = new SubscriptionPhase(
 			$pronamic_subscription,
 			new DateTimeImmutable( $rcp_membership->get_created_date( false ) ),
 			new SubscriptionInterval( $interval_spec ),
 			new Money( $rcp_membership->get_initial_amount(), $rcp_membership->get_currency() )
 		);
-	
+
 		$initial_phase->set_total_periods( 1 );
 
 		$initial_phase_end_date = $initial_phase->get_end_date();
@@ -91,25 +91,25 @@ class SubscriptionUpdater {
 		if ( null === $initial_phase_end_date ) {
 			throw new \Exception( 'The initial subscription phase has no end date, this should not happen.' );
 		}
-	
+
 		$regular_phase = new SubscriptionPhase(
 			$pronamic_subscription,
 			$initial_phase_end_date,
 			new SubscriptionInterval( 'P' . $rcp_membership_level->get_duration() . LengthUnit::to_core( $rcp_membership_level->get_duration_unit() ) ),
 			new Money( $rcp_membership->get_recurring_amount(), $rcp_membership->get_currency() )
 		);
-	
+
 		if ( 0 !== $maximum_renewals ) {
 			$regular_phase->set_total_periods( $maximum_renewals );
 		}
 
 		$pronamic_subscription->set_phases( [] );
-	
+
 		$pronamic_subscription->add_phase( $initial_phase );
 		$pronamic_subscription->add_phase( $regular_phase );
 
 		$next_payment_date = null;
-		
+
 		$expiration_timestamp = $rcp_membership->get_expiration_time();
 
 		if ( false !== $expiration_timestamp ) {

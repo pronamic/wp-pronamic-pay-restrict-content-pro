@@ -3,7 +3,7 @@
  * Upgrade 4.5.0
  *
  * @author    Pronamic <info@pronamic.eu>
- * @copyright 2005-2023 Pronamic
+ * @copyright 2005-2024 Pronamic
  * @license   GPL-3.0-or-later
  * @package   Pronamic\WordPress\Pay\Upgrades
  */
@@ -78,7 +78,7 @@ class Upgrade450 extends Upgrade {
 
 	/**
 	 * Upgrade item.
-	 * 
+	 *
 	 * @param int $post_id WordPress post ID.
 	 * @return void
 	 */

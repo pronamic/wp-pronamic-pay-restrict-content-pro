@@ -77,9 +77,11 @@ class SubscriptionUpdater {
 			$interval_spec = 'P' . $rcp_membership_level->get_trial_duration() . LengthUnit::to_core( $rcp_membership_level->get_trial_duration_unit() );
 		}
 
+		$initial_phase_start_date = new DateTimeImmutable( $rcp_membership->get_created_date( false ) );
+
 		$initial_phase = new SubscriptionPhase(
 			$pronamic_subscription,
-			new DateTimeImmutable( $rcp_membership->get_created_date( false ) ),
+			$initial_phase_start_date,
 			new SubscriptionInterval( $interval_spec ),
 			new Money( $rcp_membership->get_initial_amount(), $rcp_membership->get_currency() )
 		);
@@ -116,9 +118,9 @@ class SubscriptionUpdater {
 			$next_payment_date = new DateTimeImmutable( '@' . $expiration_timestamp );
 
 			$next_payment_date = $next_payment_date->setTime(
-				(int) $initial_phase->get_start_date()->format( 'H' ),
-				(int) $initial_phase->get_start_date()->format( 'i' ),
-				(int) $initial_phase->get_start_date()->format( 's' )
+				(int) $initial_phase_start_date->format( 'H' ),
+				(int) $initial_phase_start_date->format( 'i' ),
+				(int) $initial_phase_start_date->format( 's' )
 			);
 		}
 

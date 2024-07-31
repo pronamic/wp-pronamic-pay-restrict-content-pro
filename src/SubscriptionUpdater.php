@@ -114,7 +114,12 @@ class SubscriptionUpdater {
 
 		if ( false !== $expiration_timestamp ) {
 			$next_payment_date = new DateTimeImmutable( '@' . $expiration_timestamp );
-			$next_payment_date = $next_payment_date->setTime( 0, 0, 0 );
+
+			$next_payment_date = $next_payment_date->setTime(
+				(int) $initial_phase->get_start_date()->format( 'H' ),
+				(int) $initial_phase->get_start_date()->format( 'i' ),
+				(int) $initial_phase->get_start_date()->format( 's' )
+			);
 		}
 
 		$pronamic_subscription->set_next_payment_date( $next_payment_date );

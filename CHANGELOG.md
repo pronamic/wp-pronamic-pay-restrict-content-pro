@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.6.1] - 2024-08-01
+
+### Fixed
+
+- Fixed time difference between membership and subscription next payment date. ([2242a69](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/2242a692287f637cf3422159051988ee5b62face))
+
+Full set of changes: [`4.6.0...4.6.1`][4.6.1]
+
+[4.6.1]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.6.0...v4.6.1
+
 ## [4.6.0] - 2024-07-24
 
 ### Changed

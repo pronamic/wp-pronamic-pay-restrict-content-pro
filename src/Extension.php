@@ -119,7 +119,7 @@ class Extension extends AbstractPluginIntegration {
 
 		\add_filter( 'rcp_payment_gateways', [ $this, 'register_pronamic_gateways' ] );
 		\add_action( 'rcp_payments_settings', [ $this, 'payments_settings' ] );
-		\add_action( 'rcp_transition_membership_status', [ $this, 'rcp_transition_membership_status' ], 10, 3 );
+		\add_action( 'rcp_transition_membership_status', [ $this, 'rcp_transition_membership_status' ], 9, 3 );
 
 		\add_filter( 'rcp_membership_can_cancel', [ $this, 'rcp_membership_can_cancel' ], 10, 3 );
 		\add_filter( 'rcp_membership_payment_profile_cancelled', [ $this, 'rcp_membership_payment_profile_cancelled' ], 10, 5 );

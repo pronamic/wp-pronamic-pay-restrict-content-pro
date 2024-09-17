@@ -119,7 +119,15 @@ class Extension extends AbstractPluginIntegration {
 
 		\add_filter( 'rcp_payment_gateways', [ $this, 'register_pronamic_gateways' ] );
 		\add_action( 'rcp_payments_settings', [ $this, 'payments_settings' ] );
-		\add_action( 'rcp_transition_membership_status', [ $this, 'rcp_transition_membership_status' ], 10, 3 );
+
+		/**
+		 * We hook into membership status transitions with priority `9` as the default priority results in a conflicting
+		 * infinite loop by `rcp_set_customer_trialing_flag` of RCP membership and Pronamic subscription status updates.
+		 *
+		 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/26
+		 * @link https://github.com/stellarwp/restrict-content/blob/1b7914806e9703b6820d9073f0e6d965ebee7337/core/includes/customers/customer-actions.php#L15-L37
+		 */
+		\add_action( 'rcp_transition_membership_status', [ $this, 'rcp_transition_membership_status' ], 9, 3 );
 
 		\add_filter( 'rcp_membership_can_cancel', [ $this, 'rcp_membership_can_cancel' ], 10, 3 );
 		\add_filter( 'rcp_membership_payment_profile_cancelled', [ $this, 'rcp_membership_payment_profile_cancelled' ], 10, 5 );

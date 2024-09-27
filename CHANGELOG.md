@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.6.2] - 2024-09-27
+
+### Fixed
+
+- Fixed infinite loop when activating Restrict Content Pro subscription with past expiry date. ([#26](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/26))
+
+Full set of changes: [`4.6.1...4.6.2`][4.6.2]
+
+[4.6.2]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.6.1...v4.6.2
+
 ## [4.6.1] - 2024-08-01
 
 ### Fixed

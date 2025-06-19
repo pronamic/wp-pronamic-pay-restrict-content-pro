@@ -7,6 +7,21 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.6.3] - 2025-06-19
+
+### Commits
+
+- Allow Jetpack autoload 3, 4 and 5. ([5b3fa3f](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/5b3fa3f23adeccae26fd49f1dc5fa39111101633))
+
+### Composer
+
+- Changed `automattic/jetpack-autoloader` from `^3.0` to `v5.0.7`.
+	Release notes: https://github.com/Automattic/jetpack-autoloader/releases/tag/v5.0.7
+
+Full set of changes: [`4.6.2...4.6.3`][4.6.3]
+
+[4.6.3]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.6.2...v4.6.3
+
 ## [4.6.2] - 2024-09-27
 
 ### Fixed

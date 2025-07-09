@@ -933,6 +933,7 @@ class Extension extends AbstractPluginIntegration {
 				'object_type'      => 'subscription',
 				'object_id'        => $rcp_membership->get_object_id(),
 				'status'           => PaymentStatus::from_core( $payment->get_status() ),
+				'gateway'          => $rcp_membership->get_gateway(),
 			]
 		);
 

@@ -270,7 +270,7 @@ class Util {
 	 * @param Payment $payment           Pronamic payment object.
 	 * @return void
 	 */
-	public static function connect_pronamic_payment_id_to_rcp_payment( $rcp_membership_id, Payment $payment ) {
+	public static function connect_pronamic_payment_id_to_rcp_membership( $rcp_membership_id, Payment $payment ) {
 		\rcp_update_membership_meta( $rcp_membership_id, '_pronamic_payment_id', (string) $payment->get_id() );
 	}
 
@@ -283,7 +283,7 @@ class Util {
 	 * @param Payment $payment        Pronamic payment object.
 	 * @return void
 	 */
-	public static function connect_pronamic_payment_id_to_rcp_membership( $rcp_payment_id, Payment $payment ) {
+	public static function connect_pronamic_payment_id_to_rcp_payment( $rcp_payment_id, Payment $payment ) {
 		\rcp_update_payment_meta( $rcp_payment_id, '_pronamic_payment_id', (string) $payment->get_id() );
 	}
 }

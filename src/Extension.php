@@ -403,15 +403,33 @@ class Extension extends AbstractPluginIntegration {
 					return;
 				}
 
+				if ( 'recurring' !== $payment->get_meta( 'mollie_sequence_type' ) ) {
+					return;
+				}
+
 				$last_pronamic_payment_id = \rcp_get_membership_meta( $rcp_membership->get_id(), '_pronamic_payment_id', true );
 
 				if ( '' != $last_pronamic_payment_id && $this_pronamic_payment_id != $last_pronamic_payment_id ) {
 					return;
 				}
 
-				$rcp_membership->expire();
+				$gateways = $this->get_gateways();
 
-				$rcp_membership->set_status( 'pending' );
+				$gateway_id = $rcp_membership->get_gateway();
+
+				if ( ! \array_key_exists( $gateway_id, $gateways ) ) {
+					return;
+				}
+
+				$gateway = $gateways[ $gateway_id ];
+
+				$rcp_gateway = new $gateway['class']();
+
+				$rcp_gateway->membership = $rcp_membership;
+
+				$member = new \RCP_Member( $payment->get_customer()->get_user_id() );
+
+				\do_action( 'rcp_recurring_payment_failed', $member, $rcp_gateway );
 
 				break;
 			case Core_PaymentStatus::SUCCESS:
@@ -933,6 +951,7 @@ class Extension extends AbstractPluginIntegration {
 				'object_type'      => 'subscription',
 				'object_id'        => $rcp_membership->get_object_id(),
 				'status'           => PaymentStatus::from_core( $payment->get_status() ),
+				'gateway'          => $rcp_membership->get_gateway(),
 			]
 		);
 

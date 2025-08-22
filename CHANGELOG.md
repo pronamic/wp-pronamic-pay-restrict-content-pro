@@ -7,6 +7,18 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.0] - 2025-08-22
+
+### Commits
+
+- Send "Renewal Payment Failed" email for failed recurring payment. ([df09a70](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/df09a70c37e0bffb6bbfdfe96624b0e1b544eaa0))
+- Set renewal payment gateway. ([beca93d](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/beca93d409b567397778ba19434db407172910a8))
+- Fixed connecting Pronamic payment to RCP payment and membership. ([45cbde2](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/45cbde2fea511f3a2928588d70841edf05b49cfe))
+
+Full set of changes: [`4.6.3...4.7.0`][4.7.0]
+
+[4.7.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.6.3...v4.7.0
+
 ## [4.6.3] - 2025-06-19
 
 ### Commits

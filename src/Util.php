@@ -159,6 +159,24 @@ class Util {
 
 		$lines = new PaymentLines();
 
+		// Trial.
+		if ( $gateway->is_trial() ) {
+			$line = $lines->new_line();
+
+			$line->set_id( (string) $gateway->subscription_id );
+			$line->set_sku( null );
+			$line->set_type( PaymentLineType::DIGITAL );
+			$line->set_name( \sprintf( \__( 'Trial "%s"', 'pronamic_ideal' ), $gateway->subscription_name ) );
+			$line->set_quantity( 1 );
+			$line->set_unit_price( new Money( 0, $gateway->currency ) );
+			$line->set_total_amount( new Money( 0, $gateway->currency ) );
+			$line->set_product_url( null );
+			$line->set_image_url( null );
+			$line->set_product_category( null );
+
+			return $lines;
+		}
+
 		// Membership.
 		$line = $lines->new_line();
 

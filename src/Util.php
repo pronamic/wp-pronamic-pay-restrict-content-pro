@@ -166,6 +166,7 @@ class Util {
 			$line->set_id( (string) $gateway->subscription_id );
 			$line->set_sku( null );
 			$line->set_type( PaymentLineType::DIGITAL );
+			/* translators: %s: Subscription name */
 			$line->set_name( \sprintf( \__( 'Trial "%s"', 'pronamic_ideal' ), $gateway->subscription_name ) );
 			$line->set_quantity( 1 );
 			$line->set_unit_price( new Money( 0, $gateway->currency ) );

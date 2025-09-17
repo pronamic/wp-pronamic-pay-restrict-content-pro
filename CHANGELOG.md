@@ -7,6 +7,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.1] - 2025-09-17
+
+### Fixed
+
+- Fixed payment line for trial period. ([#30](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/30))
+
+Full set of changes: [`4.7.0...4.7.1`][4.7.1]
+
+[4.7.1]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.7.0...v4.7.1
+
 ## [4.7.0] - 2025-08-22
 
 ### Commits

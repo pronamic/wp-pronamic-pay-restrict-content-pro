@@ -48,7 +48,7 @@ class Extension extends AbstractPluginIntegration {
 		$args = wp_parse_args(
 			$args,
 			[
-				'name'                => \__( 'Restrict Content Pro', 'pronamic_ideal' ),
+				'name'                => 'Restrict Content Pro',
 				'slug'                => 'restrict-content-pro',
 				'version'             => '4.5.0',
 				'version_option_name' => 'pronamic_pay_restrictcontentpro_version',

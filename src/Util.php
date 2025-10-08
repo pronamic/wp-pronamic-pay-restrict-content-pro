@@ -219,7 +219,7 @@ class Util {
 		}
 
 		// Fees.
-		if ( \property_exists( $gateway->payment, 'fees' ) ) {
+		if ( \property_exists( $gateway->payment, 'fees' ) && $gateway->payment->fees > 0 ) {
 			$line = $lines->new_line();
 
 			$line->set_id( null );

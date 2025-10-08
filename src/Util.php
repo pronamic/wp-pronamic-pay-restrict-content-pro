@@ -234,6 +234,26 @@ class Util {
 			$line->set_product_category( null );
 		}
 
+		// Credits.
+		if ( \property_exists( $gateway->payment, 'credits' ) && $gateway->payment->credits > 0 ) {
+			$line = $lines->new_line();
+
+			$price = new Money( $gateway->payment->credits, $gateway->currency );
+
+			$price = $price->multiply( -1 );
+
+			$line->set_id( null );
+			$line->set_sku( null );
+			$line->set_type( PaymentLineType::DISCOUNT );
+			$line->set_name( \__( 'Credits', 'pronamic_ideal' ) );
+			$line->set_quantity( 1 );
+			$line->set_unit_price( $price );
+			$line->set_total_amount( $price );
+			$line->set_product_url( null );
+			$line->set_image_url( null );
+			$line->set_product_category( null );
+		}
+
 		// Result.
 		return $lines;
 	}

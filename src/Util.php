@@ -238,9 +238,7 @@ class Util {
 		if ( \property_exists( $gateway->payment, 'credits' ) && $gateway->payment->credits > 0 ) {
 			$line = $lines->new_line();
 
-			$price = new Money( $gateway->payment->credits, $gateway->currency );
-
-			$price = $price->multiply( -1 );
+			$price = new Money( -$gateway->payment->credits, $gateway->currency );
 
 			$line->set_id( null );
 			$line->set_sku( null );

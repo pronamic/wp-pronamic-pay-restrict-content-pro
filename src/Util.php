@@ -241,11 +241,11 @@ class Util {
 
 			// Make sure the applied credit does not exceed the total amount of the payment lines.
 			$credit = \min(
-				new Number( $gateway->payment->credits ),
-				$lines->get_amount()->get_number()
+				$gateway->payment->credits,
+				$lines->get_amount()->get_value()
 			);
 
-			$price = new Money( -$credit->get_value(), $gateway->currency );
+			$price = new Money( -$credit, $gateway->currency );
 
 			$line->set_id( null );
 			$line->set_sku( null );

@@ -11,6 +11,7 @@
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContent;
 
 use Pronamic\WordPress\Money\Money;
+use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Customer;
 use Pronamic\WordPress\Pay\ContactName;
 use Pronamic\WordPress\Pay\Payments\Payment;
@@ -229,6 +230,30 @@ class Util {
 			$line->set_quantity( 1 );
 			$line->set_unit_price( new Money( $gateway->payment->fees, $gateway->currency ) );
 			$line->set_total_amount( new Money( $gateway->payment->fees, $gateway->currency ) );
+			$line->set_product_url( null );
+			$line->set_image_url( null );
+			$line->set_product_category( null );
+		}
+
+		// Credits.
+		if ( \property_exists( $gateway->payment, 'credits' ) && $gateway->payment->credits > 0 ) {
+			$line = $lines->new_line();
+
+			// Make sure the applied credit does not exceed the total amount of the payment lines.
+			$credit = \min(
+				$gateway->payment->credits,
+				$lines->get_amount()->get_value()
+			);
+
+			$price = new Money( -$credit, $gateway->currency );
+
+			$line->set_id( null );
+			$line->set_sku( null );
+			$line->set_type( PaymentLineType::DISCOUNT );
+			$line->set_name( \__( 'Credits', 'pronamic_ideal' ) );
+			$line->set_quantity( 1 );
+			$line->set_unit_price( $price );
+			$line->set_total_amount( $price );
 			$line->set_product_url( null );
 			$line->set_image_url( null );
 			$line->set_product_category( null );

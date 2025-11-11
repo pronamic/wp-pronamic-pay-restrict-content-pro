@@ -7,6 +7,22 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.7.2] - 2025-11-11
+
+### Commits
+
+- Merge pull request #33 from pronamic/32-add-discount-payment-line-for-credits ([2f1026b](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/2f1026b95b02512d6350a35ffc2c80fcfbaf7137))
+- Limit applied credit using numeric values instead of Number objects. ([a0ce9fd](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/a0ce9fd5e1afe254cb61e605e72cffd3d12df432))
+- Make sure the applied credit does not exceed the total amount of the payment lines. ([f2e231e](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/f2e231e860ee08e2262dbc4aca4f4c0356e2fa8e))
+- Thanks @gemini-code-assist. ([fa695ba](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/fa695baf6507bb72bccb002181bbdf823766c093))
+- Added discount payment line for credits. ([08656c6](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/08656c66ad2bc3e553580ec973e81b0c83a10cda))
+- Only add fee when applicable. ([8838d4b](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/8838d4bebc78f09a32edde7893ec9cba1a93ca82))
+- Added this point we shoud not use translation functions. ([659078c](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/659078c6c557eec9559c7cfe0f1199250d18866f))
+
+Full set of changes: [`4.7.1...4.7.2`][4.7.2]
+
+[4.7.2]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.7.1...v4.7.2
+
 ## [4.7.1] - 2025-09-17
 
 ### Fixed

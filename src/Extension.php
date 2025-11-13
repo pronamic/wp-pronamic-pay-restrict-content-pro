@@ -149,13 +149,12 @@ class Extension extends AbstractPluginIntegration {
 		\add_action( 'save_post_pronamic_pay_subscr', [ $this, 'maybe_update_membership_gateway' ] );
 
 		/**
-		 * Filter the subscription next payment delivery date.
+		 * Filter Restrict Content Pro to query expired memberships up to an hour ago instead of current time,
+		 * to prevent RCP from sending an expiration email before the renewal payment has been created.
 		 *
-		 * Priority is set to 9 so payment gateways can override with priority 10.
-		 *
-		 * @link https://github.com/wp-pay-gateways/mollie/blob/2.1.4/src/Integration.php#L272-L344
+		 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.4.4/includes/cron-functions.php#L47-106
 		 */
-		\add_filter( 'pronamic_pay_subscription_next_payment_delivery_date', [ $this, 'next_payment_delivery_date' ], 9, 2 );
+		\add_filter( 'rcp_check_for_expired_memberships_query_args', $this->expired_memberships_query_args( ... ) );
 	}
 
 	/**
@@ -1080,7 +1079,7 @@ class Extension extends AbstractPluginIntegration {
 	}
 
 	/**
-	 * Next payment delivery date.
+	 * Filter Restrict Content Pro expired memberships query arguments.
 	 *
 	 * The Restrict Content Pro will check for expired memberships on a daily base:
 	 *
@@ -1094,20 +1093,23 @@ class Extension extends AbstractPluginIntegration {
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/email-functions.php#L328-348
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/email-functions.php#L207-242
 	 *
-	 * @param DateTimeImmutable $next_payment_delivery_date Next payment delivery date.
-	 * @param Subscription      $subscription               Subscription.
-	 * @return DateTimeImmutable
+	 * @param array $args Expired memberships query arguments.
+	 * @return array
 	 */
-	public function next_payment_delivery_date( DateTimeImmutable $next_payment_delivery_date, Subscription $subscription ) {
-		if ( 'rcp_membership' !== $subscription->source ) {
-			return $next_payment_delivery_date;
+	public function expired_memberships_query_args( array $args ) {
+		if ( ! \array_key_exists( 'expiration_date_query', $args ) ) {
+			return $args;
 		}
 
-		$date = clone $next_payment_delivery_date;
+		if ( ! \array_key_exists( 'before', $args['expiration_date_query'] ) ) {
+			return $args;
+		}
 
-		$date = $date->modify( '-1 day' );
+		$hour_ago = ( new DateTime() )->modify( '-1 hour' );
 
-		return $date;
+		$args['expiration_date_query']['before'] = $hour_ago->get_local_date()->format( 'Y-m-d H:i:s' );
+
+		return $args;
 	}
 
 	/**

@@ -1085,8 +1085,8 @@ class Extension extends AbstractPluginIntegration {
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/email-functions.php#L328-348
 	 * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/-/blob/3.3.3/includes/email-functions.php#L207-242
 	 *
-	 * @param array $args Expired memberships query arguments.
-	 * @return array
+	 * @param array{'expiration_date_query'?: array{'before'?: string}} $args Expired memberships query arguments.
+	 * @return array{'expiration_date_query'?: array{'before'?: string}}
 	 */
 	public function expired_memberships_query_args( array $args ) {
 		if ( ! \array_key_exists( 'expiration_date_query', $args ) ) {

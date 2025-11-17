@@ -66,7 +66,7 @@ class Upgrade216 extends Upgrade {
 		\WP_CLI::add_command(
 			'pronamic-pay restrict-content-pro upgrade-216 execute',
 			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
-			function ( $args, $assoc_args ) {
+			function ( $args, $assoc_args ): void {
 				\WP_CLI::log( 'Upgrade 2.1.6' );
 
 				$this->upgrade();
@@ -79,7 +79,7 @@ class Upgrade216 extends Upgrade {
 		\WP_CLI::add_command(
 			'pronamic-pay restrict-content-pro upgrade-216 list-subscriptions',
 			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
-			function ( $args, $assoc_args ) {
+			function ( $args, $assoc_args ): void {
 				\WP_CLI::log( 'Upgrade 2.1.6 - Subscriptions List' );
 
 				$posts = $this->get_subscription_posts();
@@ -94,7 +94,7 @@ class Upgrade216 extends Upgrade {
 		\WP_CLI::add_command(
 			'pronamic-pay restrict-content-pro upgrade-216 upgrade-subscriptions',
 			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
-			function ( $args, $assoc_args ) {
+			function ( $args, $assoc_args ): void {
 				\WP_CLI::log( 'Upgrade 2.1.6 - Subscriptions' );
 
 				$this->upgrade_subscriptions(
@@ -114,7 +114,7 @@ class Upgrade216 extends Upgrade {
 		\WP_CLI::add_command(
 			'pronamic-pay restrict-content-pro upgrade-216 list-payments',
 			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
-			function ( $args, $assoc_args ) {
+			function ( $args, $assoc_args ): void {
 				\WP_CLI::log( 'Upgrade 2.1.6 - Payments List' );
 
 				$posts = $this->get_payment_posts();

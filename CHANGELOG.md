@@ -7,6 +7,29 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.8.0] - 2025-11-17
+
+### Commits
+
+- Updated to PHP 8.2 or higher ([bca80bc](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/bca80bc66f0b0d064f509e3071945820e34bfa4b))
+- Removed next payment delivery date (https://github.com/pronamic/wp-pronamic-pay-mollie/issues/91). ([4d64378](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/4d6437894783a2c540c25f9984bf43725cc83dcb))
+
+### Composer
+
+- Changed `php` from `>=8.1` to `>=8.2`.
+- Changed `pronamic/wp-money` from `^2.2` to `v2.4.4`.
+	Release notes: https://github.com/pronamic/wp-money/releases/tag/v2.4.4
+- Changed `woocommerce/action-scheduler` from `^3.7` to `3.9.3`.
+	Release notes: https://github.com/woocommerce/action-scheduler/releases/tag/3.9.3
+- Changed `wp-pay-gateways/mollie` from `^4.10` to `v4.17.0`.
+	Release notes: https://github.com/pronamic/wp-pronamic-pay-mollie/releases/tag/v4.17.0
+- Changed `wp-pay/core` from `^4.17` to `v4.28.0`.
+	Release notes: https://github.com/pronamic/wp-pay-core/releases/tag/v4.28.0
+
+Full set of changes: [`4.7.2...4.8.0`][4.8.0]
+
+[4.8.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.7.2...v4.8.0
+
 ## [4.7.2] - 2025-11-11
 
 ### Commits

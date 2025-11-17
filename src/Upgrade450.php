@@ -23,7 +23,7 @@ class Upgrade450 extends Upgrade {
 	public function __construct() {
 		parent::__construct( '4.5.0' );
 
-		\add_action( 'pronamic_pay_restrictcontentpro_upgrade_4_5_0', [ $this, 'upgrade' ], 10, 1 );
+		\add_action( 'pronamic_pay_restrictcontentpro_upgrade_4_5_0', $this->upgrade( ... ), 10, 1 );
 	}
 
 	/**

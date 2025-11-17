@@ -50,15 +50,11 @@ class LengthUnit {
 	 * @return string|null WordPress payment core unit.
 	 */
 	public static function to_core( $length_unit ) {
-		switch ( $length_unit ) {
-			case self::DAY:
-				return 'D';
-			case self::MONTH:
-				return 'M';
-			case self::YEAR:
-				return 'Y';
-			default:
-				return null;
-		}
+		return match ( $length_unit ) {
+			self::DAY => 'D',
+			self::MONTH => 'M',
+			self::YEAR => 'Y',
+			default => null,
+		};
 	}
 }

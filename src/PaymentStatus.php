@@ -76,19 +76,13 @@ class PaymentStatus {
 	 * @return string|null Restrict Content Pro payment status.
 	 */
 	public static function from_core( $core_status ) {
-		switch ( $core_status ) {
-			case Core_PaymentStatus::OPEN:
-				return self::PENDING;
-			case Core_PaymentStatus::CANCELLED:
-				return self::FAILED;
-			case Core_PaymentStatus::EXPIRED:
-				return self::ABANDONED;
-			case Core_PaymentStatus::FAILURE:
-				return self::FAILED;
-			case Core_PaymentStatus::SUCCESS:
-				return self::COMPLETE;
-			default:
-				return null;
-		}
+		return match ( $core_status ) {
+			Core_PaymentStatus::OPEN => self::PENDING,
+			Core_PaymentStatus::CANCELLED => self::FAILED,
+			Core_PaymentStatus::EXPIRED => self::ABANDONED,
+			Core_PaymentStatus::FAILURE => self::FAILED,
+			Core_PaymentStatus::SUCCESS => self::COMPLETE,
+			default => null,
+		};
 	}
 }

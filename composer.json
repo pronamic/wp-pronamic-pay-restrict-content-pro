@@ -76,10 +76,10 @@
 	"require": {
 		"php": ">=8.2",
 		"automattic/jetpack-autoloader": "^3.0 || ^4.0 || ^5.0",
-		"pronamic/wp-money": "^2.2",
-		"woocommerce/action-scheduler": "^3.7",
-		"wp-pay-gateways/mollie": "^4.10",
-		"wp-pay/core": "^4.17"
+		"pronamic/wp-money": "^2.4",
+		"woocommerce/action-scheduler": "^3.9",
+		"wp-pay-gateways/mollie": "^4.15",
+		"wp-pay/core": "^4.28"
 	},
 	"require-dev": {
 		"php-coveralls/php-coveralls": "^2.5",

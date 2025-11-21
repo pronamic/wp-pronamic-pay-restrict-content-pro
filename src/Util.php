@@ -169,7 +169,7 @@ class Util {
 			$line->set_type( PaymentLineType::DIGITAL );
 			/* translators: %s: Subscription name */
 			$line->set_name( \sprintf( \__( 'Trial "%s"', 'pronamic_ideal' ), $gateway->subscription_name ) );
-			$line->set_quantity( 1 );
+			$line->set_quantity( new Number( 1 ) );
 			$line->set_unit_price( new Money( 0, $gateway->currency ) );
 			$line->set_total_amount( new Money( 0, $gateway->currency ) );
 			$line->set_product_url( null );
@@ -186,7 +186,7 @@ class Util {
 		$line->set_sku( null );
 		$line->set_type( PaymentLineType::DIGITAL );
 		$line->set_name( $gateway->subscription_name );
-		$line->set_quantity( 1 );
+		$line->set_quantity( new Number( 1 ) );
 		$line->set_unit_price( new Money( $gateway->payment->subtotal, $gateway->currency ) );
 		$line->set_total_amount( new Money( $gateway->payment->subtotal, $gateway->currency ) );
 		$line->set_product_url( null );
@@ -211,7 +211,7 @@ class Util {
 			$line->set_sku( null );
 			$line->set_type( PaymentLineType::DISCOUNT );
 			$line->set_name( $name );
-			$line->set_quantity( 1 );
+			$line->set_quantity( new Number( 1 ) );
 			$line->set_unit_price( new Money( -$gateway->discount, $gateway->currency ) );
 			$line->set_total_amount( new Money( -$gateway->discount, $gateway->currency ) );
 			$line->set_product_url( null );
@@ -227,7 +227,7 @@ class Util {
 			$line->set_sku( null );
 			$line->set_type( PaymentLineType::FEE );
 			$line->set_name( __( 'Fees', 'pronamic_ideal' ) );
-			$line->set_quantity( 1 );
+			$line->set_quantity( new Number( 1 ) );
 			$line->set_unit_price( new Money( $gateway->payment->fees, $gateway->currency ) );
 			$line->set_total_amount( new Money( $gateway->payment->fees, $gateway->currency ) );
 			$line->set_product_url( null );
@@ -251,7 +251,7 @@ class Util {
 			$line->set_sku( null );
 			$line->set_type( PaymentLineType::DISCOUNT );
 			$line->set_name( \__( 'Credits', 'pronamic_ideal' ) );
-			$line->set_quantity( 1 );
+			$line->set_quantity( new Number( 1 ) );
 			$line->set_unit_price( $price );
 			$line->set_total_amount( $price );
 			$line->set_product_url( null );

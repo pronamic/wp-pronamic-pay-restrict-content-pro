@@ -7,6 +7,21 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 ## [Unreleased][unreleased]
 -
 
+## [4.9.0] - 2026-01-05
+
+### Commits
+
+- Merge pull request #35 from pronamic/core-230-payment-line-quantity-type ([085be2f](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/085be2f8fe13ff7efb2d7498ad30d7f67ff979bb))
+- Updated for quantity `Number` (https://github.com/pronamic/wp-pay-core/issues/230). ([e2d60f7](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/commit/e2d60f79e700d93f38ac2f06b02fd90c8a3734f1))
+
+### Composer
+
+- Added `pronamic/wp-number` `^1.4`.
+
+Full set of changes: [`4.8.0...4.9.0`][4.9.0]
+
+[4.9.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.8.0...v4.9.0
+
 ## [4.8.0] - 2025-11-17
 
 ### Commits

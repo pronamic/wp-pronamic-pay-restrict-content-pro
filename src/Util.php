@@ -25,7 +25,6 @@ use RCP_Payment_Gateway;
 /**
  * Util
  *
- * @author  Reüel van der Steege
  * @version 2.2.2
  * @since   1.0.0
  */

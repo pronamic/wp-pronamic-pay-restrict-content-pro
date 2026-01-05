@@ -15,7 +15,6 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 /**
  * Giropay gateway
  *
- * @author  Reüel van der Steege
  * @version 4.3.5
  * @since   4.3.5
  */

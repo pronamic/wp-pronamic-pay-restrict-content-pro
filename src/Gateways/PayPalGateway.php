@@ -15,7 +15,6 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 /**
  * PayPal gateway
  *
- * @author  Reüel van der Steege
  * @version 2.0.0
  * @since   1.0.1
  */

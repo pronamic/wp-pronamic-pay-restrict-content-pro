@@ -15,7 +15,6 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 /**
  * Apple Pay gateway
  *
- * @author  Reüel van der Steege
  * @version 3.1.0
  * @since   3.1.0
  */

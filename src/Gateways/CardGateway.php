@@ -15,7 +15,6 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 /**
  * Card gateway
  *
- * @author  Reüel van der Steege
  * @version 4.6.0
  * @since   4.6.0
  */

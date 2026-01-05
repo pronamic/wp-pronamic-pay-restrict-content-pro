@@ -15,7 +15,6 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 /**
  * EPS gateway
  *
- * @author  Reüel van der Steege
  * @version 4.3.6
  * @since   4.3.6
  */

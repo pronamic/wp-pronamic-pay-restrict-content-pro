@@ -19,7 +19,6 @@ use WP_Post;
 /**
  * Upgrade 2.1.6
  *
- * @author  Remco Tolsma
  * @version 2.1.6
  * @since   2.1.6
  */

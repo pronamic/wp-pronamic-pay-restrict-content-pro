@@ -15,9 +15,7 @@ use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
 /**
  * Restrict Content Pro length unit
  *
- * @link https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/payments/edit-payment.php#L104-118
- *
- * @author  Remco Tolsma
+ * @link    https://gitlab.com/pronamic-plugins/restrict-content-pro/blob/3.0.10/includes/admin/payments/edit-payment.php#L104-118
  * @version 2.0.0
  * @since   1.0.0
  */

@@ -11,9 +11,7 @@
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContent;
 
 use Pronamic\WordPress\DateTime\DateTime;
-use Pronamic\WordPress\DateTime\DateTimeImmutable;
 use Pronamic\WordPress\Pay\AbstractPluginIntegration;
-use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
 use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;

@@ -18,8 +18,6 @@ use Pronamic\WordPress\Pay\Payments\Payment;
 use Pronamic\WordPress\Pay\Payments\PaymentLines;
 use Pronamic\WordPress\Pay\Payments\PaymentLineType;
 use Pronamic\WordPress\Pay\Subscriptions\Subscription;
-use Pronamic\WordPress\Pay\Subscriptions\SubscriptionInterval;
-use Pronamic\WordPress\Pay\Subscriptions\SubscriptionPhase;
 use RCP_Payment_Gateway;
 
 /**

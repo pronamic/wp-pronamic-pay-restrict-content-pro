@@ -10,8 +10,6 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContent;
 
-use Pronamic\WordPress\Pay\Payments\PaymentStatus as Core_PaymentStatus;
-
 /**
  * Restrict Content Pro length unit
  *

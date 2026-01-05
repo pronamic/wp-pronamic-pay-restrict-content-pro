@@ -16,7 +16,6 @@ use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Extensions\RestrictContent\Util;
 use Pronamic\WordPress\Pay\Plugin;
 use RCP_Payment_Gateway;
-use RCP_Payments;
 
 /**
  * Gateway

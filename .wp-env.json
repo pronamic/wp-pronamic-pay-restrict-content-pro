@@ -14,5 +14,6 @@
 	},
 	"config": {
 		"PRONAMIC_PAY_DEBUG": true
-	}
+	},
+	"testsEnvironment": false
 }

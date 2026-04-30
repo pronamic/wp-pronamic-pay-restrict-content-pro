@@ -241,6 +241,7 @@ class Extension extends AbstractPluginIntegration {
 				'pronamic_pay_eps'                     => Gateways\EpsGateway::class,
 				'pronamic_pay_ideal'                   => Gateways\IDealGateway::class,
 				'pronamic_pay_giropay'                 => Gateways\GiropayGateway::class,
+				'pronamic_pay_pay_by_bank'             => Gateways\PayByBankGateway::class,
 				'pronamic_pay_paypal'                  => Gateways\PayPalGateway::class,
 				'pronamic_pay_sofort'                  => Gateways\SofortGateway::class,
 			];

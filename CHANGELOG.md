@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [Unreleased][unreleased]
--
+
+## [4.10.0] - 2026-05-13
+
+### Added
+
+- Added support for "Pay by Bank" payment method.
+
+### Changed
+
+- Reordered gateways list to prioritize "Pay by Bank" method.
+
+Full set of changes: [`4.9.0...4.10.0`][4.10.0]
+
+[4.10.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.9.0...v4.10.0
 
 ## [4.9.0] - 2026-01-05
 

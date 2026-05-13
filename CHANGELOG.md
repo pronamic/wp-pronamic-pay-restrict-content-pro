@@ -6,6 +6,16 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+## [4.10.1] - 2026-05-13
+
+### Fixed
+
+- Fixed text domain for Mollie integration manual URL.
+
+Full set of changes: [`4.10.0...4.10.1`][4.10.1]
+
+[4.10.1]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.10.0...v4.10.1
+
 ## [4.10.0] - 2026-05-13
 
 ### Added

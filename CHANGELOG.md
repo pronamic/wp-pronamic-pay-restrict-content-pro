@@ -6,6 +6,22 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+## [4.11.0] - 2026-07-31
+
+### Changed
+
+- Added support for Action Scheduler 4.0.
+
+### Composer
+
+- Changed `woocommerce/action-scheduler` from `^3.9` to `^3.9 || ^4.0`, locked at `4.0.0`.
+	Action Scheduler 4.0 accounts for action args when scheduling unique actions, automatically purges failed actions after 3 months, and improves cleanup performance.
+	Release notes: https://github.com/woocommerce/action-scheduler/releases/tag/4.0.0
+
+Full set of changes: [`4.10.1...4.11.0`][4.11.0]
+
+[4.11.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.10.1...v4.11.0
+
 ## [4.10.1] - 2026-05-13
 
 ### Fixed

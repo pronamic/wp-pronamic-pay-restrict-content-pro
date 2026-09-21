@@ -441,23 +441,27 @@ class Extension extends AbstractPluginIntegration {
 					return;
 				}
 
-				if ( MembershipStatus::ACTIVE !== $rcp_membership->get_status() ) {
-					$expiration = '';
+				$expiration_end_date = $this->get_payment_expiration_end_date( $payment );
+				$expiration          = '';
+				$should_renew        = MembershipStatus::ACTIVE !== $rcp_membership->get_status();
 
-					$periods = $payment->get_periods();
+				if ( null !== $expiration_end_date ) {
+					$expiration = $expiration_end_date->format( DateTime::MYSQL );
+				}
 
-					if ( null !== $periods ) {
-						$end_date = null;
+				if ( ! $should_renew && null !== $expiration_end_date ) {
+					$current_expiration_timestamp = $rcp_membership->get_expiration_time();
 
-						foreach ( $periods as $period ) {
-							$end_date = \max( $end_date, $period->get_end_date() );
-						}
+					if ( false === $current_expiration_timestamp ) {
+						$should_renew = true;
+					} else {
+						$current_expiration = new \DateTimeImmutable( '@' . $current_expiration_timestamp );
 
-						if ( null !== $end_date ) {
-							$expiration = $end_date->format( DateTime::MYSQL );
-						}
+						$should_renew = $expiration_end_date > $current_expiration;
 					}
+				}
 
+				if ( $should_renew ) {
 					$rcp_membership->renew( true, 'active', $expiration );
 				}
 
@@ -961,19 +965,10 @@ class Extension extends AbstractPluginIntegration {
 
 		// Renew membership.
 		$expiration = '';
+		$end_date   = $this->get_payment_expiration_end_date( $payment );
 
-		$periods = $payment->get_periods();
-
-		if ( null !== $periods ) {
-			$end_date = null;
-
-			foreach ( $periods as $period ) {
-				$end_date = \max( $end_date, $period->get_end_date() );
-			}
-
-			if ( null !== $end_date ) {
-				$expiration = $end_date->format( DateTime::MYSQL );
-			}
+		if ( null !== $end_date ) {
+			$expiration = $end_date->format( DateTime::MYSQL );
 		}
 
 		$rcp_membership->renew( true, 'active', $expiration );
@@ -982,6 +977,36 @@ class Extension extends AbstractPluginIntegration {
 		$payment->source_id = $rcp_payment_id;
 
 		$payment->save();
+	}
+
+	/**
+	 * Get payment expiration end date from the attached periods.
+	 *
+	 * @param Payment $payment Payment.
+	 * @return \DateTimeInterface|null
+	 */
+	private function get_payment_expiration_end_date( Payment $payment ) {
+		$periods = $payment->get_periods();
+
+		if ( null === $periods ) {
+			return null;
+		}
+
+		$end_date = null;
+
+		foreach ( $periods as $period ) {
+			$period_end_date = $period->get_end_date();
+
+			if ( null === $period_end_date ) {
+				continue;
+			}
+
+			if ( null === $end_date || $period_end_date > $end_date ) {
+				$end_date = $period_end_date;
+			}
+		}
+
+		return $end_date;
 	}
 
 	/**

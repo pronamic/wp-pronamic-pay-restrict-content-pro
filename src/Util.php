@@ -75,10 +75,14 @@ class Util {
 		if ( null !== $subscription ) {
 			$payment->add_subscription( $subscription );
 
-			$start_date = $subscription->get_start_date();
+			$period_date = $subscription->get_next_payment_date();
 
-			if ( null !== $start_date ) {
-				$period = $subscription->get_period_for_date( $start_date );
+			if ( null === $period_date ) {
+				$period_date = $subscription->get_start_date();
+			}
+
+			if ( null !== $period_date ) {
+				$period = $subscription->get_period_for_date( $period_date );
 
 				if ( null !== $period ) {
 					$payment->add_period( $period );

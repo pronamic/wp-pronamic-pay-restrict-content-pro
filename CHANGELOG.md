@@ -6,9 +6,15 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
-### Changed
+## [4.11.1] - 2026-11-02
 
-- Allow Jetpack Autoloader 6.x while retaining support for 3.x, 4.x, and 5.x.
+### Composer
+
+- Changed `automattic/jetpack-autoloader` from `^3.0 || ^4.0 || ^5.0` to `^3.0 || ^4.0 || ^5.0 || ^6.0` to allow Jetpack Autoloader 6.x. Jetpack Autoloader 6.0.0 only raises its minimum PHP version to 7.4. Release notes: https://github.com/Automattic/jetpack-autoloader/blob/v6.0.0/CHANGELOG.md
+
+Full set of changes: [`4.11.0...4.11.1`][4.11.1]
+
+[4.11.1]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.11.0...v4.11.1
 
 ## [4.11.0] - 2026-07-31
 
@@ -454,7 +460,7 @@ Full set of changes: [`4.2.1...4.3.0`][4.3.0]
 ## 1.0.0 - 2017-12-13
 - First release.
 
-[unreleased]: https://github.com/wp-pay-extensions/restrict-content-pro/compare/4.2.1...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.11.1...HEAD
 [4.2.1]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/4.2.0...4.2.1
 [4.2.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/4.1.0...4.2.0
 [4.1.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/4.0.0...4.1.0

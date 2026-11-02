@@ -6,6 +6,10 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+### Changed
+
+- Allow Jetpack Autoloader 6.x while retaining support for 3.x, 4.x, and 5.x.
+
 ## [4.11.0] - 2026-07-31
 
 ### Changed

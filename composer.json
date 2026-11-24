@@ -67,11 +67,7 @@
 	"repositories": [
 		{
 			"type": "composer",
-			"url": "https://wpackagist.org",
-			"only": [
-				"wpackagist-plugin/*",
-				"wpackagist-theme/*"
-			]
+			"url": "https://repo.wp-packages.org"
 		}
 	],
 	"require": {
@@ -96,7 +92,7 @@
 		"wp-cli/dist-archive-command": "*",
 		"wp-cli/wp-cli-bundle": "*",
 		"wp-phpunit/wp-phpunit": "^6.5",
-		"wpackagist-plugin/restrict-content": "^3.2",
+		"wp-plugin/restrict-content": "^3.2",
 		"yoast/phpunit-polyfills": "^2.0"
 	},
 	"scripts": {

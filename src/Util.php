@@ -284,9 +284,7 @@ class Util {
 
 		$subscription = array_shift( $subscriptions );
 
-		if ( null === $subscription ) {
-			$subscription = new Subscription();
-		}
+		$subscription ??= new Subscription();
 
 		$subscription_updater = new SubscriptionUpdater( $gateway->membership, $subscription );
 

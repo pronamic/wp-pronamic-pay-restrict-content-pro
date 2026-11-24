@@ -81,7 +81,6 @@
 		"pronamic/wp-money": "^2.4",
 		"pronamic/wp-number": "^1.4",
 		"woocommerce/action-scheduler": "^3.9 || ^4.0",
-		"wp-pay-gateways/mollie": "^4.15",
 		"wp-pay/core": "^4.28"
 	},
 	"require-dev": {

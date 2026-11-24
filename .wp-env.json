@@ -3,6 +3,7 @@
 	"plugins": [
 		"pronamic/wp-env-quick-login",
 		"pronamic/wp-pronamic-pay-test-helper",
+		"https://downloads.wordpress.org/plugin/pronamic-ideal.zip",
 		"https://downloads.wordpress.org/plugin/restrict-content.zip",
 		"https://downloads.wordpress.org/plugin/pronamic-client.zip",
 		"https://downloads.wordpress.org/plugin/query-monitor.zip",
@@ -14,6 +15,7 @@
 		"wp-content/plugins/pronamic-pay-restrict-content": "./build/pronamic-pay-restrict-content/"
 	},
 	"config": {
+		"JETPACK_AUTOLOAD_DEV": true,
 		"PRONAMIC_PAY_DEBUG": true
 	},
 	"testsEnvironment": false

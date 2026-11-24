@@ -62,16 +62,3 @@ add_filter(
 		return $integrations;
 	}
 );
-
-add_filter(
-	'pronamic_pay_gateways',
-	function ( $gateways ) {
-		$gateways[] = new \Pronamic\WordPress\Pay\Gateways\Mollie\Integration(
-			[
-				'manual_url' => \__( 'https://www.pronamicpay.com/en/manuals/how-to-connect-mollie-to-wordpress-with-pronamic-pay/', 'pronamic-pay-restrict-content' ),
-			]
-		);
-
-		return $gateways;
-	}
-);

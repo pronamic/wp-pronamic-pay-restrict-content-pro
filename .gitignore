@@ -26,5 +26,8 @@
 # wp-env
 /.wp-env.override.json
 
-# # Packages
+# Packages
 /packages/
+
+# macOS
+.DS_Store

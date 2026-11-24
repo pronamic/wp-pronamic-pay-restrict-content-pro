@@ -2,7 +2,7 @@ parameters:
 	customRulesetUsed: false
 	dynamicConstantNames:
 		- RCP_PLUGIN_VERSION
-	level: 3
+	level: 4
 	paths:
 		- src/
 	scanDirectories:

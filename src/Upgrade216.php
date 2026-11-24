@@ -14,6 +14,7 @@ use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
 use Pronamic\WordPress\Pay\Upgrades\Upgrade;
 use RCP_Customer;
 use RCP_Membership;
+use WP_CLI;
 use WP_Post;
 
 /**
@@ -31,9 +32,7 @@ class Upgrade216 extends Upgrade {
 
 		\add_action( 'pronamic_pay_restrictcontentpro_upgrade_2_1_6', $this->upgrade( ... ), 10, 1 );
 
-		if ( \defined( '\WP_CLI' ) && \WP_CLI ) {
-			$this->cli_init();
-		}
+		\add_action( 'cli_init', $this->cli_init( ... ) );
 	}
 
 	/**
@@ -62,11 +61,11 @@ class Upgrade216 extends Upgrade {
 	 * @return void
 	 */
 	public function cli_init() {
-		\WP_CLI::add_command(
+		WP_CLI::add_command(
 			'pronamic-pay restrict-content-pro upgrade-216 execute',
 			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 			function ( $args, $assoc_args ): void {
-				\WP_CLI::log( 'Upgrade 2.1.6' );
+				WP_CLI::log( 'Upgrade 2.1.6' );
 
 				$this->upgrade();
 			},
@@ -75,11 +74,11 @@ class Upgrade216 extends Upgrade {
 			]
 		);
 
-		\WP_CLI::add_command(
+		WP_CLI::add_command(
 			'pronamic-pay restrict-content-pro upgrade-216 list-subscriptions',
 			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 			function ( $args, $assoc_args ): void {
-				\WP_CLI::log( 'Upgrade 2.1.6 - Subscriptions List' );
+				WP_CLI::log( 'Upgrade 2.1.6 - Subscriptions List' );
 
 				$posts = $this->get_subscription_posts();
 
@@ -90,11 +89,11 @@ class Upgrade216 extends Upgrade {
 			]
 		);
 
-		\WP_CLI::add_command(
+		WP_CLI::add_command(
 			'pronamic-pay restrict-content-pro upgrade-216 upgrade-subscriptions',
 			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 			function ( $args, $assoc_args ): void {
-				\WP_CLI::log( 'Upgrade 2.1.6 - Subscriptions' );
+				WP_CLI::log( 'Upgrade 2.1.6 - Subscriptions' );
 
 				$this->upgrade_subscriptions(
 					[
@@ -110,11 +109,11 @@ class Upgrade216 extends Upgrade {
 			]
 		);
 
-		\WP_CLI::add_command(
+		WP_CLI::add_command(
 			'pronamic-pay restrict-content-pro upgrade-216 list-payments',
 			// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 			function ( $args, $assoc_args ): void {
-				\WP_CLI::log( 'Upgrade 2.1.6 - Payments List' );
+				WP_CLI::log( 'Upgrade 2.1.6 - Payments List' );
 
 				$posts = $this->get_payment_posts();
 
@@ -195,8 +194,8 @@ class Upgrade216 extends Upgrade {
 	 * @return void
 	 */
 	private function log( $message ) {
-		if ( method_exists( '\WP_CLI', 'log' ) ) {
-			\WP_CLI::log( $message );
+		if ( \class_exists( WP_CLI::class ) ) {
+			WP_CLI::log( $message );
 		}
 	}
 
@@ -210,6 +209,12 @@ class Upgrade216 extends Upgrade {
 	 * @return bool True if Restrict Content Pro membership is for the specified WordPress user ID, false otherwise.
 	 */
 	private function is_rcp_membership_for_wp_user_id( $rcp_membership, $wp_user_id ) {
+		/**
+		 * The Restrict Content Pro documentation states that a customer object
+		 * is always returned, but `rcp_get_customer()` returns `false` on failure.
+		 *
+		 * @var RCP_Customer|false $rcp_customer
+		 */
 		$rcp_customer = $rcp_membership->get_customer();
 
 		$rcp_customer_user_id = null;
@@ -305,22 +310,20 @@ class Upgrade216 extends Upgrade {
 			/**
 			 * In Restrict Content Pro versions before 3.0 we may have saved the Restrict Content Pro payment ID as source ID.
 			 */
-			if ( null === $rcp_membership ) {
-				$potential_rcp_payment_id = (int) $subscription_source_id;
+			$potential_rcp_payment_id = (int) $subscription_source_id;
 
-				$potential_rcp_membership = $this->get_rcp_membership_by_rcp_payment_id( $potential_rcp_payment_id );
+			$potential_rcp_membership = $this->get_rcp_membership_by_rcp_payment_id( $potential_rcp_payment_id );
 
-				if ( null !== $potential_rcp_membership && $this->is_rcp_membership_for_wp_user_id( $potential_rcp_membership, $pronamic_subscription_post_author_id ) ) {
-					$rcp_membership = $potential_rcp_membership;
+			if ( null !== $potential_rcp_membership && $this->is_rcp_membership_for_wp_user_id( $potential_rcp_membership, $pronamic_subscription_post_author_id ) ) {
+				$rcp_membership = $potential_rcp_membership;
 
-					$this->log(
-						\sprintf(
-							'- Found Restrict Content Pro membership `%s` through potential Restrict Content Pro payment ID `%s`.',
-							$rcp_membership->get_id(),
-							$potential_rcp_payment_id
-						)
-					);
-				}
+				$this->log(
+					\sprintf(
+						'- Found Restrict Content Pro membership `%s` through potential Restrict Content Pro payment ID `%s`.',
+						$rcp_membership->get_id(),
+						$potential_rcp_payment_id
+					)
+				);
 			}
 
 			/**
@@ -437,17 +440,12 @@ class Upgrade216 extends Upgrade {
 
 			/**
 			 * We have to find a matching Restrict Content Pro payment.
-			 */
-			$rcp_payment = null;
-
-			/**
+			 *
 			 * In Restrict Content Pro versions before 3.0 we may have saved the Restrict Content Pro payment ID as source ID.
 			 */
-			if ( null === $rcp_payment ) {
-				$potential_rcp_payment_id = $payment_source_id;
+			$potential_rcp_payment_id = $payment_source_id;
 
-				$rcp_payment = $this->get_rcp_payment_by_rcp_payment_id( (int) $potential_rcp_payment_id );
-			}
+			$rcp_payment = $this->get_rcp_payment_by_rcp_payment_id( (int) $potential_rcp_payment_id );
 
 			/**
 			 * No match, no problem.

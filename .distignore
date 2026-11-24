@@ -11,6 +11,8 @@
 
 .phpunit.cache/
 
+.travis.yml
+
 .wp-env.json
 .wp-env.override.json
 
@@ -25,6 +27,8 @@ phpunit.xml.dist
 
 psalm.xml.dist
 
+qodana.yaml
+
 rector.php
 
 /build/
@@ -33,3 +37,5 @@ rector.php
 /tests/
 /wordpress/
 /wp-content/
+/vendor/bin/
+/vendor/justinrainbow/json-schema/bin/

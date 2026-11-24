@@ -1,0 +1,44 @@
+# Copyright (C) 2026 Pronamic
+# This file is distributed under the GPL-3.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Pronamic Pay Restrict Content (Pro) Add-On 4.11.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/pronamic-pay-restrict-content\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-11-24T13:29:23+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: pronamic-pay-restrict-content\n"
+
+#. Plugin Name of the plugin
+#: pronamic-pay-restrict-content.php:3
+msgid "Pronamic Pay Restrict Content (Pro) Add-On"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: pronamic-pay-restrict-content.php:4
+msgid "https://www.pronamic.eu/plugins/pronamic-pay-restrict-content-pro/"
+msgstr ""
+
+#. Description of the plugin
+#: pronamic-pay-restrict-content.php:5
+msgid "Extend the Pronamic Pay plugin with Restrict Content (Pro) support to receive payments through a variety of payment providers."
+msgstr ""
+
+#. Author of the plugin
+#: pronamic-pay-restrict-content.php:11
+msgid "Pronamic"
+msgstr ""
+
+#. Author URI of the plugin
+#: pronamic-pay-restrict-content.php:12
+msgid "https://www.pronamic.eu/"
+msgstr ""
+
+#: pronamic-pay-restrict-content.php:71
+msgid "https://www.pronamicpay.com/en/manuals/how-to-connect-mollie-to-wordpress-with-pronamic-pay/"
+msgstr ""

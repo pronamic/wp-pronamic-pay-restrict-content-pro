@@ -6,15 +6,40 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+## [5.0.0] - 2026-11-26
+
 ### Added
 
 - Added support for the Restrict Content Pro "Change Level" feature: the Pronamic Pay subscription, including the payment mandate, is moved to the new membership and updated to the new membership level. [#2](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/2)
+- Added Dutch (`nl_NL`) translation.
+
+### Changed
+
+- Requires PHP 8.3 or higher.
+- Changed text domain from `pronamic_ideal` to `pronamic-pay-restrict-content`.
+
+### Removed
+
+- Removed the bundled Mollie gateway, this add-on no longer registers payment gateways. Use the Pronamic Pay plugin for payment gateways.
 
 ### Fixed
 
 - Fixed changing the recurring amount of a membership in the Restrict Content Pro admin, the new amount was not stored. [#19](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/19)
-
 - Fixed incorrect period of the first payment when an existing membership is renewed with auto renewal, which resulted in a second payment on the old expiration date. [#28](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/28)
+- Fixed a possible error on a failed recurring payment without a customer user ID.
+
+### Composer
+
+- Removed `wp-pay-gateways/mollie`.
+- Added `composer/installers` `^2.3`.
+- Changed `php` from `>=8.2` to `>=8.3`.
+- Changed `wp-pay/core` from `^4.28` to `^4.35`, locked at `v4.35.0`.
+- Changed `pronamic/wp-money` from `^2.4` to `^2.5`, locked at `2.5.0`.
+- Updated `woocommerce/action-scheduler` lock to `4.2.0`.
+
+Full set of changes: [`4.11.1...5.0.0`][5.0.0]
+
+[5.0.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.11.1...v5.0.0
 
 ## [4.11.1] - 2026-11-02
 
@@ -470,7 +495,7 @@ Full set of changes: [`4.2.1...4.3.0`][4.3.0]
 ## 1.0.0 - 2017-12-13
 - First release.
 
-[unreleased]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v4.11.1...HEAD
+[unreleased]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/v5.0.0...HEAD
 [4.2.1]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/4.2.0...4.2.1
 [4.2.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/4.1.0...4.2.0
 [4.1.0]: https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/compare/4.0.0...4.1.0

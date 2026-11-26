@@ -488,7 +488,7 @@ class Upgrade216 extends Upgrade {
 			$payment->add_note(
 				\sprintf(
 					/* translators: 1: Old source, 2: Old source ID, 3: New source, 4: New source ID. */
-					__( 'Since Restrict Content Pro 3 a payment must be linked to a Restrict Content Pro payment. That\'s why source "%1$s" with ID "%2$s" was updated to source "%3$s" with ID %4$s".', 'pronamic-pay-restrict-content' ),
+					__( 'Since Restrict Content Pro 3 a payment must be linked to a Restrict Content Pro payment. That\'s why source "%1$s" with ID "%2$s" was updated to source "%3$s" with ID "%4$s".', 'pronamic-pay-restrict-content' ),
 					$payment_source,
 					$payment_source_id,
 					'rcp_payment',

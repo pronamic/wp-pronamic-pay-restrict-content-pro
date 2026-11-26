@@ -1,0 +1,225 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Pronamic Pay Restrict Content (Pro) Add-On 4.11.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/pronamic-pay-restrict-content\n"
+"POT-Creation-Date: 2026-11-26T11:04:22+00:00\n"
+"PO-Revision-Date: 2026-11-26 12:06+0100\n"
+"Last-Translator: Remco Tolsma <info@remcotolsma.nl>\n"
+"Language-Team: Pronamic <info@pronamic.nl>\n"
+"Language: nl_NL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.10\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Domain: pronamic-pay-restrict-content\n"
+
+#. Plugin Name of the plugin
+#: pronamic-pay-restrict-content.php:3
+msgid "Pronamic Pay Restrict Content (Pro) Add-On"
+msgstr "Pronamic Pay Restrict Content (Pro) add-on"
+
+#. Plugin URI of the plugin
+#: pronamic-pay-restrict-content.php:4
+msgid "https://www.pronamic.eu/plugins/pronamic-pay-restrict-content-pro/"
+msgstr "https://www.pronamic.eu/plugins/pronamic-pay-restrict-content-pro/"
+
+#. Description of the plugin
+#: pronamic-pay-restrict-content.php:5
+msgid "Extend the Pronamic Pay plugin with Restrict Content (Pro) support to receive payments through a variety of payment providers."
+msgstr "Breid de Pronamic Pay plugin uit met ondersteuning voor Restrict Content (Pro) om betalingen te ontvangen via verschillende betaalproviders."
+
+#. Author of the plugin
+#: pronamic-pay-restrict-content.php:11 src/Gateways/Gateway.php:330
+#: src/Gateways/Gateway.php:357
+msgid "Pronamic"
+msgstr "Pronamic"
+
+#. Author URI of the plugin
+#: pronamic-pay-restrict-content.php:12
+msgid "https://www.pronamic.eu/"
+msgstr "https://www.pronamic.nl/"
+
+#. translators: %s: Restrict Content Pro
+#: src/Extension.php:543
+#, php-format
+msgid "Subscription activated by %s."
+msgstr "Abonnement geactiveerd door %s."
+
+#: src/Extension.php:544 src/Extension.php:552 src/Extension.php:560
+#: src/Extension.php:568 src/Extension.php:746 src/Extension.php:832
+msgid "Restrict Content Pro"
+msgstr "Restrict Content Pro"
+
+#. translators: %s: Restrict Content Pro
+#: src/Extension.php:551
+#, php-format
+msgid "Subscription canceled by %s."
+msgstr "Abonnement geannuleerd door %s."
+
+#. translators: %s: Restrict Content Pro
+#: src/Extension.php:559
+#, php-format
+msgid "Subscription expired by %s."
+msgstr "Abonnement verlopen door %s."
+
+#. translators: %s: Restrict Content Pro
+#: src/Extension.php:567
+#, php-format
+msgid "Subscription pending by %s."
+msgstr "Abonnement in afwachting door %s."
+
+#: src/Extension.php:671 src/Extension.php:672
+msgid "Update payment method"
+msgstr "Betaalmethode bijwerken"
+
+#. translators: %s: payment number
+#: src/Extension.php:761
+#, php-format
+msgid "Payment %s"
+msgstr "Betaling %s"
+
+#: src/Extension.php:779
+msgid "Restrict Content Pro Payment"
+msgstr "Restrict Content Pro betaling"
+
+#: src/Extension.php:818
+msgid "Restrict Content Pro Membership"
+msgstr "Restrict Content Pro lidmaatschap"
+
+#. translators: %s: source id
+#: src/Extension.php:847
+#, php-format
+msgid "Membership %s"
+msgstr "Lidmaatschap %s"
+
+#: src/Gateways/Gateway.php:158
+msgid "Creating a subscription with an immediate charge is not supported."
+msgstr "Het aanmaken van een abonnement met een directe afschrijving wordt niet ondersteund."
+
+#: src/Gateways/Gateway.php:170
+msgid "The membership is not active."
+msgstr "Het lidmaatschap is niet actief."
+
+#: src/Gateways/Gateway.php:179
+msgid "The membership is not changed from a previous membership."
+msgstr "Het lidmaatschap is niet gewijzigd vanuit een eerder lidmaatschap."
+
+#: src/Gateways/Gateway.php:190
+msgid "The previous membership has no Pronamic Pay subscription."
+msgstr "Het vorige lidmaatschap heeft geen Pronamic Pay abonnement."
+
+#. translators: 1: previous Restrict Content Pro membership ID, 2: new Restrict Content Pro membership ID
+#: src/Gateways/Gateway.php:216
+#, php-format
+msgid "Subscription moved from Restrict Content Pro membership %1$s to membership %2$s because the membership level was changed."
+msgstr "Abonnement verplaatst van Restrict Content Pro lidmaatschap %1$s naar lidmaatschap %2$s omdat het lidmaatschapsniveau is gewijzigd."
+
+#. translators: 1: Pronamic Pay subscription ID, 2: new Restrict Content Pro membership ID
+#: src/Gateways/Gateway.php:239
+#, php-format
+msgid "Pronamic Pay subscription %1$s moved to membership %2$s."
+msgstr "Pronamic Pay abonnement %1$s verplaatst naar lidmaatschap %2$s."
+
+#. translators: 1: Pronamic Pay subscription ID, 2: previous Restrict Content Pro membership ID
+#: src/Gateways/Gateway.php:257
+#, php-format
+msgid "Pronamic Pay subscription %1$s moved from membership %2$s."
+msgstr "Pronamic Pay abonnement %1$s verplaatst vanuit lidmaatschap %2$s."
+
+#. translators: %s: admin label
+#: src/Gateways/Gateway.php:385
+#, php-format
+msgid "%s Settings"
+msgstr "%s instellingen"
+
+#: src/Gateways/Gateway.php:397
+msgid "Checkout label"
+msgstr "Afrekenen label"
+
+#: src/Gateways/Gateway.php:402
+msgid "Enter a label to display at checkout."
+msgstr "Vul een label in om te tonen bij het afrekenen."
+
+#: src/Gateways/Gateway.php:408
+msgid "Gateway Configuration"
+msgstr "Betalingsgateway configuratie"
+
+#: src/Gateways/Gateway.php:423
+msgid "Choose your configuration."
+msgstr "Kies je configuratie."
+
+#: src/Gateways/Gateway.php:500 src/Gateways/Gateway.php:527
+msgid "Payment Error"
+msgstr "Betalingsfout"
+
+#. translators: %s: JSON encoded payment data
+#: src/Gateways/Gateway.php:523
+#, php-format
+msgid "Payment creation failed before sending buyer to the payment provider. Error: %s"
+msgstr "Het aanmaken van de betaling is mislukt voordat de koper naar de betaalprovider werd gestuurd. Fout: %s"
+
+#. translators: %s: Potential WordPress user ID.
+#: src/Upgrade216.php:362
+#, php-format
+msgid "Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. Unfortunately, this subscription could not be linked to a Restrict Content Pro membership based on the source ID %s. That is why this subscription has been put on hold so that it can be corrected manually."
+msgstr "Sinds Restrict Content Pro 3 moet een abonnement gekoppeld zijn aan een Restrict Content Pro lidmaatschap. Helaas kon dit abonnement niet aan een Restrict Content Pro lidmaatschap worden gekoppeld op basis van het bron-ID %s. Daarom is dit abonnement in de wacht gezet, zodat het handmatig gecorrigeerd kan worden."
+
+#. translators: 1: Old source, 2: Old source ID, 3: New source, 4: New source ID.
+#: src/Upgrade216.php:389
+#, php-format
+msgid "Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. That's why source \"%1$s\" with ID \"%2$s\" was updated to source \"%3$s\" with ID \"%4$s\"."
+msgstr "Sinds Restrict Content Pro 3 moet een abonnement gekoppeld zijn aan een Restrict Content Pro lidmaatschap. Daarom is bron \"%1$s\" met ID \"%2$s\" bijgewerkt naar bron \"%3$s\" met ID \"%4$s\"."
+
+#. translators: 1: Old source, 2: Old source ID, 3: New source, 4: New source ID.
+#: src/Upgrade216.php:491
+#, php-format
+msgid "Since Restrict Content Pro 3 a payment must be linked to a Restrict Content Pro payment. That's why source \"%1$s\" with ID \"%2$s\" was updated to source \"%3$s\" with ID \"%4$s\"."
+msgstr "Sinds Restrict Content Pro 3 moet een betaling gekoppeld zijn aan een Restrict Content Pro betaling. Daarom is bron \"%1$s\" met ID \"%2$s\" bijgewerkt naar bron \"%3$s\" met ID \"%4$s\"."
+
+#. translators: %s: Restrict Content Pro payment ID
+#: src/Util.php:51
+#, php-format
+msgid "Restrict Content Pro payment %s"
+msgstr "Restrict Content Pro betaling %s"
+
+#. translators: %s: Subscription name
+#: src/Util.php:205
+#, php-format
+msgid "Trial \"%s\""
+msgstr "Proefperiode \"%s\""
+
+#: src/Util.php:234
+msgid "Discount"
+msgstr "Korting"
+
+#. translators: %s: Restrict Content Pro discount code
+#: src/Util.php:239
+#, php-format
+msgid "Discount code `%s`"
+msgstr "Kortingscode `%s`"
+
+#: src/Util.php:263
+msgid "Fees"
+msgstr "Kosten"
+
+#: src/Util.php:287
+msgid "Credits"
+msgstr "Tegoed"
+
+#: views/edit-payment.php:26
+msgid "Pronamic Pay Payments"
+msgstr "Pronamic Pay betalingen"
+
+#: views/edit-payment.php:32
+msgid "ID"
+msgstr "ID"
+
+#: views/edit-payment.php:33
+msgid "Last"
+msgstr "Laatste"
+
+#: views/edit-payment.php:74
+msgid "No payments found."
+msgstr "Geen betalingen gevonden."

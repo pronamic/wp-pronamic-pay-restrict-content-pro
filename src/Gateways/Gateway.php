@@ -145,8 +145,10 @@ class Gateway extends RCP_Payment_Gateway {
 		// Get label from options.
 		$option = $this->id . '_label';
 
-		if ( \array_key_exists( $option, $rcp_options ) && ! empty( $rcp_options[ $option ] ) ) {
-			return (string) $rcp_options[ $option ];
+		$value = $rcp_options[ $option ] ?? null;
+
+		if ( \is_scalar( $value ) && ! empty( $value ) ) {
+			return (string) $value;
 		}
 
 		return $label;

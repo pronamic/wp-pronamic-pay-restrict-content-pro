@@ -425,7 +425,13 @@ class Extension extends AbstractPluginIntegration {
 
 				$rcp_gateway->membership = $rcp_membership;
 
-				$member = new \RCP_Member( $payment->get_customer()->get_user_id() );
+				$user_id = $payment->get_customer()?->get_user_id();
+
+				if ( null === $user_id ) {
+					return;
+				}
+
+				$member = new \RCP_Member( $user_id );
 
 				\do_action( 'rcp_recurring_payment_failed', $member, $rcp_gateway );
 

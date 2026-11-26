@@ -71,7 +71,7 @@ class Upgrade450 extends Upgrade {
 			]
 		);
 
-		foreach ( $query->posts as $subscription_post ) {
+		foreach ( $query->posts ?? [] as $subscription_post ) {
 			$this->upgrade_item( (int) \get_post_field( 'ID', $subscription_post ) );
 		}
 	}

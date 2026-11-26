@@ -148,7 +148,7 @@ class Upgrade216 extends Upgrade {
 		$query = new \WP_Query( $args );
 
 		$subscription_posts = \array_filter(
-			$query->posts,
+			$query->posts ?? [],
 			fn( $subscription_post ) => $subscription_post instanceof WP_Post
 		);
 
@@ -179,7 +179,7 @@ class Upgrade216 extends Upgrade {
 		);
 
 		$payment_posts = \array_filter(
-			$query->posts,
+			$query->posts ?? [],
 			fn( $payment_post ) => $payment_post instanceof WP_Post
 		);
 

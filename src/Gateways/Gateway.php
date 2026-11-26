@@ -13,8 +13,12 @@ namespace Pronamic\WordPress\Pay\Extensions\RestrictContent\Gateways;
 use Pronamic\WordPress\Pay\Admin\AdminModule;
 use Pronamic\WordPress\Pay\Core\Gateway as PronamicGateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
+use Pronamic\WordPress\Pay\Extensions\RestrictContent\MembershipStatus;
+use Pronamic\WordPress\Pay\Extensions\RestrictContent\SubscriptionUpdater;
 use Pronamic\WordPress\Pay\Extensions\RestrictContent\Util;
 use Pronamic\WordPress\Pay\Plugin;
+use Pronamic\WordPress\Pay\Subscriptions\SubscriptionStatus;
+use RCP_Membership;
 use RCP_Payment_Gateway;
 
 /**
@@ -77,10 +81,186 @@ class Gateway extends RCP_Payment_Gateway {
 					 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/memberships/class-rcp-membership.php#L3454
 					 */
 					'renewal-date-changes',
+					/**
+					 * Subscription creation outside the registration form.
+					 *
+					 * Restrict Content Pro uses this feature when an administrator
+					 * changes the membership level of a recurring membership.
+					 *
+					 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/2
+					 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/admin/memberships/membership-actions.php#L396
+					 */
+					'subscription-creation',
 					'trial',
 				];
 			}
 		}
+	}
+
+	/**
+	 * Change the price of the subscription of a membership.
+	 *
+	 * Restrict Content Pro only stores the new recurring amount in the membership
+	 * if this function returns `true`. The Pronamic Pay subscription is updated
+	 * from the membership after the membership has been updated.
+	 *
+	 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/19
+	 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/memberships/class-rcp-membership.php#L3353
+	 * @see \Pronamic\WordPress\Pay\Extensions\RestrictContent\Extension::rcp_after_membership_admin_update()
+	 * @param RCP_Membership $membership Membership object.
+	 * @param float          $new_price  New price.
+	 * @return true
+	 */
+	public function change_membership_subscription_price( $membership, $new_price ) {
+		return true;
+	}
+
+	/**
+	 * Change the next bill date of a membership.
+	 *
+	 * The Pronamic Pay subscription is updated from the membership after the
+	 * membership has been updated.
+	 *
+	 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/17
+	 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/memberships/class-rcp-membership.php#L3489
+	 * @see \Pronamic\WordPress\Pay\Extensions\RestrictContent\Extension::rcp_after_membership_admin_update()
+	 * @param RCP_Membership $membership     Membership object.
+	 * @param string         $next_bill_date Next bill date in MySQL format.
+	 * @return true
+	 */
+	public function change_next_bill_date( $membership, $next_bill_date ) {
+		return true;
+	}
+
+	/**
+	 * Create a subscription for a membership.
+	 *
+	 * Restrict Content Pro calls this function after an administrator has changed
+	 * the membership level of a recurring membership. Restrict Content Pro then
+	 * disables the previous membership, which cancels the subscription, and adds
+	 * a new membership without subscription.
+	 *
+	 * The payment mandate belongs to the Pronamic Pay subscription of the previous
+	 * membership. Instead of creating a new subscription, the existing subscription
+	 * is moved to the new membership and updated to the new membership level.
+	 *
+	 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/2
+	 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/admin/memberships/membership-actions.php#L188
+	 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/memberships/class-rcp-membership.php#L3420
+	 * @param RCP_Membership $membership Membership object.
+	 * @param bool           $charge_now True if the customer should be charged immediately, false if the first payment is due at the membership expiration date.
+	 * @return true|\WP_Error
+	 */
+	public function create_subscription_for_membership( $membership, $charge_now = false ) {
+		if ( $charge_now ) {
+			return new \WP_Error(
+				'pronamic_pay_charge_now_not_supported',
+				\__( 'Creating a subscription with an immediate charge is not supported.', 'pronamic_ideal' )
+			);
+		}
+
+		/**
+		 * The new membership gets the status of the previous membership. If it
+		 * is not active, the subscription was not active either and should not
+		 * be activated by a membership level change.
+		 */
+		if ( MembershipStatus::ACTIVE !== $membership->get_status() ) {
+			return new \WP_Error(
+				'pronamic_pay_membership_not_active',
+				\__( 'The membership is not active.', 'pronamic_ideal' )
+			);
+		}
+
+		$previous_membership = \rcp_get_membership( (int) $membership->get_upgraded_from() );
+
+		if ( false === $previous_membership ) {
+			return new \WP_Error(
+				'pronamic_pay_no_previous_membership',
+				\__( 'The membership is not changed from a previous membership.', 'pronamic_ideal' )
+			);
+		}
+
+		$subscriptions = \get_pronamic_subscriptions_by_source( 'rcp_membership', (string) $previous_membership->get_id() );
+
+		$subscription = \array_shift( $subscriptions );
+
+		if ( null === $subscription ) {
+			return new \WP_Error(
+				'pronamic_pay_no_subscription',
+				\__( 'The previous membership has no Pronamic Pay subscription.', 'pronamic_ideal' )
+			);
+		}
+
+		// Update subscription.
+		$subscription->set_source_id( $membership->get_id() );
+
+		$membership_level_name = $membership->get_membership_level_name();
+
+		if ( false !== $membership_level_name ) {
+			$subscription->set_description( $membership_level_name );
+		}
+
+		try {
+			$subscription_updater = new SubscriptionUpdater( $membership, $subscription );
+
+			$subscription_updater->update_pronamic_subscription();
+		} catch ( \Exception $e ) {
+			return new \WP_Error( 'pronamic_pay_subscription_update_failed', $e->getMessage() );
+		}
+
+		$subscription->set_status( SubscriptionStatus::ACTIVE );
+
+		$subscription->add_note(
+			\sprintf(
+				/* translators: 1: previous Restrict Content Pro membership ID, 2: new Restrict Content Pro membership ID */
+				\__( 'Subscription moved from Restrict Content Pro membership %1$s to membership %2$s because the membership level was changed.', 'pronamic_ideal' ),
+				$previous_membership->get_id(),
+				$membership->get_id()
+			)
+		);
+
+		$subscription->save();
+
+		$subscription_id = (string) $subscription->get_id();
+
+		/**
+		 * Disconnect the previous membership, otherwise status changes of the
+		 * disabled membership would still update the moved subscription.
+		 *
+		 * @see \Pronamic\WordPress\Pay\Extensions\RestrictContent\Extension::rcp_transition_membership_status()
+		 */
+		if ( $previous_membership->get_gateway_subscription_id() === $subscription_id ) {
+			$previous_membership->set_gateway_subscription_id( '' );
+		}
+
+		$previous_membership->add_note(
+			\sprintf(
+				/* translators: 1: Pronamic Pay subscription ID, 2: new Restrict Content Pro membership ID */
+				\__( 'Pronamic Pay subscription %1$s moved to membership %2$s.', 'pronamic_ideal' ),
+				$subscription_id,
+				$membership->get_id()
+			)
+		);
+
+		// Connect the new membership.
+		$gateway_customer_id = $previous_membership->get_gateway_customer_id();
+
+		if ( '' !== $gateway_customer_id ) {
+			$membership->set_gateway_customer_id( $gateway_customer_id );
+		}
+
+		$membership->set_gateway_subscription_id( $subscription_id );
+
+		$membership->add_note(
+			\sprintf(
+				/* translators: 1: Pronamic Pay subscription ID, 2: previous Restrict Content Pro membership ID */
+				\__( 'Pronamic Pay subscription %1$s moved from membership %2$s.', 'pronamic_ideal' ),
+				$subscription_id,
+				$previous_membership->get_id()
+			)
+		);
+
+		return true;
 	}
 
 	/**

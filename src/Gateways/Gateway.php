@@ -15,6 +15,7 @@ use Pronamic\WordPress\Pay\Core\Gateway as PronamicGateway;
 use Pronamic\WordPress\Pay\Core\PaymentMethods;
 use Pronamic\WordPress\Pay\Extensions\RestrictContent\Util;
 use Pronamic\WordPress\Pay\Plugin;
+use RCP_Membership;
 use RCP_Payment_Gateway;
 
 /**
@@ -81,6 +82,41 @@ class Gateway extends RCP_Payment_Gateway {
 				];
 			}
 		}
+	}
+
+	/**
+	 * Change the price of the subscription of a membership.
+	 *
+	 * Restrict Content Pro only stores the new recurring amount in the membership
+	 * if this function returns `true`. The Pronamic Pay subscription is updated
+	 * from the membership after the membership has been updated.
+	 *
+	 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/19
+	 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/memberships/class-rcp-membership.php#L3353
+	 * @see \Pronamic\WordPress\Pay\Extensions\RestrictContent\Extension::rcp_after_membership_admin_update()
+	 * @param RCP_Membership $membership Membership object.
+	 * @param float          $new_price  New price.
+	 * @return true
+	 */
+	public function change_membership_subscription_price( $membership, $new_price ) {
+		return true;
+	}
+
+	/**
+	 * Change the next bill date of a membership.
+	 *
+	 * The Pronamic Pay subscription is updated from the membership after the
+	 * membership has been updated.
+	 *
+	 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/17
+	 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/memberships/class-rcp-membership.php#L3489
+	 * @see \Pronamic\WordPress\Pay\Extensions\RestrictContent\Extension::rcp_after_membership_admin_update()
+	 * @param RCP_Membership $membership     Membership object.
+	 * @param string         $next_bill_date Next bill date in MySQL format.
+	 * @return true
+	 */
+	public function change_next_bill_date( $membership, $next_bill_date ) {
+		return true;
 	}
 
 	/**

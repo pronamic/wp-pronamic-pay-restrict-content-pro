@@ -23,14 +23,14 @@ $pronamic_payment_id = (string) \rcp_get_payment_meta( $payment->id, '_pronamic_
 
 <tr>
 	<th scope="row" class="row-title">
-		<?php esc_html_e( 'Pronamic Pay Payments', 'pronamic_ideal' ); ?>
+		<?php esc_html_e( 'Pronamic Pay Payments', 'pronamic-pay-restrict-content' ); ?>
 	</th>
 	<td>
 		<table class="pronamic-pay-payments-table wp-list-table widefat striped table-view-list">
 			<thead>
 				<tr>
-					<th scope="col"><?php esc_html_e( 'ID', 'pronamic_ideal' ); ?></th>
-					<th scope="col"><?php esc_html_e( 'Last', 'pronamic_ideal' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'ID', 'pronamic-pay-restrict-content' ); ?></th>
+					<th scope="col"><?php esc_html_e( 'Last', 'pronamic-pay-restrict-content' ); ?></th>
 				</tr>
 			</thead>
 
@@ -71,7 +71,7 @@ $pronamic_payment_id = (string) \rcp_get_payment_meta( $payment->id, '_pronamic_
 
 					<tr>
 						<td colspan="2">
-							<?php esc_html_e( 'No payments found.', 'pronamic_ideal' ); ?>
+							<?php esc_html_e( 'No payments found.', 'pronamic-pay-restrict-content' ); ?>
 						</td>
 					</tr>
 

@@ -155,7 +155,7 @@ class Gateway extends RCP_Payment_Gateway {
 		if ( $charge_now ) {
 			return new \WP_Error(
 				'pronamic_pay_charge_now_not_supported',
-				\__( 'Creating a subscription with an immediate charge is not supported.', 'pronamic_ideal' )
+				\__( 'Creating a subscription with an immediate charge is not supported.', 'pronamic-pay-restrict-content' )
 			);
 		}
 
@@ -167,7 +167,7 @@ class Gateway extends RCP_Payment_Gateway {
 		if ( MembershipStatus::ACTIVE !== $membership->get_status() ) {
 			return new \WP_Error(
 				'pronamic_pay_membership_not_active',
-				\__( 'The membership is not active.', 'pronamic_ideal' )
+				\__( 'The membership is not active.', 'pronamic-pay-restrict-content' )
 			);
 		}
 
@@ -176,7 +176,7 @@ class Gateway extends RCP_Payment_Gateway {
 		if ( false === $previous_membership ) {
 			return new \WP_Error(
 				'pronamic_pay_no_previous_membership',
-				\__( 'The membership is not changed from a previous membership.', 'pronamic_ideal' )
+				\__( 'The membership is not changed from a previous membership.', 'pronamic-pay-restrict-content' )
 			);
 		}
 
@@ -187,7 +187,7 @@ class Gateway extends RCP_Payment_Gateway {
 		if ( null === $subscription ) {
 			return new \WP_Error(
 				'pronamic_pay_no_subscription',
-				\__( 'The previous membership has no Pronamic Pay subscription.', 'pronamic_ideal' )
+				\__( 'The previous membership has no Pronamic Pay subscription.', 'pronamic-pay-restrict-content' )
 			);
 		}
 
@@ -213,7 +213,7 @@ class Gateway extends RCP_Payment_Gateway {
 		$subscription->add_note(
 			\sprintf(
 				/* translators: 1: previous Restrict Content Pro membership ID, 2: new Restrict Content Pro membership ID */
-				\__( 'Subscription moved from Restrict Content Pro membership %1$s to membership %2$s because the membership level was changed.', 'pronamic_ideal' ),
+				\__( 'Subscription moved from Restrict Content Pro membership %1$s to membership %2$s because the membership level was changed.', 'pronamic-pay-restrict-content' ),
 				$previous_membership->get_id(),
 				$membership->get_id()
 			)
@@ -236,7 +236,7 @@ class Gateway extends RCP_Payment_Gateway {
 		$previous_membership->add_note(
 			\sprintf(
 				/* translators: 1: Pronamic Pay subscription ID, 2: new Restrict Content Pro membership ID */
-				\__( 'Pronamic Pay subscription %1$s moved to membership %2$s.', 'pronamic_ideal' ),
+				\__( 'Pronamic Pay subscription %1$s moved to membership %2$s.', 'pronamic-pay-restrict-content' ),
 				$subscription_id,
 				$membership->get_id()
 			)
@@ -254,7 +254,7 @@ class Gateway extends RCP_Payment_Gateway {
 		$membership->add_note(
 			\sprintf(
 				/* translators: 1: Pronamic Pay subscription ID, 2: previous Restrict Content Pro membership ID */
-				\__( 'Pronamic Pay subscription %1$s moved from membership %2$s.', 'pronamic_ideal' ),
+				\__( 'Pronamic Pay subscription %1$s moved from membership %2$s.', 'pronamic-pay-restrict-content' ),
 				$subscription_id,
 				$previous_membership->get_id()
 			)
@@ -327,7 +327,7 @@ class Gateway extends RCP_Payment_Gateway {
 	public function get_label() {
 		global $rcp_options;
 
-		$label = (string) PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic_ideal' ) );
+		$label = (string) PaymentMethods::get_name( $this->payment_method, __( 'Pronamic', 'pronamic-pay-restrict-content' ) );
 
 		// Check options.
 		if ( ! \is_array( $rcp_options ) ) {
@@ -354,7 +354,7 @@ class Gateway extends RCP_Payment_Gateway {
 	public function get_admin_label() {
 		return \sprintf(
 			'%s - %s',
-			\__( 'Pronamic', 'pronamic_ideal' ),
+			\__( 'Pronamic', 'pronamic-pay-restrict-content' ),
 			PaymentMethods::get_name( $this->payment_method )
 		);
 	}
@@ -382,7 +382,7 @@ class Gateway extends RCP_Payment_Gateway {
 						esc_html(
 							sprintf(
 								/* translators: %s: admin label */
-								__( '%s Settings', 'pronamic_ideal' ),
+								__( '%s Settings', 'pronamic-pay-restrict-content' ),
 								$this->get_admin_label()
 							)
 						)
@@ -394,18 +394,18 @@ class Gateway extends RCP_Payment_Gateway {
 
 			<tr>
 				<th>
-					<label for="rcp_settings[<?php echo esc_attr( $this->id . '_label' ); ?>]"><?php esc_html_e( 'Checkout label', 'pronamic_ideal' ); ?></label>
+					<label for="rcp_settings[<?php echo esc_attr( $this->id . '_label' ); ?>]"><?php esc_html_e( 'Checkout label', 'pronamic-pay-restrict-content' ); ?></label>
 				</th>
 				<td>
 					<input class="regular-text" id="rcp_settings[<?php echo esc_attr( $label_option ); ?>]" style="width: 300px;" name="rcp_settings[<?php echo esc_attr( $label_option ); ?>]" value="<?php echo esc_attr( $this->get_label() ); ?>"/>
 
-					<p class="description"><?php esc_html_e( 'Enter a label to display at checkout.', 'pronamic_ideal' ); ?></p>
+					<p class="description"><?php esc_html_e( 'Enter a label to display at checkout.', 'pronamic-pay-restrict-content' ); ?></p>
 				</td>
 			</tr>
 
 			<tr>
 				<th>
-					<label for="rcp_settings[<?php echo esc_attr( $config_option ); ?>]"><?php esc_html_e( 'Gateway Configuration', 'pronamic_ideal' ); ?></label>
+					<label for="rcp_settings[<?php echo esc_attr( $config_option ); ?>]"><?php esc_html_e( 'Gateway Configuration', 'pronamic-pay-restrict-content' ); ?></label>
 				</th>
 				<td>
 					<?php
@@ -420,7 +420,7 @@ class Gateway extends RCP_Payment_Gateway {
 
 					?>
 
-					<p class="description"><?php esc_html_e( 'Choose your configuration.', 'pronamic_ideal' ); ?></p>
+					<p class="description"><?php esc_html_e( 'Choose your configuration.', 'pronamic-pay-restrict-content' ); ?></p>
 				</td>
 			</tr>
 		</table>
@@ -497,7 +497,7 @@ class Gateway extends RCP_Payment_Gateway {
 
 			\wp_die(
 				\esc_html( Plugin::get_default_error_message() ),
-				\esc_html__( 'Payment Error', 'pronamic_ideal' ),
+				\esc_html__( 'Payment Error', 'pronamic-pay-restrict-content' ),
 				[ 'response' => 401 ]
 			);
 		}
@@ -520,11 +520,11 @@ class Gateway extends RCP_Payment_Gateway {
 				\esc_html(
 					\sprintf(
 						/* translators: %s: JSON encoded payment data */
-						__( 'Payment creation failed before sending buyer to the payment provider. Error: %s', 'pronamic_ideal' ),
+						__( 'Payment creation failed before sending buyer to the payment provider. Error: %s', 'pronamic-pay-restrict-content' ),
 						$e->getMessage()
 					)
 				),
-				\esc_html__( 'Payment Error', 'pronamic_ideal' ),
+				\esc_html__( 'Payment Error', 'pronamic-pay-restrict-content' ),
 				[ 'response' => 401 ]
 			);
 		}

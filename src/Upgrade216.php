@@ -359,7 +359,7 @@ class Upgrade216 extends Upgrade {
 					$subscription->add_note(
 						\sprintf(
 							/* translators: %s: Potential WordPress user ID. */
-							__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. Unfortunately, this subscription could not be linked to a Restrict Content Pro membership based on the source ID %s. That is why this subscription has been put on hold so that it can be corrected manually.', 'pronamic_ideal' ),
+							__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. Unfortunately, this subscription could not be linked to a Restrict Content Pro membership based on the source ID %s. That is why this subscription has been put on hold so that it can be corrected manually.', 'pronamic-pay-restrict-content' ),
 							$subscription_source_id
 						)
 					);
@@ -386,7 +386,7 @@ class Upgrade216 extends Upgrade {
 				$subscription->add_note(
 					\sprintf(
 						/* translators: 1: Old source, 2: Old source ID, 3: New source, 4: New source ID. */
-						__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. That\'s why source "%1$s" with ID "%2$s" was updated to source "%3$s" with ID "%4$s".', 'pronamic_ideal' ),
+						__( 'Since Restrict Content Pro 3 a subscription must be linked to a Restrict Content Pro membership. That\'s why source "%1$s" with ID "%2$s" was updated to source "%3$s" with ID "%4$s".', 'pronamic-pay-restrict-content' ),
 						$subscription_source,
 						$subscription_source_id,
 						'rcp_membership',
@@ -488,7 +488,7 @@ class Upgrade216 extends Upgrade {
 			$payment->add_note(
 				\sprintf(
 					/* translators: 1: Old source, 2: Old source ID, 3: New source, 4: New source ID. */
-					__( 'Since Restrict Content Pro 3 a payment must be linked to a Restrict Content Pro payment. That\'s why source "%1$s" with ID "%2$s" was updated to source "%3$s" with ID %4$s".', 'pronamic_ideal' ),
+					__( 'Since Restrict Content Pro 3 a payment must be linked to a Restrict Content Pro payment. That\'s why source "%1$s" with ID "%2$s" was updated to source "%3$s" with ID %4$s".', 'pronamic-pay-restrict-content' ),
 					$payment_source,
 					$payment_source_id,
 					'rcp_payment',

@@ -540,32 +540,32 @@ class Extension extends AbstractPluginIntegration {
 			case MembershipStatus::ACTIVE:
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription activated by %s.', 'pronamic_ideal' ),
-					__( 'Restrict Content Pro', 'pronamic_ideal' )
+					__( 'Subscription activated by %s.', 'pronamic-pay-restrict-content' ),
+					__( 'Restrict Content Pro', 'pronamic-pay-restrict-content' )
 				);
 
 				break;
 			case MembershipStatus::CANCELLED:
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription canceled by %s.', 'pronamic_ideal' ),
-					__( 'Restrict Content Pro', 'pronamic_ideal' )
+					__( 'Subscription canceled by %s.', 'pronamic-pay-restrict-content' ),
+					__( 'Restrict Content Pro', 'pronamic-pay-restrict-content' )
 				);
 
 				break;
 			case MembershipStatus::EXPIRED:
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription expired by %s.', 'pronamic_ideal' ),
-					__( 'Restrict Content Pro', 'pronamic_ideal' )
+					__( 'Subscription expired by %s.', 'pronamic-pay-restrict-content' ),
+					__( 'Restrict Content Pro', 'pronamic-pay-restrict-content' )
 				);
 
 				break;
 			case MembershipStatus::PENDING:
 				$note = sprintf(
 					/* translators: %s: Restrict Content Pro */
-					__( 'Subscription pending by %s.', 'pronamic_ideal' ),
-					__( 'Restrict Content Pro', 'pronamic_ideal' )
+					__( 'Subscription pending by %s.', 'pronamic-pay-restrict-content' ),
+					__( 'Restrict Content Pro', 'pronamic-pay-restrict-content' )
 				);
 
 				break;
@@ -668,8 +668,8 @@ class Extension extends AbstractPluginIntegration {
 		$action = \sprintf(
 			'<a href="%1$s" title="%2$s"><button type="button">%3$s</button></a>',
 			\esc_url( $subscription->get_mandate_selection_url() ),
-			\esc_attr( \__( 'Update payment method', 'pronamic_ideal' ) ),
-			\esc_html( \__( 'Update payment method', 'pronamic_ideal' ) )
+			\esc_attr( \__( 'Update payment method', 'pronamic-pay-restrict-content' ) ),
+			\esc_html( \__( 'Update payment method', 'pronamic-pay-restrict-content' ) )
 		);
 
 		$actions = \sprintf( '%s<br/>%s', $action, $actions );
@@ -743,7 +743,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @return string $text
 	 */
 	public function payment_source_text( $text, Payment $payment ) {
-		$text = __( 'Restrict Content Pro', 'pronamic_ideal' ) . '<br />';
+		$text = __( 'Restrict Content Pro', 'pronamic-pay-restrict-content' ) . '<br />';
 
 		$source_url = add_query_arg(
 			[
@@ -758,7 +758,7 @@ class Extension extends AbstractPluginIntegration {
 			'<a href="%s">%s</a>',
 			esc_url( $source_url ),
 			/* translators: %s: payment number */
-			sprintf( __( 'Payment %s', 'pronamic_ideal' ), $payment->source_id )
+			sprintf( __( 'Payment %s', 'pronamic-pay-restrict-content' ), $payment->source_id )
 		);
 
 		return $text;
@@ -776,7 +776,7 @@ class Extension extends AbstractPluginIntegration {
 	 */
 	public function payment_source_description( $description, Payment $payment ) {
 		return match ( $payment->source ) {
-			'rcp_payment' => __( 'Restrict Content Pro Payment', 'pronamic_ideal' ),
+			'rcp_payment' => __( 'Restrict Content Pro Payment', 'pronamic-pay-restrict-content' ),
 			default => $description,
 		};
 	}
@@ -815,7 +815,7 @@ class Extension extends AbstractPluginIntegration {
 	 */
 	public function subscription_source_description( $description, Subscription $subscription ) {
 		return match ( $subscription->get_source() ) {
-			'rcp_membership' => __( 'Restrict Content Pro Membership', 'pronamic_ideal' ),
+			'rcp_membership' => __( 'Restrict Content Pro Membership', 'pronamic-pay-restrict-content' ),
 			default => $description,
 		};
 	}
@@ -829,7 +829,7 @@ class Extension extends AbstractPluginIntegration {
 	 * @return string $text
 	 */
 	public function subscription_source_text( $text, Subscription $subscription ) {
-		$text = __( 'Restrict Content Pro', 'pronamic_ideal' ) . '<br />';
+		$text = __( 'Restrict Content Pro', 'pronamic-pay-restrict-content' ) . '<br />';
 
 		$source_url = add_query_arg(
 			[
@@ -844,7 +844,7 @@ class Extension extends AbstractPluginIntegration {
 			'<a href="%s">%s</a>',
 			esc_url( $source_url ),
 			/* translators: %s: source id */
-			sprintf( __( 'Membership %s', 'pronamic_ideal' ), $subscription->get_source_id() )
+			sprintf( __( 'Membership %s', 'pronamic-pay-restrict-content' ), $subscription->get_source_id() )
 		);
 
 		return $text;

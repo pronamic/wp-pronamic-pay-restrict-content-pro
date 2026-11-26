@@ -48,7 +48,7 @@ class Util {
 
 		$payment->title = sprintf(
 			/* translators: %s: Restrict Content Pro payment ID */
-			__( 'Restrict Content Pro payment %s', 'pronamic_ideal' ),
+			__( 'Restrict Content Pro payment %s', 'pronamic-pay-restrict-content' ),
 			$gateway->payment->id
 		);
 
@@ -202,7 +202,7 @@ class Util {
 			$line->set_sku( null );
 			$line->set_type( PaymentLineType::DIGITAL );
 			/* translators: %s: Subscription name */
-			$line->set_name( \sprintf( \__( 'Trial "%s"', 'pronamic_ideal' ), $gateway->subscription_name ) );
+			$line->set_name( \sprintf( \__( 'Trial "%s"', 'pronamic-pay-restrict-content' ), $gateway->subscription_name ) );
 			$line->set_quantity( new Number( 1 ) );
 			$line->set_unit_price( new Money( 0, $gateway->currency ) );
 			$line->set_total_amount( new Money( 0, $gateway->currency ) );
@@ -231,12 +231,12 @@ class Util {
 		if ( $gateway->discount ) {
 			$line = $lines->new_line();
 
-			$name = \__( 'Discount', 'pronamic_ideal' );
+			$name = \__( 'Discount', 'pronamic-pay-restrict-content' );
 
 			if ( \property_exists( $gateway, 'discount_code' ) ) {
 				$name = \sprintf(
 					/* translators: %s: Restrict Content Pro discount code */
-					__( 'Discount code `%s`', 'pronamic_ideal' ),
+					__( 'Discount code `%s`', 'pronamic-pay-restrict-content' ),
 					$gateway->discount_code
 				);
 			}
@@ -260,7 +260,7 @@ class Util {
 			$line->set_id( null );
 			$line->set_sku( null );
 			$line->set_type( PaymentLineType::FEE );
-			$line->set_name( __( 'Fees', 'pronamic_ideal' ) );
+			$line->set_name( __( 'Fees', 'pronamic-pay-restrict-content' ) );
 			$line->set_quantity( new Number( 1 ) );
 			$line->set_unit_price( new Money( $gateway->payment->fees, $gateway->currency ) );
 			$line->set_total_amount( new Money( $gateway->payment->fees, $gateway->currency ) );
@@ -284,7 +284,7 @@ class Util {
 			$line->set_id( null );
 			$line->set_sku( null );
 			$line->set_type( PaymentLineType::DISCOUNT );
-			$line->set_name( \__( 'Credits', 'pronamic_ideal' ) );
+			$line->set_name( \__( 'Credits', 'pronamic-pay-restrict-content' ) );
 			$line->set_quantity( new Number( 1 ) );
 			$line->set_unit_price( $price );
 			$line->set_total_amount( $price );

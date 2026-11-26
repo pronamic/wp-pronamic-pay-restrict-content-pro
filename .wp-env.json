@@ -1,4 +1,8 @@
 {
+	"config": {
+		"JETPACK_AUTOLOAD_DEV": true,
+		"PRONAMIC_PAY_DEBUG": true
+	},
 	"core": null,
 	"plugins": [
 		"pronamic/wp-env-quick-login",
@@ -13,10 +17,6 @@
 	"mappings": {
 		"wp-content/plugins/pronamic-pay-restrict-content-dev": ".",
 		"wp-content/plugins/pronamic-pay-restrict-content": "./build/pronamic-pay-restrict-content/"
-	},
-	"config": {
-		"JETPACK_AUTOLOAD_DEV": true,
-		"PRONAMIC_PAY_DEBUG": true
 	},
 	"testsEnvironment": false
 }

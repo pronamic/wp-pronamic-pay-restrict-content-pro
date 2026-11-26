@@ -6,9 +6,14 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+### Added
+
+- Added support for the Restrict Content Pro "Change Level" feature: the Pronamic Pay subscription, including the payment mandate, is moved to the new membership and updated to the new membership level. [#2](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/2)
+
 ### Fixed
 
 - Fixed changing the recurring amount of a membership in the Restrict Content Pro admin, the new amount was not stored. [#19](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/19)
+
 - Fixed incorrect period of the first payment when an existing membership is renewed with auto renewal, which resulted in a second payment on the old expiration date. [#28](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/28)
 
 ## [4.11.1] - 2026-11-02

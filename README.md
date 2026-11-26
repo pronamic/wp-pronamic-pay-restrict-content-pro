@@ -27,15 +27,29 @@ Pronamic Pay subscription:
 #### Edit "Membership Level"
 
 When you change the "Membership Level" of a Restrict Content Pro membership the
-connected Pronamic Pay subscription will be cancelled. If you click the 
-Restrict Content Pro "Change Level" button you will see a confirmation modal
-dialog with the following text:
+connected Pronamic Pay subscription will be moved to the new membership. If you
+click the Restrict Content Pro "Change Level" button you will see a confirmation
+modal dialog with the following text:
 
-> Are you sure you want to change the membership level? The subscription will be cancelled at the payment gateway and this customer will not be automatically billed again. 
+> Are you sure you want to change the membership level? The subscription price at the payment gateway will be updated to match the price and duration of the new membership level.
 
 If you confirm by selecting OK Restrict Content Pro will create a new membership.
-The other Restrict Content Pro membership will be marked as `disabled`. The new
-Restrict Content Pro membership will not be connected to a Pronamic Pay subscription.
+The other Restrict Content Pro membership will be marked as `disabled`. For an
+active membership with auto renew the Pronamic Pay subscription, including the
+payment mandate, is moved to the new membership and updated to the price and
+duration of the new membership level.
+
+Good to know:
+
+- The customer is not charged at the moment of the change. The first payment for
+  the new membership level is due at the expiration date of the new membership.
+- Restrict Content Pro calculates the expiration date of the new membership from
+  the moment of the change. You can edit the expiration date afterwards.
+- Restrict Content Pro sends the cancellation email for the previous membership.
+- The customer does not explicitly agree to the new price, inform your customers
+  to prevent chargebacks.
+- A membership without auto renew, or a membership that is not active, will not
+  be connected to a Pronamic Pay subscription after the change.
 
 #### Edit "Membership Status"
 

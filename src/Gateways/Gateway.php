@@ -51,6 +51,18 @@ class Gateway extends RCP_Payment_Gateway {
 			if ( null !== $payment_method && $payment_method->supports( 'recurring' ) ) {
 				$this->supports = [
 					/**
+					 * Expiration extension on renewals.
+					 *
+					 * Without this feature Restrict Content Pro calculates the new expiration
+					 * date of a renewed auto renewing membership from today, instead of from
+					 * the current expiration date. The subscription period of the renewal
+					 * payment starts at the current expiration date.
+					 *
+					 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/28
+					 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/memberships/class-rcp-membership.php#L2075
+					 */
+					'expiration-extension-on-renewals',
+					/**
 					 * Price changes.
 					 *
 					 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/19

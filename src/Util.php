@@ -10,6 +10,7 @@
 
 namespace Pronamic\WordPress\Pay\Extensions\RestrictContent;
 
+use Pronamic\WordPress\DateTime\DateTimeImmutable;
 use Pronamic\WordPress\Money\Money;
 use Pronamic\WordPress\Number\Number;
 use Pronamic\WordPress\Pay\Customer;
@@ -75,7 +76,7 @@ class Util {
 		if ( null !== $subscription ) {
 			$payment->add_subscription( $subscription );
 
-			$start_date = $subscription->get_start_date();
+			$start_date = self::get_first_period_start_date( $gateway, $subscription );
 
 			if ( null !== $start_date ) {
 				$period = $subscription->get_period_for_date( $start_date );
@@ -100,6 +101,42 @@ class Util {
 		$payment->set_total_amount( $amount );
 
 		return $payment;
+	}
+
+	/**
+	 * Get the start date of the period the first payment of a registration pays for.
+	 *
+	 * Restrict Content Pro reuses the existing membership for renewals, for example
+	 * when a member switches from manual to automatic renewal. The subscription start
+	 * date is then the original membership creation date, a period that was paid long ago:
+	 *
+	 * - New, upgraded and downgraded memberships are created during registration,
+	 *   the first payment pays for the period from the subscription start date.
+	 * - Renewal of an active membership: the expiration date has not been extended yet,
+	 *   the payment pays for the period from the current expiration date, which is the
+	 *   subscription next payment date.
+	 * - Renewal of an inactive membership: Restrict Content Pro has already set the
+	 *   expiration date to one membership duration from now, the payment pays for the
+	 *   period from now.
+	 *
+	 * @link https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/28
+	 * @link https://plugins.trac.wordpress.org/browser/restrict-content/tags/3.2.10/core/includes/registration-functions.php#L378
+	 * @param RCP_Payment_Gateway $gateway      Restrict Content Pro gateway object.
+	 * @param Subscription        $subscription Subscription.
+	 * @return DateTimeImmutable|null
+	 */
+	private static function get_first_period_start_date( $gateway, Subscription $subscription ) {
+		$is_renewal = \property_exists( $gateway->payment, 'transaction_type' ) && 'renewal' === $gateway->payment->transaction_type;
+
+		if ( ! $is_renewal ) {
+			return $subscription->get_start_date();
+		}
+
+		if ( $gateway->membership->is_active() ) {
+			return $subscription->get_next_payment_date();
+		}
+
+		return new DateTimeImmutable();
 	}
 
 	/**

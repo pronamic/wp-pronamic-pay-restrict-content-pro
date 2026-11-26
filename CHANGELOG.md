@@ -6,6 +6,10 @@ This projects adheres to [Semantic Versioning](http://semver.org/) and [Keep a C
 
 ## [Unreleased][unreleased]
 
+### Fixed
+
+- Fixed incorrect period of the first payment when an existing membership is renewed with auto renewal, which resulted in a second payment on the old expiration date. [#28](https://github.com/pronamic/wp-pronamic-pay-restrict-content-pro/issues/28)
+
 ## [4.11.1] - 2026-11-02
 
 ### Composer
